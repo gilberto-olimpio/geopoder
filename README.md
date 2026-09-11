@@ -1,192 +1,159 @@
-# GeoPoder — Alpha 2.0a (Supabase Multiplayer)
+# GeoPoder — Alpha 2.0a.1
 
-Este pacote é a **primeira entrega da Alpha 2**. Ele migra o GeoPoder de um jogo local para uma arquitetura multiplayer com **4 equipes obrigatórias**, cada uma em seu próprio aparelho, e inicia a coleta de telemetria de playtest.
+Esta atualização adiciona uma **Área do Professor protegida por conta autorizada**, um **Dashboard** e um **Histórico de partidas/playtests** com exportação em Markdown, CSV e JSON.
 
-## O que já funciona nesta etapa
+> Esta versão ainda é a infraestrutura anterior ao motor 2.0b. Ela não adiciona Eventos/turnos jogáveis. O objetivo é proteger o acesso docente e começar a armazenar/consultar o histórico antes dos playtests completos.
 
-- criação de sala pelo professor;
-- código curto de sala (`GEO-XXXX`);
-- entrada de exatamente quatro equipes;
-- assentos fixos: Aurora, Montária, Pacífica e Solária;
-- nome de equipe associado ao país;
-- autenticação anônima do Supabase para cada aparelho;
-- reconexão no mesmo aparelho após recarregar a página;
-- estado público sincronizado por Supabase Realtime;
-- mãos privadas: cada jogador recebe somente a própria mão; o professor pode ver todas;
-- inicialização do baralho, mãos, ordem de turno, 8 Eventos e 4 Desafios no servidor;
-- banco preparado para estado autoritativo do servidor;
-- telemetria desde a criação da sala;
-- painel do professor com exportação em **Markdown, CSV e JSON**;
-- campo de notas do professor integrado à telemetria.
+## O que muda
 
-## O que entra na etapa Alpha 2.0b
-
-- migração do motor completo de cartas para a Edge Function;
-- Eventos e escolhas simultâneas;
-- Desafios Geográficos simultâneos;
-- cronômetros do servidor;
-- dados globais;
-- Reações;
-- Diplomacia entre aparelhos;
-- Acordos Comerciais e Blocos;
-- perdas redirecionadas quando atributo = 0;
-- log curto de resultado em cada tela;
-- telemetria detalhada de cartas jogadas/descartadas, questões, acertos, tempo de resposta, dados, negociações e atributos.
+- As equipes continuam entrando anonimamente por código de sala.
+- O professor passa a entrar com **e-mail e senha** do Supabase Auth.
+- Ter uma conta no Supabase não basta: o usuário também precisa estar em `gp_teacher_profiles` com `is_active = true`.
+- Somente professores autorizados podem criar salas, iniciar partidas, ver mãos de todas as equipes, registrar notas e consultar histórico.
+- O painel do professor mostra salas abertas e partidas anteriores.
+- Partidas podem ser marcadas como **interrompidas** sem perder a telemetria.
+- Cada partida passa a registrar `game_version` e `rules_version`.
+- O relatório histórico já está preparado para consolidar futuramente `QUESTION_ANSWERED`, `CARD_PLAYED`, `CARD_DISCARDED`, `CARD_NO_VALID_TARGET` etc.
 
 ---
 
-# Instalação no Supabase
+# Atualização a partir da Alpha 2.0a atual
 
-## 1. Ative login anônimo
+## 1. NÃO substitua seu `config.js`
 
-No Dashboard do Supabase, habilite **Anonymous Sign-Ins** em Authentication.
+Seu `config.js` do GitHub já contém a URL e a publishable key corretas. **Mantenha esse arquivo como está.**
 
-Os jogadores não precisam criar conta: cada aparelho recebe uma identidade temporária persistida no navegador.
+Neste pacote existe apenas `config.example.js` como referência.
 
-## 2. Crie o banco
+## 2. Execute a migration 002
 
-Abra **SQL Editor** e execute:
+No Supabase, abra **SQL Editor** e execute:
 
-`supabase/migrations/001_geopoder_alpha2.sql`
+`supabase/migrations/002_geopoder_alpha2_0a1_teacher_area.sql`
 
-Ele cria:
+Ela cria a tabela de professores e acrescenta os campos de histórico/versionamento.
 
-- `gp_rooms`
-- `gp_room_players`
-- `gp_matches`
-- `gp_player_private_state`
-- `gp_server_match_state`
-- `gp_telemetry_events`
+## 3. Crie sua conta de professor
 
-Também cria RLS, funções auxiliares de autorização e adiciona as tabelas necessárias ao Realtime.
+No Supabase:
 
-## 3. Crie a Edge Function `game-api`
+**Authentication → Users → Add user**
 
-No Dashboard, vá a **Edge Functions** e crie uma função chamada:
+Crie um usuário com seu e-mail e uma senha forte. Não use login anônimo para o professor.
 
-`game-api`
-
-Cole o conteúdo de:
-
-`supabase/functions/game-api/index.ts`
-
-A função deve exigir JWT. O arquivo `supabase/config.toml` já contém a configuração equivalente para uso pela CLI.
-
-### Se usar CLI
-
-Na raiz deste pacote:
-
-```bash
-supabase functions deploy game-api
-```
-
-Não coloque secret key no frontend. A Edge Function usa as chaves secretas do próprio ambiente Supabase.
-
-## 4. Configure o frontend
-
-No diretório `web/`, edite `config.js`:
-
-```js
-window.GEOPOWER_CONFIG = {
-  SUPABASE_URL: 'https://SEU-PROJETO.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_...'
-};
-```
-
-Use a **publishable key**, não a secret key.
-
-## 5. Publique o diretório `web/`
-
-Pode ser hospedado em qualquer serviço de arquivos estáticos, por exemplo GitHub Pages, Netlify ou Vercel.
-
-Para teste local, use um servidor HTTP simples. Exemplo com Python:
-
-```bash
-cd web
-python -m http.server 8080
-```
+## 4. Autorize essa conta no GeoPoder
 
 Abra:
 
-`http://localhost:8080`
+`supabase/migrations/003_authorize_teacher_TEMPLATE.sql`
+
+Substitua:
+
+- `SEU NOME`
+- `SEU_EMAIL@EXEMPLO.COM`
+
+pelo seu nome e pelo MESMO e-mail criado em Authentication.
+
+Execute o SQL no SQL Editor. A consulta final deve retornar exatamente uma linha com `is_active = true`.
+
+## 5. Opcional: assumir as salas antigas da Alpha 2.0a
+
+As salas de teste que você criou anteriormente pertencem ao usuário anônimo usado pela versão antiga. Se quiser que elas apareçam no novo histórico, há um script opcional:
+
+`004_adopt_legacy_rooms_OPTIONAL.sql`
+
+**Atenção:** o modelo fornecido transfere todas as salas atuais para o e-mail indicado. Só use agora se este projeto Supabase contém apenas seus próprios testes.
+
+## 6. Atualize a Edge Function `game-api`
+
+Supabase:
+
+**Edge Functions → game-api → Code**
+
+Substitua TODO o código pelo arquivo:
+
+`supabase/functions/game-api/index.ts`
+
+Depois clique em **Deploy** e aguarde a publicação terminar.
+
+## 7. Atualize o frontend no GitHub
+
+No repositório publicado pelo GitHub Pages, substitua apenas:
+
+- `index.html`
+- `app.js`
+- `styles.css`
+
+pelos arquivos da pasta `web/` deste pacote.
+
+**Não sobrescreva o seu `config.js` configurado.**
+
+O repositório publicado deve continuar assim:
+
+```text
+index.html
+app.js
+styles.css
+config.js   ← seu arquivo atual, já configurado
+```
+
+## 8. Aguarde o GitHub Pages publicar
+
+Em **Actions**, aguarde o deploy ficar verde. Depois abra o site com `Ctrl + F5` ou em janela anônima.
 
 ---
 
-# Teste mínimo da Alpha 2.0a
+# Primeiro teste da 2.0a.1
 
-1. Abra o jogo em um aparelho do professor.
-2. Crie uma sala e anote o código.
-3. Abra o mesmo endereço em quatro navegadores/aparelhos diferentes.
-4. Em cada um, use o código e ocupe um país diferente.
-5. O professor deve ver as quatro equipes aparecerem quase imediatamente.
-6. Clique em **Iniciar partida**.
-7. Cada jogador deve ver:
-   - os atributos públicos dos quatro países;
-   - somente a própria mão;
-   - o país ativo e a fase atual.
-8. O professor deve ver a telemetria e poder exportar o relatório.
-9. Atualize a página de um jogador. Ele deve voltar à mesma sala e manter seu país/mão.
-
----
-
-# Telemetria planejada
-
-A tabela `gp_telemetry_events` usa um formato de eventos. Isso permite ampliar relatórios sem redesenhar o banco.
-
-Exemplos futuros:
-
-- `QUESTION_ANSWERED`
-- `CARD_DRAWN`
-- `CARD_PLAYED`
-- `CARD_DISCARDED`
-- `CARD_TRADED`
-- `CARD_RENEWED`
-- `CARD_NO_VALID_TARGET`
-- `ATTRIBUTE_CHANGED`
-- `DIE_ROLLED`
-- `ADVANTAGE_USED`
-- `AGREEMENT_PROPOSED`
-- `AGREEMENT_ACCEPTED`
-- `AGREEMENT_REJECTED`
-- `BLOCK_FORMED`
-- `BLOCK_BROKEN`
-- `REACTION_USED`
-- `TURN_STARTED`
-- `FIRST_INTERACTION`
-- `TURN_FINISHED`
-- `TURN_EXPIRED`
-- `MATCH_FINISHED`
-- `PLAYER_FEEDBACK`
-
-O relatório Markdown foi pensado para ser enviado diretamente ao ChatGPT durante os playtests.
+1. Abra o site.
+2. Clique em **Área do Professor**.
+3. Faça login com o e-mail/senha criados no Supabase.
+4. O sistema deve abrir o **Painel do Professor**.
+5. Crie uma sala de teste.
+6. Abra quatro navegadores/aparelhos e entre como Aurora, Montária, Pacífica e Solária.
+7. Volte ao painel do professor e verifique se a sala aparece em **Salas abertas**.
+8. Abra a sala e inicie a partida.
+9. Registre uma nota de playtest.
+10. Marque a sessão como interrompida.
+11. Volte ao Dashboard. Ela deve aparecer em **Partidas anteriores**.
+12. Abra **Relatório** e teste as exportações Markdown, CSV e JSON.
 
 ---
 
 # Segurança
 
-- O navegador usa apenas a **publishable key**.
-- Nenhum navegador recebe `gp_server_match_state`.
-- Jogadores não possuem permissão de escrita direta nas tabelas do jogo.
-- Mudanças passam pela Edge Function.
-- RLS limita a leitura da mão privada ao próprio jogador e ao professor.
-- A telemetria completa fica visível apenas para o professor da sala.
+O botão de Professor não concede privilégios. A Edge Function verifica `gp_teacher_profiles` antes de:
 
-## Estrutura do pacote
+- criar sala;
+- iniciar partida;
+- consultar histórico;
+- acessar telemetria;
+- ver todas as mãos;
+- registrar notas;
+- interromper uma sessão.
 
-```text
-geopoder_alpha2_supabase/
-├── README.md
-├── web/
-│   ├── index.html
-│   ├── styles.css
-│   ├── app.js
-│   ├── config.js
-│   └── config.example.js
-└── supabase/
-    ├── config.toml
-    ├── migrations/
-    │   └── 001_geopoder_alpha2.sql
-    └── functions/
-        └── game-api/
-            └── index.ts
-```
+Portanto, mesmo que outra pessoa descubra a interface de login, uma conta que não esteja autorizada em `gp_teacher_profiles` não recebe os privilégios docentes.
+
+As equipes continuam usando Anonymous Sign-In, que deve permanecer ativado no Supabase.
+
+---
+
+# Histórico e telemetria
+
+O Dashboard diferencia:
+
+- **Salas abertas**: lobby ou partida ativa.
+- **Partidas anteriores**: finalizadas ou interrompidas.
+
+O relatório de uma partida mostra:
+
+- turma, código, data, status e versão;
+- equipes e países;
+- duração e última rodada, quando disponíveis;
+- contagem dos eventos de telemetria;
+- notas do professor;
+- dados pedagógicos quando `QUESTION_ANSWERED` existir;
+- uso de cartas quando os eventos da Alpha 2.0b forem registrados;
+- exportação Markdown, CSV e JSON.
+
+O Markdown é o formato recomendado para enviar ao ChatGPT durante os debates de playtest.
