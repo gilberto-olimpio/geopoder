@@ -45,3 +45,13 @@ label{display:block;font-weight:700;font-size:.9rem;margin-bottom:6px}.field{mar
 
 /* 2.0b.1 — preparação de turno e notas persistentes */
 .turn-ready{border-color:#8b5cf6;background:linear-gradient(180deg,rgba(48,38,80,.96),rgba(18,29,49,.98))}.ready-btn{font-size:1.02rem;padding:13px 18px}.turn-ready .waiting-orb{border-top-color:#c4b5fd}#teacherNote{min-height:130px;line-height:1.45}
+
+/* Alpha 2.0c — seleção de país e diplomacia */
+select option:disabled { color: #888; background: #eee; }
+.bad-text { color: #a33; }
+.diplomacy-box { border: 1px solid rgba(90,90,110,.25); border-radius: 12px; padding: 10px 12px; background: rgba(255,255,255,.45); }
+.diplomacy-box summary { cursor: pointer; font-weight: 700; }
+.diplomacy-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(90,90,110,.18); }
+.trade-line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.trade-line select { min-width: 180px; }
+.reaction-panel { box-shadow: 0 0 0 2px rgba(97,63,170,.18) inset; }
