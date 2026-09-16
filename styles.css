@@ -82,3 +82,51 @@ select option:disabled { color: #888; background: #eee; }
 @media(max-width:820px){
   .in-match{overflow:auto}.in-match #screen{height:auto;overflow:visible}.command-room{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"top" "event" "national" "situation" "bottom";overflow:visible}.command-top{align-items:flex-start;flex-direction:column}.command-tools{flex-wrap:wrap}.command-bottom{min-height:260px}.command-hand{grid-template-columns:repeat(2,minmax(0,1fr))}.command-event{min-height:240px}.event-round{position:static;display:inline-block;margin-top:12px}.teacher-dock{grid-template-columns:1fr}.world-grid{grid-template-columns:1fr}
 }
+
+/* Alpha 2.0d.1 — refinamentos de interface do playtest */
+.command-room{grid-template-columns:230px minmax(0,1fr) 300px;grid-template-rows:70px minmax(0,1fr) 218px}
+.command-top{padding:7px 11px}
+.command-top-right{min-width:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px}
+.command-recent{width:min(650px,100%);display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;font-size:.66rem;color:#91a7c2;line-height:1.1}
+.command-recent span{flex:0 0 auto;text-transform:uppercase;letter-spacing:.08em;font-size:.56rem;font-weight:900;color:#6faed4}
+.command-recent b{min-width:0;max-width:470px;color:#dbe8f7;font-size:.66rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Mesa de Situação recebe toda a área central; o histórico saiu daqui. */
+.command-situation{padding:14px 16px}
+.situation-phase{display:flex;flex:1 1 auto;min-height:0;overflow:auto;padding:10px 2px 2px}
+.situation-phase>*{width:100%;box-sizing:border-box}
+.situation-phase>.command-action{min-height:100%}
+.situation-feed{display:none!important}
+.command-action{padding:15px}
+.command-action h3{font-size:1.14rem}
+.command-action p{font-size:.88rem}
+.command-action .btn{min-height:36px}
+
+/* Gabinete Nacional mais compacto para manter Influência integralmente visível. */
+.command-national{padding:11px 12px}
+.national-country{padding:4px 0 6px;margin-top:2px}
+.national-country h2{font-size:1.28rem}
+.national-country .small{font-size:.69rem}
+.national-stats{gap:5px;margin-top:6px}
+.national-stats>div{border-radius:9px;padding:5px 4px}
+.national-stats span{font-size:.86rem}
+.national-stats b{font-size:1.1rem;line-height:1}
+.national-stats small{font-size:.59rem;margin-top:1px}
+.national-score{margin-top:6px;padding:6px 8px;border-radius:9px;min-height:31px;flex:0 0 auto}
+.national-score span{font-size:.72rem;font-weight:800;color:#c9d9eb}
+.national-score strong{font-size:1.25rem}
+.national-badges{gap:4px;margin-top:5px}
+.national-badges span{font-size:.61rem;padding:3px 5px}
+.relation-label{margin-top:8px}
+.command-national .relation-row{min-height:0;overflow:auto}
+
+@media(max-width:1100px){
+  .command-room{grid-template-columns:205px minmax(0,1fr) 250px;grid-template-rows:66px minmax(0,1fr) 205px}
+  .command-recent{max-width:520px}.command-recent b{max-width:330px}
+  .command-national{padding:9px 10px}.national-country h2{font-size:1.14rem}
+  .national-stats>div{padding:4px 3px}.national-stats b{font-size:1rem}.national-score{padding:5px 7px}
+}
+@media(max-width:820px){
+  .command-top-right{align-items:stretch;width:100%}.command-recent{justify-content:flex-start;width:100%}.command-recent b{max-width:none}
+  .command-room{grid-template-columns:1fr;grid-template-rows:auto;}
+}

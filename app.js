@@ -216,12 +216,15 @@
     screen.innerHTML=`<div class="command-room">
       <header class="command-top">
         <div class="command-brand"><div class="eyebrow">GeoPoder · Sala ${esc(state.room.code)}</div><div class="command-title">${esc(phaseTitle(pub))}</div><div class="command-sub">Rodada ${pub.round}/8 · ${esc(pub.game_version||GAME_VERSION)} · regras ${esc(pub.rules_version||RULES_VERSION)}</div></div>
-        <div class="command-tools">
-          <button class="command-tool" data-command-modal="world">🌍 Situação mundial</button>
-          <button class="command-tool" data-command-modal="diplomacy">🤝 Diplomacia</button>
-          <button class="command-tool" data-command-modal="history">📜 Histórico</button>
-          <button class="command-tool" data-command-modal="rules">? Regras</button>
-          <button class="command-tool danger-lite" id="leaveActive">${isTeacher?'Painel':'Sair'}</button>
+        <div class="command-top-right">
+          <div class="command-tools">
+            <button class="command-tool" data-command-modal="world">🌍 Situação mundial</button>
+            <button class="command-tool" data-command-modal="diplomacy">🤝 Diplomacia</button>
+            <button class="command-tool" data-command-modal="history">📜 Histórico</button>
+            <button class="command-tool" data-command-modal="rules">? Regras</button>
+            <button class="command-tool danger-lite" id="leaveActive">${isTeacher?'Painel':'Sair'}</button>
+          </div>
+          ${renderCommandRecent(pub)}
         </div>
       </header>
       <aside class="command-national">${renderNationalCommand(pub,isTeacher)}</aside>
@@ -282,11 +285,14 @@
     return `<div class="command-section-label">Controle docente</div><h2>Sala ${esc(state.room.code)}</h2><div class="teacher-phase"><b>${esc(phaseTitle(pub))}</b><span>Rodada ${pub.round}/8</span></div><div class="teacher-controls">${controls||'<span class="muted small">Aguardando ação dos estudantes.</span>'}<button class="btn danger" id="interruptSession">Interromper sessão</button></div><div class="teacher-hint">Sem cronômetro automático. O professor controla o ritmo e pode encerrar turnos ou fases.</div>`;
   }
 
+  function renderCommandRecent(pub){
+    const last=(pub.recent_log||[]).slice(-1)[0];
+    return `<div class="command-recent"><span>O que acabou de acontecer</span><b title="${last?esc(last.text||last):'Nenhuma ação recente.'}">${last?esc(last.text||last):'Nenhuma ação recente.'}</b></div>`;
+  }
+
   function renderSituationCommand(pub,isTeacher,own){
-    const log=pub.recent_log||[];
     return `<div class="situation-head"><div><div class="command-section-label">Mesa de situação</div><h2>${esc(phaseTitle(pub))}</h2></div>${pub.active_country?`<span class="situation-active">Em foco: ${esc(pub.active_country)}</span>`:''}</div>
-      <div class="situation-phase">${renderPhasePanel(pub,isTeacher,own)}</div>
-      <div class="situation-feed"><div class="command-section-label">O que acabou de acontecer</div>${log.length?log.slice(-4).reverse().map(x=>`<div class="feed-line">${esc(x.text||x)}</div>`).join(''):'<div class="muted tiny">Nenhuma ação recente.</div>'}</div>`;
+      <div class="situation-phase">${renderPhasePanel(pub,isTeacher,own)}</div>`;
   }
 
   function renderPhasePanel(pub,isTeacher,own){
