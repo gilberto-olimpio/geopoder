@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0d';
+  const GAME_VERSION = 'Alpha 2.0d.2';
   const RULES_VERSION = '0.4-A';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -445,7 +445,14 @@
 
   function bindMatchActions(pub,isTeacher,own){
     document.querySelectorAll('[data-pending]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('respond_pending',{roomId:state.room.id,choice:b.dataset.pending});await refreshSnapshot()}));
-    document.querySelectorAll('[data-challenge-answer]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('answer_challenge',{roomId:state.room.id,answer:Number(b.dataset.challengeAnswer)});await refreshSnapshot()}));
+    document.querySelectorAll('[data-challenge-answer]').forEach(b=>b.onclick=()=>withBusy(async()=>{
+      const buttons=[...document.querySelectorAll('[data-challenge-answer]')];
+      buttons.forEach(x=>x.disabled=true);
+      b.classList.add('selected');
+      b.setAttribute('aria-pressed','true');
+      await api('answer_challenge',{roomId:state.room.id,answer:Number(b.dataset.challengeAnswer)});
+      await refreshSnapshot();
+    }));
     document.querySelector('[data-turn-action="pass"]')?.addEventListener('click',()=>withBusy(async()=>{await api('turn_action',{roomId:state.room.id,kind:'pass'});await refreshSnapshot()}));
     document.querySelectorAll('[data-recovery]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('turn_action',{roomId:state.room.id,kind:'recovery',attr:b.dataset.recovery});await refreshSnapshot()}));
     document.querySelectorAll('[data-play-card]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('play_card',{roomId:state.room.id,cardId:Number(b.dataset.playCard)});await refreshSnapshot()}));
