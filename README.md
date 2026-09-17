@@ -1,4 +1,4 @@
-# GeoPoder — Alpha 2.0e
+# GeoPoder — Alpha 2.0f
 
 **Subtítulo interno:** Gabinete de Governo / Sala de Comando  
 **Regras:** 0.4-C  
@@ -6,7 +6,19 @@
 
 ## Objetivo desta versão
 
-A 2.0e é a primeira implementação da nova direção visual aprovada nos mockups. O motor multiplayer permanece baseado na 2.0d.3, mas a experiência do jogador foi reorganizada para parecer uma sala de comando governamental e para tornar mais claro o que está acontecendo, o que afeta o país e o que o jogador pode fazer.
+A 2.0f mantém a direção visual da Sala de Comando e otimiza o uso do espaço em telas de notebook e Chromebook. O motor multiplayer permanece baseado na 2.0d.3.
+
+## Otimização da Sala de Comando
+
+- A consulta de um Dossiê agora acontece dentro da **Mesa de Situação**, sem criar uma área abaixo da navegação.
+- A carta consultada exibe imagem, contexto, efeito completo, disponibilidade e as ações **Jogar carta** e **Voltar à Mesa**.
+- Decisões obrigatórias, Desafios, Eventos e outras fases críticas têm prioridade e fecham a consulta da carta.
+- A faixa **Dossiês do Governo** ficou mais baixa e preserva todas as cartas visíveis.
+- A carta em consulta recebe destaque na mão.
+- O **Gabinete Nacional** ganhou resumo em duas colunas para Influência e Vantagem; atributos e relações cabem no painel sem desaparecer.
+- O **Cenário Global** mantém nome, tipo e efeito do Evento visíveis sem barra de rolagem no uso normal.
+- A **Mesa de Situação** não apresenta rolagem desnecessária nos estados comuns; fases com muitas escolhas continuam podendo rolar para não esconder ações.
+- A grade passou a usar alturas adaptativas conforme a altura disponível da tela.
 
 ## Mudanças principais de UI/UX
 
@@ -72,9 +84,7 @@ Eventos que desligam bônus de Relação/Bloco continuam desligando também este
 
 ### Supabase
 
-Substitua o conteúdo da Edge Function `game-api` por `game-api.ts` e faça **Deploy**.
-
-**Não há migration SQL nesta versão.**
+Não é necessário alterar a Edge Function nem executar SQL nesta versão.
 
 ### GitHub Pages
 
@@ -87,12 +97,12 @@ Substitua:
 
 Mantenha seu `config.js` atual. **Não substitua o config.js.**
 
-O cache-bust da versão é `?v=20e`.
+O cache-bust da versão é `?v=20f`.
 
 ## Validação local feita
 
 - `node --check app.js`: OK.
-- verificação sintática TypeScript: nenhuma falha além do import `jsr:@supabase/server`, que não é resolvido pelo TypeScript local e é esperado no ambiente Supabase/Deno.
+- estrutura, delimitadores e media queries de `styles.css` verificados.
 - referências dos cinco assets de carta verificadas.
 
 ## O que observar no playtest
@@ -106,5 +116,7 @@ Esta versão deve ser testada principalmente para UX e Diplomacia:
 - o onboarding ajuda sem interromper demais?
 - Acordos e Blocos passam a ser desejados por causa dos bônus 0.4-C?
 - as cinco cartas piloto parecem mais ligadas a acontecimentos do mundo real sem esconder o efeito mecânico?
+- em resoluções de 1366×768 e 1366×600, os atributos, o Evento e os Dossiês permanecem integralmente acessíveis?
+- ao consultar uma carta, a leitura e os botões permanecem dentro da Mesa de Situação?
 
 A expansão visual para as 28 cartas deve ser feita depois desse teste.

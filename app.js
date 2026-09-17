@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0e';
+  const GAME_VERSION = 'Alpha 2.0f';
   const RULES_VERSION = '0.4-C';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -44,7 +44,7 @@
   const REACTION_IDS_UI = new Set([18,19,20,21,22,23]);
 
   let sb = null;
-  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set(),onboardingActive:false,onboardingStep:0};
+  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set(),onboardingActive:false,onboardingStep:0,selectedDossierId:null};
   let heartbeatTimer = null, refreshTimer = null, tickTimer = null, uiTimer = null;
   let tickInFlight = false;
 
@@ -296,6 +296,7 @@
     document.getElementById('commandModal')?.addEventListener('click',e=>{if(e.target?.id==='commandModal')closeCommandModal()});
     bindMatchActions(pub,isTeacher,own);
     document.querySelectorAll('[data-open-card]').forEach(b=>b.onclick=()=>openCardDossier(Number(b.dataset.openCard),pub));
+    document.querySelectorAll('[data-close-dossier]').forEach(b=>b.onclick=()=>{state.selectedDossierId=null;renderRoom()});
     document.querySelectorAll('[data-dismiss-tip]').forEach(b=>b.onclick=()=>{markTipSeen(b.dataset.dismissTip);renderRoom()});
     animateDiceDisplay(pub.dice_display);
     mountOnboarding(isTeacher);
@@ -321,14 +322,14 @@
 
   function renderCommandEvent(e,pub){
     if(!e)return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><div class="event-empty">Aguardando o próximo boletim internacional.</div>`;
-    const kind=(e.kind||'Evento').toUpperCase(),quote=e.kind==='Oportunidade'?'“Toda abertura no sistema internacional cria espaço para novas estratégias.”':e.kind==='Crise'?'“Crises testam governos antes de testarem fronteiras.”':'“O cenário internacional muda; governos precisam escolher como responder.”',summary=e.kind==='Oportunidade'?'Governos identificam novas possibilidades de cooperação, crescimento e projeção internacional.':e.kind==='Crise'?'Tensões internacionais pressionam mercados, redes e decisões de governo em várias regiões.':'Uma mudança no cenário internacional exige respostas rápidas e escolhas estratégicas dos governos.';
-    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><p class="event-summary">${esc(summary)}</p><div class="event-effect-box"><b>EFEITO ATIVO</b><p>${esc(e.effect)}</p></div><blockquote>${quote}<cite>— Observatório Político Internacional</cite></blockquote></article>`;
+    const kind=(e.kind||'Evento').toUpperCase();
+    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><div class="event-effect-box"><b>EFEITO ATIVO</b><p>${esc(e.effect)}</p></div></article>`;
   }
 
   function renderNationalCommand(pub,isTeacher){
     if(isTeacher)return renderTeacherControlCompact(pub);
     const c=pub.countries?.[state.me.country]||{},country=state.me.country,total=(c.eco||0)+(c.net||0)+(c.dip||0)+(c.cult||0),cu=COUNTRY_UI[country]||{};
-    return `<div class="panel-title"><span>▥</span><div><b>GABINETE NACIONAL</b><small>Gestão interna para um país mais forte</small></div></div><div class="national-identity">${countrySeal(country)}<div><small>REPÚBLICA DE</small><h2>${esc(country)}</h2><span>${esc(cu.motto||'')}</span></div></div><div class="national-meters">${attrMeter(c.eco,'eco')}${attrMeter(c.net,'net')}${attrMeter(c.dip,'dip')}${attrMeter(c.cult,'cult')}</div><div class="national-score-v2"><div><span>★</span><b>INFLUÊNCIA INTERNACIONAL</b></div><strong>${total}</strong></div><div class="national-score-v2 advantage"><div><span>✥</span><b>VANTAGEM DISPONÍVEL</b></div><strong>${c.advantages??0}</strong></div><div class="relation-title">RELAÇÕES ATUAIS</div><div class="relation-list-v2">${renderRelationList(country,pub.relations)}</div>`;
+    return `<div class="panel-title"><span>▥</span><div><b>GABINETE NACIONAL</b><small>Gestão interna para um país mais forte</small></div></div><div class="national-identity">${countrySeal(country)}<div><small>REPÚBLICA DE</small><h2>${esc(country)}</h2><span>${esc(cu.motto||'')}</span></div></div><div class="national-meters">${attrMeter(c.eco,'eco')}${attrMeter(c.net,'net')}${attrMeter(c.dip,'dip')}${attrMeter(c.cult,'cult')}</div><div class="national-summary"><div class="national-score-v2"><div><span>★</span><b>INFLUÊNCIA</b></div><strong>${total}</strong></div><div class="national-score-v2 advantage"><div><span>✥</span><b>VANTAGEM</b></div><strong>${c.advantages??0}</strong></div></div><div class="relation-title">RELAÇÕES ATUAIS</div><div class="relation-list-v2">${renderRelationList(country,pub.relations)}</div>`;
   }
   function renderRelationList(country,relations){const arr=[];for(const[k,r]of Object.entries(relations||{})){const ps=k.split('|');if(!ps.includes(country))continue;const partner=ps.find(x=>x!==country),label=r.type==='block'?'Bloco Econômico':'Acordo Comercial';arr.push(`<div class="relation-v2 ${r.type} ${r.suspended?'suspended':''}"><span>${r.type==='block'?'▲':'▬'}</span><b>${esc(partner)}</b><small>${esc(label)}${r.suspended?' · suspenso':''}</small></div>`)}return arr.join('')||'<div class="relation-empty">Nenhuma relação formal ativa.</div>'}
 
@@ -350,7 +351,26 @@
   }
 
   function renderSituationCommand(pub,isTeacher,own){
-    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>Analisar · planejar · decidir · governar</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${renderDiceDisplay(pub.dice_display)}${contextTip(pub,isTeacher,own)}<div class="situation-phase">${renderPhasePanel(pub,isTeacher,own)}</div>${renderCommandRecent(pub)}`;
+    const selected=Number(state.selectedDossierId),inHand=!isTeacher&&Boolean(selected)&&Boolean(own?.hand?.includes(selected));
+    const inspectionAllowed=inHand&&dossierInspectionAllowed(pub);
+    if(state.selectedDossierId&&!inspectionAllowed)state.selectedDossierId=null;
+    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>Analisar · planejar · decidir · governar</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${inspectionAllowed?'':renderDiceDisplay(pub.dice_display)}${inspectionAllowed?'':contextTip(pub,isTeacher,own)}<div class="situation-phase ${inspectionAllowed?'showing-dossier':''}">${inspectionAllowed?renderSituationDossier(selected,pub):renderPhasePanel(pub,isTeacher,own)}</div>${renderCommandRecent(pub)}`;
+  }
+
+  function dossierInspectionAllowed(pub){
+    return !pub.pending_public&&!['challenge','challenge_result','diplomacy','turn_ready'].includes(pub.phase);
+  }
+
+  function renderSituationDossier(id,pub){
+    const c=CARD[id];if(!c)return'';
+    const active=pub.phase==='turns'&&state.me.country===pub.active_country,reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country);
+    const art=c.art?`<img src="${esc(c.art)}" alt="Ilustração temática de ${esc(c.name)}">`:`<div class="situation-dossier-placeholder"><span>${cardTypeGlyph(c.type)}</span><small>DOCUMENTO DE GOVERNO</small></div>`;
+    let action='';
+    if(reaction)action='<div class="dossier-status violet">Carta de Reação: será oferecida automaticamente quando o gatilho ocorrer.</div>';
+    else if(active&&valid)action=`<button class="btn primary situation-play" data-play-card="${id}">APRESENTAR AO CONSELHO · JOGAR CARTA</button>`;
+    else if(active&&!valid)action='<div class="dossier-status warn">Neste momento não existe alvo válido para esta carta.</div>';
+    else action='<div class="dossier-status">Planejamento: esta carta poderá ser jogada quando chegar seu turno.</div>';
+    return `<article class="situation-dossier"><div class="situation-dossier-head"><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><b>DOSSIÊ #${String(id).padStart(2,'0')}</b></div><div class="situation-dossier-body"><div class="situation-dossier-art">${art}</div><div class="situation-dossier-copy"><h2>${esc(c.name)}</h2>${c.headline?`<h3>${esc(c.headline)}</h3>`:''}${c.brief?`<p class="situation-dossier-brief">${esc(c.brief)}</p>`:''}<div class="situation-dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div></div></div><div class="situation-dossier-actions">${action}<button class="btn ghost" data-close-dossier>VOLTAR À MESA</button></div></article>`;
   }
 
   function dieGlyph(n){return ({1:'⚀',2:'⚁',3:'⚂',4:'⚃',5:'⚄',6:'⚅'})[Number(n)]||'🎲'}
@@ -424,13 +444,13 @@
   }
 
   function commandCardHtml(id,pub,active){
-    const c=CARD[id]||{id,name:`Carta ${id}`,type:'',tags:[],effect:''},reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country),status=reaction?'REAÇÃO':active?(valid?'PRONTO':'SEM ALVO'):'PLANEJAMENTO';
-    return `<article class="command-card dossier-card ${c.art?'has-art':''}">${c.art?`<img src="${esc(c.art)}" alt="">`:`<div class="dossier-thumb-placeholder">${cardTypeGlyph(c.type)}</div>`}<div class="command-card-top"><span>${esc(c.type)}</span><span>#${String(id).padStart(2,'0')}</span></div><h4>${esc(c.name)}</h4><p>${esc(c.headline||c.effect)}</p><div class="command-card-footer"><div class="tag-row">${(c.tags||[]).slice(0,2).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div><button class="btn compact ${active&&valid&&!reaction?'primary':'ghost'}" data-open-card="${id}">${status==='PRONTO'?'Abrir Dossiê':reaction?'Consultar Reação':status==='SEM ALVO'?'Consultar · sem alvo':'Consultar'}</button></div></article>`;
+    const c=CARD[id]||{id,name:`Carta ${id}`,type:'',tags:[],effect:''},reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country),status=reaction?'REAÇÃO':active?(valid?'PRONTO':'SEM ALVO'):'PLANEJAMENTO',inspectable=dossierInspectionAllowed(pub);
+    return `<article class="command-card dossier-card ${c.art?'has-art':''} ${Number(state.selectedDossierId)===id?'selected':''}">${c.art?`<img src="${esc(c.art)}" alt="">`:`<div class="dossier-thumb-placeholder">${cardTypeGlyph(c.type)}</div>`}<div class="command-card-top"><span>${esc(c.type)}</span><span>#${String(id).padStart(2,'0')}</span></div><h4>${esc(c.name)}</h4><p>${esc(c.headline||c.effect)}</p><div class="command-card-footer"><div class="tag-row">${(c.tags||[]).slice(0,2).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div><button class="btn compact ${active&&valid&&!reaction?'primary':'ghost'}" data-open-card="${id}" ${inspectable?'':'disabled title="Conclua primeiro a decisão atual"'}>${inspectable?(status==='PRONTO'?'Abrir Dossiê':reaction?'Consultar Reação':status==='SEM ALVO'?'Consultar · sem alvo':'Consultar'):'Após esta etapa'}</button></div></article>`;
   }
   function openCardDossier(id,pub){
-    const c=CARD[id],modal=document.getElementById('commandModal'),title=document.getElementById('commandModalTitle'),body=document.getElementById('commandModalBody');if(!c||!modal||!title||!body)return;
-    title.textContent=`Dossiê #${String(id).padStart(2,'0')} · ${c.name}`;const active=pub.phase==='turns'&&!pub.pending_public&&state.me.country===pub.active_country,reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country);
-    body.innerHTML=`${editorialCardHtml(c,{expanded:true})}<div class="dossier-actions">${reaction?'<div class="banner violet">Esta é uma carta de Reação. Ela ficará disponível automaticamente quando seu gatilho acontecer.</div>':active&&valid?`<button class="btn primary dossier-play" id="playDossierNow">APRESENTAR AO CONSELHO · JOGAR CARTA</button>`:active&&!valid?'<div class="banner warn">Neste momento não existe alvo válido para esta carta.</div>':'<div class="banner">Você pode estudar este Dossiê agora e jogá-lo quando chegar seu turno.</div>'}<button class="btn ghost" id="closeDossierNow">Voltar à Mesa de Situação</button></div>`;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.getElementById('closeDossierNow').onclick=closeCommandModal;document.getElementById('playDossierNow')?.addEventListener('click',()=>withBusy(async()=>{closeCommandModal();await api('play_card',{roomId:state.room.id,cardId:id});await refreshSnapshot()}));
+    if(!CARD[id]||!dossierInspectionAllowed(pub))return;
+    state.selectedDossierId=id;
+    renderRoom();
   }
 
   function renderTeacherDock(pub){
