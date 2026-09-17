@@ -5,14 +5,14 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0d.2';
-  const RULES_VERSION = '0.4-A';
+  const GAME_VERSION = 'Alpha 2.0d.3';
+  const RULES_VERSION = '0.4-B';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
   const C = (id,name,type,tags,effect)=>({id,name,type,tags,effect});
   const CARDS = [
     C(1,'Infraestrutura Digital','Desenvolvimento',['Relação'],'+1 Redes. Se houver Relação Comercial com país de Redes maiores, renove 1 carta da mão.'),
-    C(2,'Diplomacia Multilateral','Desenvolvimento',[],'+1 Diplomacia. Com ao menos 1 Acordo, olhe o topo e decida manter ou descartar.'),
+    C(2,'Diplomacia Multilateral','Desenvolvimento',[],'+1 Diplomacia. Com ao menos 1 Acordo ativo, olhe o topo do baralho e decida mantê-lo ou descartá-lo.'),
     C(3,'Marca Cultural Global','Desenvolvimento',['Relação'],'+1 Cultura. Um parceiro comercial pode renovar 1 carta da mão.'),
     C(4,'Investimento Produtivo','Desenvolvimento',['Relação'],'Com parceiro comercial: ambos +1 Economia. Sem alvo: você +1 Economia.'),
     C(5,'Logística Integrada','Desenvolvimento',['Bloco'],'+1 Redes. Em Bloco, protege 1 perda de Economia por Interferência nesta rodada.'),
@@ -27,7 +27,7 @@
     C(14,'Pressão Geopolítica','Interferência',['Acordo'],'Alvo escolhe: -1 Diplomacia; descartar 1 aleatória; ou encerrar Acordo com você.'),
     C(15,'Ataque às Redes','Interferência',['Anti-líder'],'Alvo com Redes ≥ às suas perde 1 Redes. Se era líder em Redes, renove 1 carta da mão.'),
     C(16,'Tensão no Bloco','Interferência',['Bloco'],'Escolha um Bloco. Os membros decidem: um perde 1 Diplomacia ou o Bloco dissolve.'),
-    C(17,'Embargo Secundário','Interferência',['Acordo'],'Alvo com 2 Acordos encerra 1 deles ou perde 1 Economia.'),
+    C(17,'Embargo Secundário','Interferência',['Acordo'],'Alvo com 2 Acordos ativos deve encerrar 1 deles ou perder 1 Economia. Blocos não são encerrados por esta carta.'),
     C(18,'Mediação Internacional','Reação',['Defesa'],'Quando Interferência causar perda de atributo a você, reduza uma perda em 1.'),
     C(19,'Retaliação Comercial','Reação',['Acordo','Transferência'],'Quando perder Economia: reduza em 1; atacante -1 Economia; Acordo entre vocês termina.'),
     C(20,'Defesa Cibernética','Reação',['Redes'],'Quando perder Redes por carta ou Evento, cancele 1 ponto.'),
@@ -35,16 +35,16 @@
     C(22,'Solidariedade do Bloco','Reação',['Bloco'],'Quando você ou parceiro sofrer perda por Interferência, reduza 1. Se protegeu parceiro, renove 1 carta da mão.'),
     C(23,'Cláusula de Salvaguarda','Reação',['Acordo','Bloco'],'Quando carta/Evento dissolveria Acordo ou Bloco, cancele mediante descarte.'),
     C(24,'Capital Especulativo','Risco',['1d6'],'1–2: -1 Economia; 3–4: +1; 5–6: +2.'),
-    C(25,'Investimento Estrangeiro Direto','Risco',['Relação','1d6'],'Outro país aceita ou recusa. Se aceitar, role 1d6 (+1 com Relação): 1–2 ambos -1 Eco; 3–4 ambos +1; 5–6 ambos +1 e você renova 1 carta da mão.'),
+    C(25,'Investimento Estrangeiro Direto','Risco',['Relação','1d6'],'Outro país aceita ou recusa. Aceitar o investimento não cria Acordo. Se aceitar, role 1d6 (+1 com Relação Comercial ativa): 1–2 ambos -1 Economia; 3–4 ambos +1; 5–6 ambos +1 e você renova 1 carta da mão.'),
     C(26,'Plataforma Global','Risco',['Redes','Cultura'],'Expansão: +1 Redes OU +1 Cultura; depois escolha outro país com Cultura abaixo de 8 para receber +1 Cultura. Regulação: +1 Diplomacia e renove 1 carta da mão.'),
-    C(27,'Abertura Comercial','Risco',['Acordo'],'Escolha +1 Economia OU usar a ação para propor Acordo; se aceito, ambos renovam 1 carta da mão.'),
+    C(27,'Abertura Comercial','Risco',['Cúpula','Acordo'],'+1 Economia. Na Cúpula Diplomática desta rodada, se a sua iniciativa formar um novo Acordo, você e o parceiro renovam 1 carta da mão.'),
     C(28,'Disputa de Influência','Risco',['1d6'],'Escolha país fora do seu Bloco. Ambos rolam 1d6; vencedor +1 Diplomacia, perdedor -1. Empate: nada.')
   ];
   const CARD = Object.fromEntries(CARDS.map(c=>[c.id,c]));
   const REACTION_IDS_UI = new Set([18,19,20,21,22,23]);
 
   let sb = null;
-  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null};
+  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set()};
   let heartbeatTimer = null, refreshTimer = null, tickTimer = null, uiTimer = null;
   let tickInFlight = false;
 
@@ -200,6 +200,7 @@
   const activeList=pub=>pub.active_countries||Object.keys(pub.countries||{});
   function publicBlockPartner(pub,country){for(const[k,r]of Object.entries(pub.relations||{})){if(r.type==='block'&&!r.suspended&&k.split('|').includes(country))return k.split('|').find(x=>x!==country)||null}return null}
   function publicAgreementPartners(pub,country){const out=[];for(const[k,r]of Object.entries(pub.relations||{})){if(r.type==='agreement'&&!r.suspended&&k.split('|').includes(country))out.push(k.split('|').find(x=>x!==country))}return out.filter(Boolean)}
+  function publicCommercialRelationCount(pub,country){let n=0;for(const[k,r]of Object.entries(pub.relations||{})){if(!r.suspended&&k.split('|').includes(country))n++}return n}
   function publicRelation(pub,a,b){return pub.relations?.[[a,b].sort().join('|')]||null}
   function cardHasValidTarget(id,pub,country){const act=activeList(pub),me=pub.countries?.[country]||{};if([18,19,20,21,22,23].includes(id))return false;if(id===11)return publicAgreementPartners(pub,country).length>0;if(id===12)return act.some(c=>c!==country&&Number(pub.countries[c]?.eco)>Number(me.eco));if(id===13)return act.some(c=>c!==country&&Number(pub.countries[c]?.cult)>=Number(me.cult));if(id===15)return act.some(c=>c!==country&&Number(pub.countries[c]?.net)>=Number(me.net));if(id===16)return Object.values(pub.relations||{}).some(r=>r.type==='block'&&!r.suspended);if(id===17)return act.some(c=>c!==country&&publicAgreementPartners(pub,c).length>=2);return true}
 
@@ -238,6 +239,7 @@
     document.getElementById('commandModalClose')?.addEventListener('click',closeCommandModal);
     document.getElementById('commandModal')?.addEventListener('click',e=>{if(e.target?.id==='commandModal')closeCommandModal()});
     bindMatchActions(pub,isTeacher,own);
+    animateDiceDisplay(pub.dice_display);
   }
 
   function phaseTitle(pub){
@@ -249,7 +251,7 @@
     if(pub.phase==='event')return'Evento Mundial';
     if(pub.phase==='challenge')return'Desafio Geográfico';
     if(pub.phase==='challenge_result')return'Resultado do Desafio';
-    if(pub.phase==='draw')return'Compra e renovação';
+    if(pub.phase==='draw')return pub.draw_context?.after_challenge?'Compra normal da rodada':'Compra da rodada';
     if(pub.phase==='turn_ready')return`${pub.active_country} se prepara`;
     if(pub.phase==='turns')return`Turno de ${pub.active_country}`;
     if(pub.phase==='diplomacy')return'Cúpula Diplomática';
@@ -292,7 +294,31 @@
 
   function renderSituationCommand(pub,isTeacher,own){
     return `<div class="situation-head"><div><div class="command-section-label">Mesa de situação</div><h2>${esc(phaseTitle(pub))}</h2></div>${pub.active_country?`<span class="situation-active">Em foco: ${esc(pub.active_country)}</span>`:''}</div>
+      ${renderDiceDisplay(pub.dice_display)}
       <div class="situation-phase">${renderPhasePanel(pub,isTeacher,own)}</div>`;
+  }
+
+  function dieGlyph(n){return ({1:'⚀',2:'⚁',3:'⚂',4:'⚃',5:'⚄',6:'⚅'})[Number(n)]||'🎲'}
+  function renderDiceDisplay(d){
+    if(!d?.rolls?.length)return'';
+    const alreadySeen=state.seenDiceIds?.has(String(d.id||''));
+    const rolls=d.rolls.map((r,i)=>{const total=Number(r.total??r.result),hasMod=Number(r.modifier||0)!==0;return `<div class="dice-result-unit"><span class="dice-face-animated ${alreadySeen?'settled':'rolling'}" data-die-final="${Number(r.result)}" data-die-index="${i}">${alreadySeen?dieGlyph(r.result):'🎲'}</span><div><b>${r.country?esc(r.country):esc(r.label||'Rolagem')}</b><strong class="dice-number ${alreadySeen?'':'pending'}" data-die-number="${i}">${alreadySeen?r.result:'…'}${alreadySeen&&hasMod?` ${r.modifier>0?'+':'−'} ${Math.abs(r.modifier)} = ${total}`:''}</strong>${r.reroll?'<small>rerrolagem</small>':''}</div></div>`}).join('');
+    return `<div class="dice-result-banner ${alreadySeen?'settled':'rolling'}" data-dice-display="${esc(d.id||'')}"><div class="dice-result-copy"><span>🎲 Resultado da rolagem</span><b>${esc(d.source||'Rolagem')}</b>${d.note?`<small>${esc(d.note)}</small>`:''}</div><div class="dice-result-rolls">${rolls}</div></div>`;
+  }
+  function animateDiceDisplay(d){
+    if(!d?.id||!d?.rolls?.length)return;
+    const id=String(d.id);if(state.seenDiceIds?.has(id))return;
+    state.seenDiceIds.add(id);
+    const banner=document.querySelector(`[data-dice-display="${CSS.escape(id)}"]`);if(!banner)return;
+    const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const faces=[1,2,3,4,5,6];
+    d.rolls.forEach((r,i)=>{
+      const face=banner.querySelector(`[data-die-index="${i}"]`),num=banner.querySelector(`[data-die-number="${i}"]`);if(!face||!num)return;
+      const settle=()=>{face.textContent=dieGlyph(r.result);face.classList.remove('rolling');face.classList.add('settled');const mod=Number(r.modifier||0),total=Number(r.total??r.result);num.textContent=`${r.result}${mod?` ${mod>0?'+':'−'} ${Math.abs(mod)} = ${total}`:''}`;num.classList.remove('pending');};
+      if(reduce){settle();return;}
+      let step=0;const max=8+i*2;const timer=setInterval(()=>{face.textContent=dieGlyph(faces[Math.floor(Math.random()*6)]);step++;if(step>=max){clearInterval(timer);setTimeout(settle,80+i*80)}},65+i*8);
+    });
+    setTimeout(()=>banner.classList.remove('rolling'),900);
   }
 
   function renderPhasePanel(pub,isTeacher,own){
@@ -302,7 +328,8 @@
     if(pub.phase==='turn_ready')return renderTurnReady(pub,isTeacher);
     if(pub.phase==='turns')return renderTurn(pub,isTeacher);
     if(pub.phase==='diplomacy')return renderDiplomacyPhase(pub,isTeacher,own);
-    if(pub.phase==='draw'||pub.phase==='event')return `<section class="action-panel command-action"><div class="waiting-orb"></div><h3>Resolução em andamento</h3><p class="muted">A carta de Evento permanece visível ao lado. Aguarde a próxima decisão necessária.</p></section>`;
+    if(pub.phase==='draw')return `<section class="action-panel command-action flow-panel"><div class="eyebrow">${pub.draw_context?.after_challenge?'Etapa 2 de 2 · Compra normal':'Compra da rodada'}</div><h3>${pub.draw_context?.after_challenge?'A recompensa do Desafio terminou. Agora começa a compra normal da rodada.':'Distribuindo as cartas da rodada'}</h3><p class="muted">${pub.draw_context?.after_challenge?'A renovação recebida por líder no Desafio não substitui esta compra. Cada país ainda recebe sua compra normal.':'Aguarde a próxima decisão necessária.'}</p></section>`;
+    if(pub.phase==='event')return `<section class="action-panel command-action"><div class="waiting-orb"></div><h3>Resolução em andamento</h3><p class="muted">A carta de Evento permanece visível ao lado. Aguarde a próxima decisão necessária.</p></section>`;
     return'';
   }
 
@@ -330,7 +357,7 @@
       const log=pub.recent_log||[];body.innerHTML=log.length?`<div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')}</div>`:'<div class="history-empty">Nenhum registro recente.</div>';
     } else {
       title.textContent='Regras rápidas';
-      body.innerHTML=`<div class="rules-quick"><p><b>Ação Principal:</b> no seu turno, jogue 1 carta, use Recuperação Nacional quando um atributo estiver em 0 ou passe.</p><p><b>Sem cronômetro:</b> o professor controla o ritmo e pode encerrar um turno que esteja parado.</p><p><b>Cúpula Diplomática:</b> ao final de cada rodada, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação, sair de Bloco ou não agir.</p><p><b>Evento Global:</b> o Evento mostrado à direita vale durante toda a rodada.</p><p><b>Influência:</b> soma dos quatro atributos. No fim, países com todos os atributos em pelo menos 2 recebem +2 por equilíbrio.</p></div>`;
+      body.innerHTML=`<div class="rules-quick"><p><b>Ação Principal:</b> no seu turno, jogue 1 carta, use Recuperação Nacional quando um atributo estiver em 0 ou passe.</p><p><b>Sem cronômetro:</b> o professor controla o ritmo e pode encerrar um turno que esteja parado.</p><p><b>Cúpula Diplomática:</b> ao final de cada rodada, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação, sair de Bloco ou não agir. Aceitar ou recusar proposta não gasta a iniciativa. Efeitos de cartas que rompem, protegem ou alteram relações acontecem imediatamente e não contam como iniciativa da Cúpula.</p><p><b>Evento Global:</b> o Evento mostrado à direita vale durante toda a rodada.</p><p><b>Influência:</b> soma dos quatro atributos. No fim, países com todos os atributos em pelo menos 2 recebem +2 por equilíbrio.</p></div>`;
     }
     modal.classList.add('open');modal.setAttribute('aria-hidden','false');
   }
@@ -365,7 +392,6 @@
       if(stage==='sanction_mode')buttons=`<button class="btn primary" data-pending="normal">Sanção normal: −1 Economia</button><button class="btn danger" data-pending="intensify">Romper Acordo e intensificar</button>`;
       if(stage==='block')buttons=(p.blocks||[]).map(k=>`<button class="btn primary" data-pending="${esc(k)}">Bloco ${esc(k.replace('|',' ↔ '))}</button>`).join('');
       if(stage==='platform'){buttons=`<button class="btn primary" data-pending="regulation">Regulação: +1 Diplomacia e renovar</button>`+(p.expansion_targets||[]).map(t=>`<button class="btn good" data-pending="expansion:net:${esc(t)}">Expansão: +1 Redes; ${esc(t)} +1 Cultura</button><button class="btn good" data-pending="expansion:cult:${esc(t)}">Expansão: +1 Cultura; ${esc(t)} +1 Cultura</button>`).join('');}
-      if(stage==='opening'){buttons=`<button class="btn good" data-pending="eco">+1 Economia</button>`+(p.agreement_targets||[]).map(t=>`<button class="btn primary" data-pending="agreement:${esc(t)}">Propor Acordo a ${esc(t)}</button>`).join('');}
       return `<section class="card action-panel" style="margin-top:16px"><div class="eyebrow">Jogar carta</div>${card}<h3>Escolha como resolver</h3><div class="actions">${buttons||'<span class="muted">Nenhuma opção válida.</span>'}</div></section>`;
     }
     if(['reaction_loss','reaction_dissolve'].includes(p.kind)){const id=Number(priv.cardId||0);return `<section class="card action-panel reaction-panel" style="margin-top:16px"><div class="eyebrow">Reação disponível</div><h3>Você pode responder agora</h3>${id?cardHtml(id):''}<div class="actions"><button class="btn violet" data-pending="use">Usar Reação</button><button class="btn ghost" data-pending="decline">Não reagir</button></div></section>`}
@@ -388,12 +414,13 @@
     if(p.kind==='loss_choice')return `<section class="card action-panel"><div class="eyebrow">Perda de atributo</div><h3>${esc(p.source)}</h3><p>Você perderá <b>${p.amount}</b> em ${ATTRS[p.attr]||p.attr}.</p><div class="actions"><button class="btn danger" data-pending="accept">Sofrer perda</button>${p.can_use_advantage?'<button class="btn violet" data-pending="use_advantage">🎓 Gastar Vantagem e reduzir 1</button>':''}</div></section>`;
     if(p.kind==='redirect_loss')return `<section class="card action-panel"><div class="eyebrow">Atributo zerado</div><h3>Redirecione ${p.remaining} ponto(s) de perda</h3><p class="muted">Escolha outro atributo.</p><div class="actions">${(p.available_attrs||[]).map(a=>`<button class="btn" data-pending="${a}">${ATTRS[a]}</button>`).join('')}</div></section>`;
     if(p.kind==='event_roll_decision')return `<section class="card action-panel dice-panel"><div class="eyebrow">Rolagem pública</div><div class="big-die">🎲 ${p.roll}</div><h3>${esc(p.source)}</h3><div class="actions"><button class="btn primary" data-pending="accept">Aceitar resultado</button>${p.can_reroll?'<button class="btn violet" data-pending="reroll">🎓 Gastar Vantagem e rerrolar</button>':''}</div></section>`;
-    if(['discard_card','renew_discard','hand_limit_discard'].includes(p.kind))return `<section class="card action-panel"><div class="eyebrow">Escolha uma carta</div><h3>${esc(p.reason||'Descarte')}</h3>${handHtml(own?.hand||[],{buttonFor:id=>({button:'Descartar',data:`data-pending="${id}"`})})}</section>`;
-    if(p.kind==='draw_choice')return `<section class="card action-panel"><div class="eyebrow">Compra da rodada</div><h3>Como deseja comprar?</h3><div class="actions"><button class="btn primary" data-pending="normal">Comprar 1 carta</button><button class="btn violet" data-pending="advantage">🎓 Gastar Vantagem: ver 2 e ficar com 1</button></div></section>`;
+    if(p.kind==='renew_discard'){const challengeReward=String(p.reason||'').includes('Acerto do líder no Desafio');return `<section class="card action-panel flow-panel ${challengeReward?'challenge-reward-flow':''}"><div class="eyebrow">${challengeReward?'Etapa 1 de 2 · Recompensa do Desafio':'Renovação de carta'}</div><h3>${challengeReward?'Você acertou como líder: renove 1 carta':esc(p.reason||'Renovação')}</h3>${challengeReward?'<p class="flow-explain">Esta renovação é a recompensa do Desafio e <b>não gasta Vantagem Geográfica</b>. Uma carta já foi comprada para a renovação; escolha agora qual carta da sua mão será descartada. Depois haverá a compra normal da rodada.</p>':''}${handHtml(own?.hand||[],{buttonFor:id=>({button:'Descartar esta carta',data:`data-pending="${id}"`})})}</section>`}
+    if(['discard_card','hand_limit_discard'].includes(p.kind))return `<section class="card action-panel"><div class="eyebrow">Escolha uma carta</div><h3>${esc(p.reason||'Descarte')}</h3>${handHtml(own?.hand||[],{buttonFor:id=>({button:'Descartar',data:`data-pending="${id}"`})})}</section>`;
+    if(p.kind==='draw_choice'){const adv=Number(state.match.public_state?.countries?.[mine]?.advantages||0),canAdv=Boolean(p.can_use_advantage)&&adv>0,post=Boolean(state.match.public_state?.draw_context?.after_challenge);return `<section class="card action-panel flow-panel round-draw-flow"><div class="eyebrow">${post?'Etapa 2 de 2 · Compra normal da rodada':'Compra da rodada'}</div><h3>${post?'Agora faça a compra normal da rodada':'Como deseja comprar?'}</h3><p class="flow-explain">${post?'A renovação do Desafio já foi resolvida. Esta é uma compra diferente. ':''}Sua compra normal é <b>1 carta</b>. ${canAdv?`Você possui <b>${adv} Vantagem${adv===1?'':'s'}</b> e pode gastar 1 para revelar 2 cartas, escolher 1 e descartar a outra.`:'Você não precisa gastar Vantagem para esta compra.'}</p><div class="actions"><button class="btn primary" data-pending="normal">Comprar 1 carta${canAdv?' e manter a Vantagem':''}</button>${canAdv?'<button class="btn violet" data-pending="advantage">🎓 Gastar 1 Vantagem: ver 2 e ficar com 1</button>':''}</div></section>`};
     if(p.kind==='draw_keep'){const ids=own?.pending?.candidates||[];return `<section class="card action-panel"><div class="eyebrow">Vantagem Geográfica</div><h3>Escolha qual carta ficará na sua mão</h3><div class="hand">${ids.map(id=>cardHtml(id,{button:'Ficar com esta',data:`data-pending="${id}"`})).join('')}</div></section>`}
     return `<section class="card action-panel"><h3>Decisão necessária</h3><p>${esc(pendingDescription(p))}</p></section>`;
   }
-  function pendingDescription(p){return({card_setup:'Escolha de alvo ou modo da carta.',reaction_loss:'Uma Reação pode reduzir a perda.',reaction_dissolve:'Uma Reação pode impedir o rompimento da relação.',agreement_replace_proposer:'Escolha qual Acordo substituir.',agreement_response:'Resposta a proposta de Acordo.',block_response:'Resposta a proposta de Bloco.',trade_response:'Resposta a proposta de troca.',trade_return:'Escolha da carta devolvida na troca.',optional_renew:'Renovação opcional.',top_card_choice:'Decisão sobre o topo do baralho.',top_two_keep:'Escolha entre duas cartas.',tariff_choice:'Resposta às Barreiras Tarifárias.',pressure_choice:'Resposta à Pressão Geopolítica.',block_tension_choice:'Decisão do Bloco.',embargo_choice:'Resposta ao Embargo Secundário.',ied_response:'Resposta ao Investimento Estrangeiro Direto.',card_roll_decision:'Decisão sobre rolagem.',dispute_reroll:'Possível rerrolagem.',event_choice:'Escolha do Evento Mundial.',loss_choice:'Decisão sobre uma perda.',redirect_loss:'Redirecionamento de perda.',event_roll_decision:'Decisão sobre uma rolagem.',renew_discard:'Renovação de carta.',hand_limit_discard:'Descarte por limite da mão.',draw_choice:'Compra da rodada.',draw_keep:'Escolha entre duas cartas.'})[p.kind]||p.kind}
+  function pendingDescription(p){return({card_setup:'Escolha de alvo ou modo da carta.',reaction_loss:'Uma Reação pode reduzir a perda.',reaction_dissolve:'Uma Reação pode impedir o rompimento da relação.',agreement_replace_proposer:'Escolha qual Acordo substituir.',agreement_response:'Resposta a proposta de Acordo.',block_response:'Resposta a proposta de Bloco.',trade_response:'Resposta a proposta de troca.',trade_return:'Escolha da carta devolvida na troca.',optional_renew:'Renovação opcional.',top_card_choice:'Decisão sobre o topo do baralho.',top_two_keep:'Escolha entre duas cartas.',tariff_choice:'Resposta às Barreiras Tarifárias.',pressure_choice:'Resposta à Pressão Geopolítica.',block_tension_choice:'Decisão do Bloco.',embargo_choice:'Resposta ao Embargo Secundário.',ied_response:'Resposta ao Investimento Estrangeiro Direto.',card_roll_decision:'Decisão sobre rolagem.',dispute_reroll:'Possível rerrolagem.',event_choice:'Escolha do Evento Mundial.',loss_choice:'Decisão sobre uma perda.',redirect_loss:'Redirecionamento de perda.',event_roll_decision:'Decisão sobre uma rolagem.',renew_discard:'Renovação de carta.',hand_limit_discard:'Descarte por limite da mão.',draw_choice:'Escolha explícita da compra normal da rodada.',draw_keep:'Escolha entre duas cartas.'})[p.kind]||p.kind}
   function eventChoicePanel(p){
     const eid=p.event_id;let html='';
     if(eid===1)html=`<button class="btn danger" data-pending="lose">Perder 1 Economia</button>${(p.relations||[]).map(r=>`<button class="btn" data-pending="suspend:${r.partner}">Suspender ${r.type==='block'?'Bloco':'Acordo'} com ${esc(r.partner)}</button>`).join('')}`;
@@ -401,7 +428,7 @@
     if(eid===5)html='<button class="btn danger" data-pending="cult">Perder 1 Cultura</button><button class="btn danger" data-pending="net">Perder 1 Redes</button>';
     if(eid===6)html='<button class="btn danger" data-pending="lose">Perder 1 Economia</button><button class="btn" data-pending="discard">Descartar 1 carta</button>';
     if(eid===7||eid===8)html=`<button class="btn danger" data-pending="lose">Perder 1 Economia</button>${(p.relations||[]).map(r=>`<button class="btn" data-pending="end:${r.partner}">Encerrar Acordo com ${esc(r.partner)}</button>`).join('')}`;
-    if(eid===14)html=`<button class="btn ghost" data-pending="skip">Não propor</button>${(p.valid_targets||[]).map(t=>`<button class="btn good" data-pending="propose:${t}">Propor Acordo a ${esc(t)}</button>`).join('')}`;
+    if(eid===14)html=`<div class="banner good" style="width:100%">Esta é uma proposta extra do Evento e não consome sua iniciativa na Cúpula Diplomática.</div><button class="btn ghost" data-pending="skip">Não usar a proposta extra</button>${(p.valid_targets||[]).map(t=>`<button class="btn good" data-pending="propose:${t}">Propor Acordo extra a ${esc(t)}</button>`).join('')}`;
     if(eid===16)html='<button class="btn good" data-pending="cult">+1 Cultura</button><button class="btn violet" data-pending="renew">Renovar 1 carta</button>';
     return `<section class="card action-panel" style="margin-top:16px"><div class="eyebrow">Sua decisão no Evento</div><h3>Escolha uma opção</h3><div class="actions">${html}</div></section>`;
   }
@@ -423,11 +450,11 @@
   function renderDiplomacyPhase(pub,isTeacher,own){
     const active=activeList(pub),done=pub.diplomacy_done||[];
     if(isTeacher)return `<section class="action-panel command-action diplomacy-phase"><div class="eyebrow">Cúpula Internacional</div><h3>Uma iniciativa diplomática por país</h3><div class="diplomacy-status-grid">${active.map(c=>`<div class="dip-status ${done.includes(c)?'done':''}"><b>${esc(c)}</b><span>${done.includes(c)?'✓ concluída':'aguardando'}</span></div>`).join('')}</div><p class="muted tiny">Aceitar ou recusar a proposta de outro país não consome a iniciativa do receptor. Encerre a Cúpula pelo controle docente quando desejar.</p></section>`;
-    const me=state.me.country,c=pub.countries?.[me]||{};
+    const me=state.me.country,c=pub.countries?.[me]||{},openingBonus=Boolean(c.openingCommercialBonus);
     if(done.includes(me))return `<section class="action-panel command-action diplomacy-phase"><div class="eyebrow">Cúpula Internacional</div><h3>Sua iniciativa já foi concluída</h3><p class="muted">Você ainda pode receber e responder propostas de outros países. Use o botão Diplomacia no topo para acompanhar as relações.</p><div class="diplomacy-status-grid">${active.map(x=>`<div class="dip-status ${done.includes(x)?'done':''}"><b>${esc(x)}</b><span>${done.includes(x)?'✓':'…'}</span></div>`).join('')}</div></section>`;
     if(c.dipBlocked)return `<section class="action-panel command-action diplomacy-phase"><div class="eyebrow">Cúpula Internacional</div><h3>Seu país está impedido de agir diplomaticamente nesta rodada</h3><p class="muted">Esta restrição veio do Evento Global. Você ainda pode responder propostas recebidas.</p></section>`;
     const agreements=publicAgreementPartners(pub,me),block=publicBlockPartner(pub,me),agreementLocked=Boolean(pub.flags?.noAgreements||pub.flags?.noRelations||c.noNewAgreementRound),unrelated=agreementLocked?[]:active.filter(x=>x!==me&&!publicRelation(pub,me,x)&&!pub.countries[x]?.noNewAgreementRound),blockLocked=Boolean(pub.flags?.noRelations||block),blockTargets=blockLocked?[]:active.filter(x=>x!==me&&!publicBlockPartner(pub,x)),tradeTargets=active.filter(x=>x!==me&&Number(pub.countries[x]?.hand_count||0)>0);
-    return `<section class="action-panel command-action diplomacy-phase"><div class="eyebrow">Sua iniciativa diplomática</div><h3>Escolha uma ação para a Cúpula</h3><div class="dip-action-groups">
+    return `<section class="action-panel command-action diplomacy-phase"><div class="eyebrow">Sua iniciativa diplomática</div><h3>Escolha uma ação para a Cúpula</h3>${openingBonus?'<div class="banner good opening-bonus"><b>Abertura Comercial ativa:</b> se sua iniciativa formar um novo Acordo nesta Cúpula, você e o parceiro renovam 1 carta.</div>':''}<div class="dip-action-groups">
       <div><b>Propor Acordo</b><div class="actions">${unrelated.length?unrelated.map(t=>`<button class="btn compact" data-diplomacy="agreement" data-target="${esc(t)}">${esc(t)}</button>`).join(''):'<span class="muted tiny">Sem alvo disponível.</span>'}</div></div>
       <div><b>Formar Bloco</b><div class="actions">${blockTargets.length?blockTargets.map(t=>`<button class="btn compact" data-diplomacy="block" data-target="${esc(t)}">${esc(t)}</button>`).join(''):'<span class="muted tiny">Sem alvo disponível.</span>'}</div></div>
       <div><b>Trocar 1 carta por 1</b><div class="trade-line"><select id="tradeTarget">${tradeTargets.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select><select id="tradeCard">${(own?.hand||[]).map(id=>`<option value="${id}">${esc(CARD[id]?.name||'Carta '+id)}</option>`).join('')}</select><button class="btn compact" id="tradeSubmit" ${(!tradeTargets.length||!(own?.hand||[]).length)?'disabled':''}>Propor troca</button></div></div>

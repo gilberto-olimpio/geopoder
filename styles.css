@@ -130,3 +130,21 @@ select option:disabled { color: #888; background: #eee; }
   .command-top-right{align-items:stretch;width:100%}.command-recent{justify-content:flex-start;width:100%}.command-recent b{max-width:none}
   .command-room{grid-template-columns:1fr;grid-template-rows:auto;}
 }
+
+/* Alpha 2.0d.3 — clareza de fluxo e rolagens visuais */
+.flow-panel{position:relative}
+.flow-explain{border:1px solid #36516f;background:#0a1727;border-radius:10px;padding:10px 12px!important;color:#d9e6f5!important;line-height:1.45!important}
+.challenge-reward-flow{border-color:#64549c;background:linear-gradient(180deg,rgba(44,37,76,.88),rgba(15,25,43,.94))}
+.round-draw-flow{border-color:#37698a;background:linear-gradient(180deg,rgba(21,53,73,.9),rgba(13,27,45,.94))}
+.opening-bonus{margin:8px 0 10px!important;padding:9px 10px!important;font-size:.75rem;line-height:1.35}
+
+.dice-result-banner{flex:0 0 auto;margin-top:9px;border:1px solid #526f94;border-radius:13px;background:linear-gradient(135deg,rgba(22,46,75,.98),rgba(34,27,62,.98));padding:9px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:diceBannerIn .45s ease-out}
+.dice-result-copy{display:flex;flex-direction:column;gap:1px;min-width:145px}.dice-result-copy span{text-transform:uppercase;letter-spacing:.08em;font-size:.58rem;font-weight:900;color:#91d0f7}.dice-result-copy b{font-size:.82rem;color:#f1f6ff}.dice-result-copy small{font-size:.63rem;color:#aebed2}
+.dice-result-rolls{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}.dice-result-unit{display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(3,12,24,.48);padding:5px 8px}.dice-result-unit>div{display:grid;grid-template-columns:auto auto;column-gap:6px;align-items:baseline}.dice-result-unit b{font-size:.66rem;color:#bcd1e8}.dice-result-unit strong{font-size:1rem;color:#fff}.dice-result-unit small{grid-column:1/-1;font-size:.56rem;color:#c8b7ff;text-transform:uppercase;letter-spacing:.06em}.dice-face-animated{display:inline-block;font-size:2rem;line-height:1;color:#fff;text-shadow:0 0 16px rgba(119,194,255,.45);animation:diceRollIn .72s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes diceRollIn{0%{transform:rotate(-220deg) scale(.45);opacity:0}45%{transform:rotate(35deg) scale(1.22);opacity:1}72%{transform:rotate(-12deg) scale(.94)}100%{transform:rotate(0) scale(1)}}
+@keyframes diceBannerIn{0%{transform:translateY(-8px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.dice-result-banner,.dice-face-animated{animation:none}}
+@media(max-width:1100px){.dice-result-banner{padding:7px 8px;gap:8px}.dice-result-copy{min-width:125px}.dice-face-animated{font-size:1.65rem}.dice-result-unit{padding:4px 6px}}
+@media(max-width:820px){.dice-result-banner{align-items:flex-start;flex-direction:column}.dice-result-rolls{justify-content:flex-start}}
+.dice-number.pending{opacity:.55;letter-spacing:.08em}.dice-face-animated.rolling{filter:drop-shadow(0 0 10px rgba(126,202,255,.6))}.dice-face-animated.settled{animation:diceSettle .28s ease-out}.dice-result-banner.rolling{box-shadow:0 0 0 1px rgba(121,189,255,.16),0 8px 24px rgba(0,0,0,.22)}
+@keyframes diceSettle{0%{transform:scale(1.28) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
