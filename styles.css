@@ -229,45 +229,208 @@ select option:disabled { color: #888; background: #eee; }
 .final-command{justify-content:flex-start!important;text-align:center!important}.final-command h1{font-size:1.45rem}.final-ranking-v2{display:grid;gap:5px;width:min(650px,100%);margin:6px auto}.final-rank{display:grid;grid-template-columns:42px 38px minmax(0,1fr) 60px 70px;align-items:center;gap:8px;border:1px solid #405565;background:#0b2331;padding:6px 9px;text-align:left}.final-rank.winner{border-color:#b68c38;background:linear-gradient(90deg,#3b3017,#0e2733);box-shadow:inset 3px 0 0 #e2b74d}.final-rank>span{font-size:1.05rem;color:#e1c168;font-weight:800}.final-rank .country-seal{width:31px;height:31px;font-size:1rem}.final-rank div b{display:block}.final-rank div small{font-family:Inter,Arial,sans-serif;color:#96a8b2;font-size:.52rem}.final-rank strong{font-size:1.12rem;text-align:right}.final-rank em{font-family:Inter,Arial,sans-serif;font-size:.48rem;color:#93a3ac;font-style:normal;text-transform:uppercase}.final-quote{font-family:Georgia,serif!important;font-style:italic!important;color:#c9b781!important;text-align:center!important}.final-nav{grid-template-columns:1fr!important}.final-nav .gov-nav-btn{border-right:0;justify-self:stretch}
 .command-situation .action-panel{border:1px solid rgba(191,154,74,.42)!important;border-radius:4px!important;background:linear-gradient(180deg,rgba(8,29,42,.94),rgba(5,20,31,.97))!important;box-shadow:inset 0 0 38px rgba(55,94,105,.08)!important;padding:14px 16px!important;min-height:100%;font-family:Inter,Arial,sans-serif}.command-situation .action-panel .eyebrow{color:#e2bb5a!important;font-size:.58rem!important;letter-spacing:.12em!important}.command-situation .action-panel h3{font-family:Georgia,serif}.command-situation .action-panel .game-card{background:#e5d8bc;color:#211f1b;border-color:#9c8350}.command-situation .action-panel .game-card p{color:#484137}.command-situation .action-panel .game-card .num{color:#765b22}
 
-/* Alpha 2.0f — sala de comando otimizada para uma única tela */
-@media(min-width:901px){
-  .government-room{
-    grid-template-columns:clamp(250px,21vw,295px) minmax(0,1fr) clamp(285px,23vw,325px)!important;
-    grid-template-rows:clamp(62px,9vh,74px) minmax(0,1fr) clamp(128px,21vh,166px) clamp(48px,7vh,54px)!important;
-    gap:6px!important;padding:6px!important
-  }
-  .government-top{padding:0 9px!important}
-  .gov-brand,.gov-country-ident,.gov-team,.gov-round,.gov-online{height:52px;padding:0 9px}
-  .command-national,.command-situation,.command-event{padding:8px 10px!important}
-  .panel-title{padding-bottom:5px}.panel-title b{font-size:.82rem}.panel-title small{font-size:.47rem}
+/* Alpha 2.0e.2 — estados diplomáticos 0.4-C */
+.btn.warn{background:#6b4f18;border-color:#d6a93d;color:#fff0bc}
+.relation-v2.tension,.relation-chip.tension{border-color:#c28a2b;background:rgba(194,138,43,.12)}
+.relation-v2.crisis,.relation-chip.crisis{border-color:#b54848;background:rgba(181,72,72,.12)}
+.relation-v2.suspended{opacity:.68;filter:saturate(.65)}
 
-  .national-identity{padding:5px 0;gap:7px}.national-identity .country-seal{width:34px;height:34px;font-size:1.12rem}.national-identity h2{font-size:1.05rem}.national-identity small,.national-identity span{font-size:.43rem}
-  .national-meters{gap:4px;margin-top:0}.gov-attr-head{font-size:.58rem}.gov-attr-head b{font-size:.88rem}.gov-meter i{height:8px}
-  .national-summary{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
-  .national-summary .national-score-v2{margin:0!important;padding:5px 6px;border:1px solid rgba(215,169,62,.26);background:rgba(7,25,36,.72)}
-  .national-score-v2>div{gap:4px}.national-score-v2 span{font-size:.75rem}.national-score-v2 b{font-size:.48rem}.national-score-v2 strong{font-size:.96rem}
-  .relation-title{padding:5px 0 2px;font-size:.52rem}.relation-list-v2{gap:0;overflow:hidden}.relation-v2{padding:3px 2px;font-size:.55rem}.relation-v2 small{font-size:.48rem}.relation-empty{font-size:.54rem;padding:4px 0}
+/* ==========================================================
+   Alpha 2.0e.2 — Otimização de espaço / Mesa de Situação
+   - Mais área útil para a Mesa
+   - Gabinete e Cenário Global sem conteúdo essencial cortado
+   - Dossiês compactos; leitura/jogada dentro da Mesa
+   - Arquivos de Governo abrem em janela sobreposta real
+   ========================================================== */
 
-  .command-event{overflow:hidden!important}.event-paper{height:calc(100% - 31px);margin-top:5px;padding:6px 7px;overflow:hidden;display:flex;flex-direction:column}
-  .event-paper-top{font-size:.5rem;flex:0 0 auto}.event-paper h2{font-size:clamp(.84rem,1.3vw,1.08rem);margin:5px 0 4px;flex:0 0 auto}
-  .event-visual{height:clamp(38px,7vh,58px);flex:0 0 auto}.event-visual>span{font-size:1.45rem}.event-effect-box{padding:5px 6px;margin-top:5px;min-height:0;overflow:hidden}.event-effect-box b{font-size:.5rem}.event-effect-box p{font-size:.58rem!important;line-height:1.28!important}
-
-  .situation-phase{padding:5px 0 3px!important}.situation-phase>.command-action{min-height:0!important;height:100%}.situation-phase .action-panel{margin-top:0!important;min-height:0!important}
-  .command-action{padding:10px 12px!important}.command-action h1{font-size:1.35rem}.command-action h2{font-size:1.12rem}.command-action p{font-size:.7rem}.command-recent{padding-top:4px;gap:7px}.command-recent b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-  .command-bottom{padding:5px 8px 7px!important}.dossier-dock-head{padding-bottom:3px}.dossier-dock-head span{font-size:.6rem}.dossier-dock-head b,.dossier-dock-head small{font-size:.49rem}
-  .command-hand{gap:6px!important}.dossier-card>img,.dossier-thumb-placeholder{height:clamp(34px,7vh,50px)}.dossier-thumb-placeholder{font-size:1.05rem}
-  .dossier-card h4{font-size:.6rem!important;margin:3px 5px 1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dossier-card p{font-size:.47rem!important;line-height:1.08!important;margin:0 5px!important;-webkit-line-clamp:1}.dossier-card .command-card-footer{padding:2px 4px 4px}.dossier-card .tag-row{display:none}.dossier-card .btn{min-height:21px!important;padding:3px 4px!important;font-size:.47rem!important;margin-top:2px}.dossier-card.selected{border-color:#f0c75b!important;box-shadow:0 0 0 2px rgba(240,199,91,.32),0 5px 16px rgba(0,0,0,.36)!important}
+/* Estrutura desktop: a mão ocupa menos altura e libera a faixa central. */
+.government-room{
+  grid-template-columns:275px minmax(0,1fr) 330px!important;
+  grid-template-rows:70px minmax(0,1fr) 166px 52px!important;
+  gap:7px!important;
+  padding:7px!important;
 }
 
-.situation-phase.showing-dossier{overflow:hidden!important}
-.situation-dossier{height:100%;min-height:0;border:1px solid #9d834a;background:linear-gradient(180deg,#eee4cf,#ddceb0);color:#24211c;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.situation-dossier-head{display:flex;justify-content:space-between;gap:8px;background:#082635;color:#e8c975;padding:5px 8px;font-family:Inter,Arial,sans-serif;font-size:.48rem;letter-spacing:.07em;text-transform:uppercase;flex:0 0 auto}
-.situation-dossier-body{display:grid;grid-template-columns:minmax(120px,34%) minmax(0,1fr);gap:9px;padding:8px;min-height:0;flex:1 1 auto;overflow:hidden}
-.situation-dossier-art{min-height:0;overflow:hidden;border:1px solid #947b45;background:#0a2635}.situation-dossier-art img{display:block;width:100%;height:100%;object-fit:cover}.situation-dossier-placeholder{height:100%;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e0bc5c;background:linear-gradient(140deg,#12384a,#071822)}.situation-dossier-placeholder span{font-size:2rem}.situation-dossier-placeholder small{font-family:Inter,Arial,sans-serif;font-size:.42rem;letter-spacing:.1em;margin-top:4px}
-.situation-dossier-copy{min-width:0;min-height:0;display:flex;flex-direction:column}.situation-dossier-copy h2{font-family:Georgia,serif;font-size:1.05rem;line-height:1.05;text-transform:uppercase;margin:0 0 4px;color:#1d2528}.situation-dossier-copy h3{font-family:Georgia,serif;font-size:.72rem;line-height:1.15;margin:0 0 4px;color:#393329}.situation-dossier-brief{font-family:Georgia,serif!important;font-size:.58rem!important;line-height:1.22!important;color:#51493d!important;margin:0 0 5px!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.situation-dossier-effect{border:1px solid #3d5260;background:#0b2939;color:#edf0ea;padding:6px 8px;margin-top:auto}.situation-dossier-effect>b{font-family:Inter,Arial,sans-serif;color:#e4bd58;font-size:.5rem;letter-spacing:.09em}.situation-dossier-effect p{font-family:Inter,Arial,sans-serif!important;color:#e8eeee!important;font-size:.62rem!important;line-height:1.28!important;margin:2px 0 0!important}
-.situation-dossier-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:stretch;padding:0 8px 7px;flex:0 0 auto}.situation-dossier-actions .btn{border-radius:2px;padding:6px 9px;font-size:.57rem}.dossier-status{border:1px solid #4b6473;background:#113044;color:#dce8ec;padding:6px 8px;font:600 .56rem/1.25 Inter,Arial,sans-serif}.dossier-status.warn{border-color:#8c7132;background:#3a2f18;color:#f0dda6}.dossier-status.violet{border-color:#655184;background:#2a2140;color:#e1d5f3}
+/* O modal era filho direto da grade e herdava position:relative. Isto garante
+   que Situação Mundial/Diplomacia/Inteligência/Histórico/Como Jogar realmente
+   fiquem por cima da tela, sem criar conteúdo abaixo da barra de navegação. */
+.government-room>.command-modal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:4000!important;
+  padding:18px!important;
+  background:rgba(1,7,10,.86)!important;
+}
+.government-room>.command-modal.open{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.command-modal-card{
+  width:min(1120px,calc(100vw - 36px))!important;
+  max-height:calc(100vh - 36px)!important;
+  min-height:0!important;
+}
+.command-modal-head{flex:0 0 auto!important;padding:10px 14px!important}
+.command-modal-body{flex:1 1 auto!important;min-height:0!important;overflow:auto!important;padding:12px!important}
 
+/* Gabinete: atributos e placar são prioritários e permanecem visíveis. */
+.command-national{padding:9px 11px!important}
+.command-national .panel-title{padding-bottom:5px!important}
+.command-national .panel-title b{font-size:.87rem!important}
+.command-national .panel-title small{font-size:.48rem!important}
+.national-identity{padding:5px 0!important;gap:8px!important}
+.national-identity .country-seal{width:36px!important;height:36px!important;font-size:1.2rem!important}
+.national-identity h2{font-size:1.12rem!important}
+.national-meters{gap:4px!important;margin-top:0!important}
+.gov-attr-head{font-size:.61rem!important}
+.gov-attr-head b{font-size:.92rem!important}
+.gov-meter{gap:2px!important;margin-top:1px!important}
+.gov-meter i{height:8px!important}
+.national-score-strip{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;border-top:1px solid rgba(215,169,62,.32);padding-top:5px}
+.national-score-strip .national-score-v2{margin:0!important;padding:4px 6px!important;border:1px solid #2a4656!important;background:#081d29!important;min-width:0!important}
+.national-score-strip .national-score-v2>div{gap:4px!important;min-width:0!important}
+.national-score-strip .national-score-v2 span{font-size:.82rem!important}
+.national-score-strip .national-score-v2 b{font-size:.5rem!important;white-space:nowrap!important}
+.national-score-strip .national-score-v2 strong{font-size:1.03rem!important}
+.relation-title{padding:4px 0 3px!important;font-size:.54rem!important;margin-top:4px!important}
+.relation-list-v2{gap:1px!important;overflow:auto!important;scrollbar-width:thin;max-height:58px!important}
+.relation-v2{grid-template-columns:14px 1fr auto!important;padding:2px 2px!important;font-size:.56rem!important;min-height:18px!important}
+.relation-v2 small{font-size:.49rem!important}
+
+/* Mesa: rolagem deixa de ser necessária no estado normal. Só decisões
+   excepcionalmente extensas podem rolar dentro do próprio painel. */
+.command-situation{padding:8px 12px 7px!important}
+.situation-topline{min-height:27px!important}
+.situation-phase{overflow:hidden!important;padding:5px 0 3px!important}
+.situation-phase>.command-action,.situation-phase>.card.action-panel{
+  width:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow:auto!important;
+  scrollbar-width:thin;
+}
+.command-action{padding:11px 13px!important}
+.command-action h1{font-size:1.5rem!important;margin:.1rem 0 .35rem!important}
+.command-action h2{font-size:1.14rem!important;margin:.1rem 0 .35rem!important}
+.command-action h3{margin:.1rem 0 .3rem!important}
+.command-action p{font-size:.69rem!important;line-height:1.32!important;margin:.25rem 0!important}
+.command-recent{min-height:23px!important;padding:4px 7px!important}
+.council-tip{padding:5px 8px!important;margin-top:4px!important}
+.council-tip p{font-size:.57rem!important;line-height:1.22!important}
+.council-tip b{font-size:.68rem!important}
+
+/* Cenário Global: texto mecânico visível sem barra de rolagem permanente. */
+.command-event{padding:9px!important;overflow:hidden!important}
+.command-event .panel-title{padding-bottom:5px!important}
+.command-event .panel-title b{font-size:.88rem!important}
+.command-event .panel-title small{font-size:.48rem!important}
+.event-paper{height:calc(100% - 32px)!important;margin-top:5px!important;padding:6px 7px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;min-height:0!important}
+.event-paper-top{font-size:.51rem!important;flex:0 0 auto!important}
+.event-paper h2{font-size:1rem!important;line-height:1!important;margin:5px 0 4px!important;flex:0 0 auto!important}
+.event-visual{height:52px!important;min-height:52px!important;flex:0 0 52px!important}
+.event-visual>span{font-size:1.55rem!important}
+.event-summary{font-size:.62rem!important;line-height:1.2!important;margin:5px 0!important;flex:0 0 auto!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.event-effect-box{padding:5px 6px!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important}
+.event-effect-box b{font-size:.5rem!important}
+.event-effect-box p{font-size:.58rem!important;line-height:1.22!important;margin:2px 0!important}
+.event-paper blockquote{font-size:.52rem!important;line-height:1.18!important;margin:5px 4px 0!important;flex:0 0 auto!important}
+.event-paper cite{font-size:.4rem!important;margin-top:2px!important}
+
+/* Dossiês no rodapé: são uma mão compacta. O detalhamento pertence à Mesa. */
+.command-bottom{padding:5px 8px 7px!important}
+.dossier-dock-head{padding:0 2px 3px!important;min-height:16px!important}
+.dossier-dock-head span{font-size:.61rem!important}
+.dossier-dock-head b{font-size:.54rem!important}
+.dossier-dock-head small{font-size:.49rem!important}
+.command-hand{gap:6px!important}
+.dossier-card>img,.dossier-thumb-placeholder{height:42px!important;min-height:42px!important}
+.dossier-thumb-placeholder{font-size:1rem!important}
+.dossier-card h4{font-size:.63rem!important;margin:4px 6px 1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dossier-card p{font-size:.49rem!important;line-height:1.1!important;margin:0 6px!important;-webkit-line-clamp:1!important}
+.dossier-card .command-card-footer{padding:2px 5px 4px!important}
+.dossier-card .tag-row{margin:1px 0!important;min-height:9px!important;white-space:nowrap;overflow:hidden}
+.dossier-card .mini-tag{font-size:.38rem!important;padding:0 3px!important}
+.dossier-card .btn{min-height:20px!important;padding:2px 4px!important;font-size:.46rem!important}
+
+/* Dossiê aberto dentro da Mesa de Situação — formato horizontal, sem retirar
+   o jogador da tela principal. */
+.dossier-preview-phase{padding-top:4px!important}
+.situation-dossier-preview{justify-content:flex-start!important;padding:8px 10px!important;overflow:hidden!important}
+.situation-dossier-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;border-bottom:1px solid rgba(215,169,62,.35);padding-bottom:4px;margin-bottom:6px;font-family:Inter,Arial,sans-serif}
+.situation-dossier-head>div{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;flex:1}
+.situation-dossier-head span{font-size:.49rem;letter-spacing:.08em;color:#e8c66f;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.situation-dossier-head b{font-size:.5rem;color:#92aab6;white-space:nowrap}
+.situation-dossier-close{width:25px;height:25px;display:grid;place-items:center;border:1px solid #587181;background:#0a2736;color:#e7eef0;font-size:1rem;line-height:1;cursor:pointer}
+.situation-dossier-grid{display:grid;grid-template-columns:minmax(150px,34%) minmax(0,1fr);gap:9px;flex:1 1 auto;min-height:0;overflow:hidden}
+.situation-dossier-media{min-width:0;min-height:0;overflow:hidden;border:1px solid #75643c;background:#0b2230}
+.situation-dossier-media img{width:100%;height:100%;object-fit:cover;display:block}
+.situation-dossier-art.placeholder{width:100%;height:100%;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#173a4c,#071722);color:#d8b458}
+.situation-dossier-art.placeholder span{font-size:2rem}.situation-dossier-art.placeholder small{font-family:Inter,Arial,sans-serif;font-size:.48rem;letter-spacing:.1em;margin-top:4px}
+.situation-dossier-copy{min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.situation-dossier-copy h2{font-size:1.18rem!important;text-transform:uppercase!important;margin:0 0 3px!important;color:#f0e7d5!important}
+.situation-dossier-copy h3{font-family:Georgia,serif!important;color:#e1c47c!important;font-size:.76rem!important;line-height:1.15!important;margin:0 0 3px!important}
+.situation-dossier-brief{font-size:.6rem!important;line-height:1.2!important;color:#aebbc1!important;margin:0 0 4px!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.situation-dossier-effect{border:1px solid #506675;background:#071b27;padding:6px 8px;margin-top:2px;min-height:0;overflow:auto;scrollbar-width:thin}
+.situation-dossier-effect b{font-family:Inter,Arial,sans-serif;color:#e0b958;font-size:.5rem;letter-spacing:.09em}
+.situation-dossier-effect p{font-family:Inter,Arial,sans-serif!important;color:#e2e9eb!important;font-size:.64rem!important;line-height:1.25!important;margin:2px 0 0!important}
+.situation-dossier-copy>.tag-row{margin-top:4px;min-height:0}
+.situation-dossier-copy .mini-tag{font-size:.45rem;padding:1px 5px}
+.situation-dossier-actions{display:flex;gap:7px;align-items:center;flex:0 0 auto;margin-top:6px}
+.situation-dossier-actions>.btn{font-size:.59rem!important;padding:6px 9px!important}
+.situation-dossier-actions>.btn.primary{flex:1 1 auto}
+.situation-dossier-note{flex:1 1 auto;border:1px solid #496274;background:#0b2837;color:#cbd8dd;padding:6px 8px;font-family:Inter,Arial,sans-serif;font-size:.57rem;line-height:1.2}
+.situation-dossier-note.violet{border-color:#68558c;background:#241d37}.situation-dossier-note.warn{border-color:#8d6c2f;background:#3a2f17;color:#eedca9}
+
+/* Navegação um pouco mais baixa, mantendo os alvos confortáveis. */
+.gov-nav-btn{padding:4px 8px!important;grid-template-columns:32px 1fr!important}
+.gov-nav-btn>span{font-size:1.08rem!important}
+.gov-nav-btn>b{font-size:.58rem!important}
+.gov-nav-btn>small{font-size:.39rem!important}
+
+/* Professor: a nota de playtest também fica compacta para devolver altura à Mesa. */
+.teacher-dock{gap:7px!important}
+.teacher-note-wrap textarea{margin-top:3px!important;padding:5px 7px!important;font-size:.68rem!important}
+.teacher-dock-actions{gap:3px!important;min-width:142px!important}
+.teacher-dock-actions .btn{font-size:.59rem!important;padding:4px 7px!important}
+
+/* Viewports baixos, comuns em Chromebook com barra do navegador visível. */
+@media (min-width:901px) and (max-height:700px){
+  .government-room{grid-template-columns:275px minmax(0,1fr) 330px!important;grid-template-rows:62px minmax(0,1fr) 132px 46px!important;gap:6px!important;padding:6px!important}
+  .government-top{padding:0 8px!important}
+  .gov-brand,.gov-country-ident,.gov-team,.gov-round,.gov-online{height:48px!important;padding:0 9px!important}
+  .gov-logo{width:36px!important;height:36px!important;font-size:1.18rem!important;margin-right:8px!important}
+  .gov-title{font-size:1.08rem!important}.gov-title small{font-size:.65rem!important}.gov-motto{font-size:.46rem!important}
+  .gov-country-ident .country-seal{width:38px!important;height:38px!important;font-size:1.25rem!important}.gov-country-ident b{font-size:.9rem!important}.gov-country-ident span,.gov-country-ident small{font-size:.45rem!important}
+  .gov-team b{font-size:.76rem!important}.gov-round small,.gov-team small,.gov-online small{font-size:.45rem!important}.gov-round b{font-size:.62rem!important}.gov-online>span{font-size:.57rem!important}
+  .round-track i{width:15px!important;height:2px!important}
+
+  .command-national{padding:7px 9px!important}.national-identity{padding:3px 0!important}.national-identity span{display:none!important}
+  .national-meters{gap:3px!important}.gov-attr-head{font-size:.56rem!important}.gov-meter i{height:7px!important}
+  .national-score-strip{margin-top:4px!important;padding-top:4px!important}.national-score-strip .national-score-v2{padding:3px 4px!important}.national-score-strip .national-score-v2 b{font-size:.45rem!important}.national-score-strip .national-score-v2 strong{font-size:.92rem!important}
+  .relation-title{margin-top:2px!important;padding:3px 0 2px!important}.relation-list-v2{max-height:45px!important}.relation-v2{min-height:15px!important;font-size:.51rem!important;padding:1px!important}.relation-v2 small{font-size:.43rem!important}
+
+  .command-situation{padding:7px 10px 6px!important}.situation-topline{min-height:24px!important}.panel-title.compact b{font-size:.78rem!important}.panel-title.compact small{font-size:.43rem!important}.situation-active{padding:3px 6px!important;font-size:.48rem!important}
+  .situation-phase{padding:3px 0 2px!important}.command-action{padding:8px 10px!important}.command-action h1{font-size:1.28rem!important}.command-action h2{font-size:1rem!important}.command-action p{font-size:.61rem!important}.command-recent{min-height:20px!important;padding:3px 6px!important}.command-recent span,.recent-link{font-size:.46rem!important}.command-recent b{font-size:.54rem!important}
+  .council-tip{padding:4px 6px!important}.council-tip>div>span{font-size:.42rem!important}.council-tip p{font-size:.51rem!important}.tip-close{padding:4px 6px!important;font-size:.5rem!important}
+
+  .command-event{padding:7px!important}.command-event .panel-title{padding-bottom:3px!important}.event-paper{height:calc(100% - 27px)!important;margin-top:3px!important;padding:5px 6px!important}.event-paper h2{font-size:.89rem!important;margin:4px 0!important}.event-visual{height:40px!important;min-height:40px!important;flex-basis:40px!important}.event-visual>span{font-size:1.25rem!important}.event-summary{display:none!important}.event-effect-box{padding:4px 5px!important}.event-effect-box p{font-size:.53rem!important;line-height:1.17!important}.event-paper blockquote{display:none!important}
+
+  .command-bottom{padding:4px 7px 5px!important}.dossier-dock-head{padding-bottom:2px!important}.dossier-dock-head small{display:none!important}.dossier-card>img,.dossier-thumb-placeholder{height:31px!important;min-height:31px!important}.dossier-card h4{font-size:.56rem!important;margin:3px 5px 1px!important}.dossier-card p{font-size:.43rem!important}.dossier-card .tag-row{display:none!important}.dossier-card .command-card-footer{padding:1px 4px 3px!important}.dossier-card .btn{min-height:18px!important;font-size:.41rem!important;padding:1px 3px!important}
+
+  .government-nav .gov-nav-btn{padding:3px 6px!important;grid-template-columns:27px 1fr!important}.government-nav .gov-nav-btn>span{font-size:.95rem!important}.government-nav .gov-nav-btn>b{font-size:.51rem!important}.government-nav .gov-nav-btn>small{font-size:.34rem!important}
+
+  .situation-dossier-preview{padding:6px 8px!important}.situation-dossier-grid{grid-template-columns:minmax(120px,31%) minmax(0,1fr)!important;gap:7px!important}.situation-dossier-copy h2{font-size:1rem!important}.situation-dossier-copy h3{font-size:.66rem!important}.situation-dossier-brief{font-size:.53rem!important;-webkit-line-clamp:1!important}.situation-dossier-effect{padding:4px 6px!important}.situation-dossier-effect p{font-size:.56rem!important}.situation-dossier-actions{margin-top:4px!important}.situation-dossier-actions>.btn{font-size:.51rem!important;padding:4px 7px!important}.situation-dossier-note{font-size:.5rem!important;padding:4px 6px!important}
+
+  .command-modal-card{max-height:calc(100vh - 20px)!important;width:min(1080px,calc(100vw - 24px))!important}.government-room>.command-modal{padding:10px!important}.command-modal-head{padding:7px 10px!important}.command-modal-body{padding:8px!important}
+  .world-grid{gap:7px!important}.world-grid .card{padding:8px!important}.rules-tabs{gap:6px!important}.rules-tabs section{padding:7px!important}.rules-tabs p{font-size:.62rem!important}.intel-summary{margin-bottom:7px!important}
+}
+
+/* Tablet/celular continua usando o fluxo empilhado; o modal precisa permanecer fixo. */
 @media(max-width:900px){
-  .situation-phase.showing-dossier{overflow:visible!important}.situation-dossier{height:auto;min-height:420px}.situation-dossier-body{grid-template-columns:1fr;overflow:visible}.situation-dossier-art{height:160px}.situation-dossier-actions{grid-template-columns:1fr}.dossier-card.selected{border-color:#f0c75b!important;box-shadow:0 0 0 2px rgba(240,199,91,.32)!important}
+  .government-room>.command-modal{position:fixed!important;inset:0!important;z-index:4000!important}
+  .command-modal-card{width:calc(100vw - 20px)!important;max-height:calc(100vh - 20px)!important}
+  .national-score-strip{grid-template-columns:1fr 1fr}
+  .situation-dossier-grid{grid-template-columns:1fr!important;overflow:auto!important}
+  .situation-dossier-media{max-height:160px}
 }
