@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0e.2';
+  const GAME_VERSION = 'Alpha 2.0g';
   const RULES_VERSION = '0.4-C';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -71,17 +71,19 @@
     'Solária':{symbol:'☀',motto:'Cultura · inovação · projeção'}
   };
   const ATTR_UI={eco:{icon:'●',label:'Economia',cls:'eco'},net:{icon:'⌘',label:'Redes',cls:'net'},dip:{icon:'◆',label:'Diplomacia',cls:'dip'},cult:{icon:'◈',label:'Cultura',cls:'cult'}};
-  const tutorialSeenKey='gp_onboarding_20e_seen';
-  const tipKey=k=>`gp_tip_20e_${k}`;
+  const tutorialSeenKey='gp_onboarding_20g_seen';
+  const tipKey=k=>`gp_tip_20g_${k}`;
   const hasSeenTip=k=>localStorage.getItem(tipKey(k))==='1';
   const markTipSeen=k=>localStorage.setItem(tipKey(k),'1');
   function countrySeal(country){const u=COUNTRY_UI[country]||{symbol:'✦'};return `<span class="country-seal country-${esc(country||'')}" aria-hidden="true">${u.symbol}</span>`}
   function attrMeter(value,attr){const v=Math.max(0,Math.min(8,Number(value||0)));return `<div class="gov-attr attr-${attr}"><div class="gov-attr-head"><span>${ATTR_UI[attr]?.icon||'●'} ${ATTR_UI[attr]?.label||attr}</span><b>${v}</b></div><div class="gov-meter" aria-label="${esc(ATTR_UI[attr]?.label||attr)} ${v} de 8">${Array.from({length:8},(_,i)=>`<i class="${i<v?'on':''}"></i>`).join('')}</div></div>`}
-  function cardTypeGlyph(type){return type==='Interferência'?'⚠':type==='Reação'?'↩':type==='Risco'?'◆':'▣'}
+  function cardTypeGlyph(type){return type==='Interferência'?'◎':type==='Reação'?'⛨':type==='Risco'?'◆':'▣'}
+  function cardTypeClass(type){return type==='Interferência'?'type-interference':type==='Reação'?'type-reaction':type==='Risco'?'type-risk':'type-development'}
+  function cardTypeLabel(type){return type==='Reação'?'REAÇÃO · use quando o gatilho ocorrer':type==='Interferência'?'INTERFERÊNCIA · ação contra outro país':type==='Risco'?'RISCO / ESCOLHA':'DESENVOLVIMENTO'}
   function editorialCardHtml(c,{expanded=false}={}){
     if(!c)return'';
     const art=c.art?`<img class="dossier-art" src="${esc(c.art)}" alt="Ilustração temática de ${esc(c.name)}">`:`<div class="dossier-art dossier-art-placeholder"><span>${cardTypeGlyph(c.type)}</span><small>DOCUMENTO DE GOVERNO</small></div>`;
-    return `<article class="dossier-full ${expanded?'expanded':''}"><div class="dossier-classification"><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><span>DOSSIÊ #${String(c.id).padStart(2,'0')}</span></div><h3>${esc(c.name)}</h3>${art}${c.headline?`<div class="dossier-headline">${esc(c.headline)}</div>`:''}${c.brief?`<p class="dossier-brief">${esc(c.brief)}</p>`:''}<div class="dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div>${c.quote?`<blockquote>“${esc(c.quote)}”<cite>— ${esc(c.source||'Análise internacional')}</cite></blockquote>`:''}<div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></article>`;
+    return `<article class="dossier-full ${cardTypeClass(c.type)} ${expanded?'expanded':''}"><div class="dossier-classification"><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><span>DOSSIÊ #${String(c.id).padStart(2,'0')}</span></div><h3>${esc(c.name)}</h3>${art}${c.headline?`<div class="dossier-headline">${esc(c.headline)}</div>`:''}${c.brief?`<p class="dossier-brief">${esc(c.brief)}</p>`:''}<div class="dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div>${c.quote?`<blockquote>“${esc(c.quote)}”<cite>— ${esc(c.source||'Análise internacional')}</cite></blockquote>`:''}<div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></article>`;
   }
   function currentCountry(pub,isTeacher){return isTeacher?null:state.me?.country||pub.active_country||null}
   function contextTip(pub,isTeacher,own){
@@ -102,10 +104,11 @@
     if(localStorage.getItem(tutorialSeenKey)==='1'&&!state.onboardingActive)return;
     if(!state.onboardingActive){state.onboardingActive=true;state.onboardingStep=0;}
     const steps=[
-      {target:'.command-situation',kicker:'BEM-VINDO AO GEOPODER',title:'Você está no comando',text:'Sua equipe assumiu o governo de um país. As decisões tomadas nesta Sala de Comando afetam Economia, Redes, Diplomacia, Cultura e sua Influência internacional.',button:'Assumir o governo'},
-      {target:'.command-national',kicker:'1 · SEU PAÍS',title:'Gabinete Nacional',text:'Acompanhe aqui os quatro atributos, sua Influência, Vantagens e relações internacionais. A soma dos quatro atributos forma sua Influência.',button:'Continuar'},
-      {target:'.command-event',kicker:'2 · O MUNDO AO REDOR',title:'Cenário Global',text:'A cada rodada, crises, oportunidades e mudanças internacionais alteram o ambiente da partida. Leia o Evento antes de decidir.',button:'Continuar'},
-      {target:'.command-bottom',kicker:'3 · SUAS DECISÕES',title:'Mesa de Situação e Dossiês',text:'A Mesa de Situação mostra o que está acontecendo e o que você pode fazer. Os Dossiês são suas cartas: políticas, estratégias e ações internacionais.',button:'Entrar na Sala de Comando'}
+      {target:'.command-situation',kicker:'BEM-VINDO AO GEOPODER',title:'Seu objetivo é ampliar a Influência do país',text:'A partida dura 8 rodadas. Sua Influência é a soma de Economia, Redes, Diplomacia e Cultura. Ao final, quem tiver maior Influência vence; manter todos os quatro atributos em pelo menos 2 concede +2 de Potência Equilibrada.',button:'Entendi o objetivo'},
+      {target:'.command-national',kicker:'1 · GOVERNE SEU PAÍS',title:'Fortaleça quatro dimensões de poder',text:'Economia, Redes, Diplomacia e Cultura podem crescer ou sofrer perdas. Observe também suas Vantagens e Relações. Não existe uma única estratégia: você decide como construir sua Influência.',button:'Continuar'},
+      {target:'.command-event',kicker:'2 · LEIA O MUNDO',title:'O Evento muda as condições da rodada',text:'Antes de agir, confira o Cenário Global. Crises e oportunidades podem alterar regras, afetar atributos ou mudar o valor de Acordos e Blocos.',button:'Continuar'},
+      {target:'.command-bottom',kicker:'3 · TOME UMA DECISÃO',title:'Use seus Dossiês',text:'No seu turno, examine os Dossiês e escolha uma Ação Principal. Você também pode usar Recuperação Nacional quando um atributo estiver em 0 ou passar. Cartas de Reação são diferentes: elas aparecem quando seu gatilho acontece.',button:'Continuar'},
+      {target:'.command-situation',kicker:'4 · ACOMPANHE OS OUTROS',title:'Toda ação importante aparece na Mesa',text:'Quando outro governo agir, a Mesa de Situação destacará quem tomou a decisão, qual foi o alvo e quais consequências ocorreram. Se seu país for atingido, você receberá um alerta em evidência.',button:'Entrar na Sala de Comando'}
     ];
     const step=steps[Math.min(state.onboardingStep,steps.length-1)];
     document.querySelectorAll('.onboard-focus').forEach(x=>x.classList.remove('onboard-focus'));
@@ -123,7 +126,7 @@
   }
 
   async function api(action,payload={}){
-    const {data,error}=await sb.functions.invoke('game-api',{body:{action,...payload}});
+    const {data,error}=await sb.functions.invoke('game-api',{body:{action,clientVersion:GAME_VERSION,...payload}});
     if(error){let message=error.message||'Falha ao chamar game-api.';try{const ctx=error.context;if(ctx&&typeof ctx.json==='function'){const b=await ctx.json();message=b?.detail||b?.error||message}}catch{}throw new Error(message)}
     if(!data?.ok)throw new Error(data?.detail||data?.error||'Resposta inválida do servidor.');return data;
   }
@@ -253,6 +256,7 @@
   function relationChips(country,relations){const arr=[];for(const [k,r] of Object.entries(relations||{})){const parts=k.split('|');if(parts.includes(country)){const p=parts.find(x=>x!==country);arr.push(`<span class="relation-chip ${r.type}">${r.type==='block'?'🤝 Bloco':'⇄ Acordo'} · ${esc(p)}${r.suspended?' · suspenso':r.tension?' · sob tensão':r.crisis?' · em crise':''}</span>`)}}return arr.join('')||'<span class="muted tiny">Sem relações</span>'}
   const activeList=pub=>pub.active_countries||Object.keys(pub.countries||{});
   function publicBlockPartner(pub,country){for(const[k,r]of Object.entries(pub.relations||{})){if(r.type==='block'&&!r.suspended&&k.split('|').includes(country))return k.split('|').find(x=>x!==country)||null}return null}
+  function publicAnyBlockPartner(pub,country){for(const[k,r]of Object.entries(pub.relations||{})){if(r.type==='block'&&k.split('|').includes(country))return k.split('|').find(x=>x!==country)||null}return null}
   function publicAgreementPartners(pub,country,{usable=false}={}){const out=[];for(const[k,r]of Object.entries(pub.relations||{})){if(r.type==='agreement'&&!r.suspended&&(!usable||(!r.tension&&!pub.flags?.relationBonusOff))&&k.split('|').includes(country))out.push(k.split('|').find(x=>x!==country))}return out.filter(Boolean)}
   function publicCommercialRelationCount(pub,country){let n=0;for(const[k,r]of Object.entries(pub.relations||{})){if(!r.suspended&&k.split('|').includes(country))n++}return n}
   function publicRelation(pub,a,b){return pub.relations?.[[a,b].sort().join('|')]||null}
@@ -261,6 +265,49 @@
   function countryHtml(c,d,isMine,pub){const total=(d.eco||0)+(d.net||0)+(d.dip||0)+(d.cult||0);return `<section class="card country-${c} ${pub.active_country===c?'active-country':''}"><div class="actions"><h3 style="margin:0">${esc(c)}</h3>${isMine?'<span class="badge good">Seu país</span>':''}${pub.active_country===c?'<span class="badge violet">Turno</span>':''}</div><div class="muted small">${esc(d.team_name||'')}</div><div class="kpis"><div class="kpi"><b>${d.eco??0}</b><span>💰 Economia</span></div><div class="kpi"><b>${d.net??0}</b><span>🌐 Redes</span></div><div class="kpi"><b>${d.dip??0}</b><span>🤝 Diplomacia</span></div><div class="kpi"><b>${d.cult??0}</b><span>🎭 Cultura</span></div></div><div class="separator"></div><div class="actions"><span class="badge">Influência ${total}</span><span class="badge">🃏 ${d.hand_count??0}</span><span class="badge">🎓 ${d.advantages??0}</span></div><div class="relation-row">${relationChips(c,pub.relations)}</div></section>`}
   function cardHtml(id,{button='',data='',disabled=false}={}){const c=CARD[id]||{name:`Carta ${id}`,type:'',tags:[],effect:''};return `<article class="game-card"><div class="num">CARTA ${id} · ${esc(c.type)}</div><h4>${esc(c.name)}</h4><p>${esc(c.effect)}</p><div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div>${button?`<button class="btn compact ${disabled?'':'primary'}" ${data} ${disabled?'disabled':''}>${esc(button)}</button>`:''}</article>`}
   function handHtml(hand,opts={}){return `<div class="hand">${(hand||[]).map(id=>cardHtml(id,opts.buttonFor?opts.buttonFor(id):{})).join('')||'<p class="muted">Nenhuma carta.</p>'}</div>`}
+
+
+  function bulletinIcon(b){
+    if(b?.kind==='impact')return '!';
+    if(b?.kind==='reaction')return '⛨';
+    if(b?.kind==='diplomacy')return '◆';
+    if(b?.kind==='dice')return '🎲';
+    if(b?.kind==='benefit')return '+';
+    return '›';
+  }
+  function renderActionSpotlight(pub,isTeacher){
+    const a=pub.action_spotlight;
+    const p=pub.pending_public;
+    if(!a && !p)return '';
+    const actor=a?.actor||p?.actor||p?.proposer||null;
+    const target=a?.target||p?.target||null;
+    const card=a?.card_name||(a?.card_id?CARD[a.card_id]?.name:null)||p?.source||null;
+    const consequences=(a?.consequences||[]).slice(-3);
+    const targetHtml=target?`<span class="spotlight-arrow">→</span><span class="spotlight-target">${esc(target)}</span>`:'';
+    return `<section class="action-spotlight ${target===state.me?.country?'targets-me':''}">
+      <div class="spotlight-kicker">${target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'AÇÃO EM EVIDÊNCIA'}</div>
+      <div class="spotlight-main"><span class="spotlight-actor">${esc(actor||'Sistema')}</span>${targetHtml}</div>
+      ${card?`<div class="spotlight-card">${esc(card)}</div>`:''}
+      ${consequences.length?`<div class="spotlight-consequences">${consequences.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}
+    </section>`;
+  }
+  function renderImpactToasts(pub,isTeacher){
+    if(isTeacher||!state.me?.country)return '';
+    const me=state.me.country;
+    const feed=(pub.bulletins||[]).slice(-5).filter(b=>b.target===me && ['impact','reaction'].includes(b.kind)).slice(-2).reverse();
+    if(!feed.length)return '';
+    return `<aside class="impact-toasts" aria-live="assertive">${feed.map(b=>`<article class="impact-toast ${b.kind||''}">
+      <div class="impact-toast-top"><span>${bulletinIcon(b)}</span><b>${b.kind==='reaction'?'RESPOSTA DIPLOMÁTICA':'ISTO AFETOU SEU PAÍS'}</b></div>
+      <h4>${esc(b.title||b.source||'Novo acontecimento')}</h4>
+      ${b.actor?`<p><strong>${esc(b.actor)}</strong>${b.source?` · ${esc(b.source)}`:''}</p>`:''}
+      ${b.body?`<div class="impact-body">${esc(b.body)}</div>`:''}
+    </article>`).join('')}</aside>`;
+  }
+  function renderPublicWire(pub){
+    const feed=(pub.bulletins||[]).slice(-4).reverse();
+    if(!feed.length)return '';
+    return `<div class="public-wire"><span>AGÊNCIA INTERNACIONAL</span><div>${feed.map(b=>`<i>${bulletinIcon(b)} ${esc(b.title||b.body||'Atualização')}</i>`).join('')}</div></div>`;
+  }
 
   function renderMatch(isTeacher){
     if(isTeacher)captureTeacherNoteDraft();
@@ -290,6 +337,8 @@
         <button class="gov-nav-btn exit" id="leaveActive"><span>↪</span><b>${isTeacher?'PAINEL':'SAIR'}</b><small>${isTeacher?'Gestão docente':'Deixar a sala'}</small></button>
       </footer>
       <div class="command-modal" id="commandModal" aria-hidden="true"><div class="command-modal-card"><div class="command-modal-head"><div><small>ARQUIVO DE GOVERNO</small><h3 id="commandModalTitle">Detalhes</h3></div><button class="btn ghost compact" id="commandModalClose">Fechar</button></div><div id="commandModalBody" class="command-modal-body"></div></div></div>
+      ${renderImpactToasts(pub,isTeacher)}
+      ${renderPublicWire(pub)}
     </div>`;
     document.getElementById('leaveActive').onclick=()=>leaveCurrentRoom(isTeacher);
     document.querySelectorAll('[data-command-modal]').forEach(b=>b.onclick=()=>openCommandModal(b.dataset.commandModal,pub));
@@ -355,7 +404,7 @@
   function renderSituationCommand(pub,isTeacher,own){
     const canPreview=!isTeacher&&state.previewCardId&&pub.phase==='turns'&&!pub.pending_public;
     const center=canPreview?renderSituationDossier(Number(state.previewCardId),pub,own):renderPhasePanel(pub,isTeacher,own);
-    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>Analisar · planejar · decidir · governar</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${canPreview?'':renderDiceDisplay(pub.dice_display)}${canPreview?'':contextTip(pub,isTeacher,own)}<div class="situation-phase ${canPreview?'dossier-preview-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
+    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>Analisar · planejar · decidir · governar</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${canPreview?'':renderActionSpotlight(pub,isTeacher)}${canPreview?'':renderDiceDisplay(pub.dice_display)}${canPreview?'':contextTip(pub,isTeacher,own)}<div class="situation-phase ${canPreview?'dossier-preview-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
   }
 
   function renderSituationDossier(id,pub,own){
@@ -363,7 +412,7 @@
     const active=pub.phase==='turns'&&!pub.pending_public&&state.me.country===pub.active_country,reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country);
     const art=c.art?`<img src="${esc(c.art)}" alt="Ilustração temática de ${esc(c.name)}">`:`<div class="situation-dossier-art placeholder"><span>${cardTypeGlyph(c.type)}</span><small>DOSSIÊ DE GOVERNO</small></div>`;
     const action=reaction?'<div class="situation-dossier-note violet">Carta de Reação: será oferecida automaticamente quando o gatilho acontecer.</div>':active&&valid?`<button class="btn primary" data-preview-play="${id}">JOGAR ESTE DOSSIÊ</button>`:active&&!valid?'<div class="situation-dossier-note warn">Neste momento não existe alvo válido para esta carta.</div>':'<div class="situation-dossier-note">Planejamento: você poderá jogar este Dossiê quando chegar seu turno.</div>';
-    return `<section class="command-action situation-dossier-preview"><div class="situation-dossier-head"><div><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><b>DOSSIÊ #${String(id).padStart(2,'0')}</b></div><button class="situation-dossier-close" data-preview-close aria-label="Fechar dossiê">×</button></div><div class="situation-dossier-grid"><div class="situation-dossier-media">${art}</div><div class="situation-dossier-copy"><h2>${esc(c.name)}</h2>${c.headline?`<h3>${esc(c.headline)}</h3>`:''}${c.brief?`<p class="situation-dossier-brief">${esc(c.brief)}</p>`:''}<div class="situation-dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div><div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></div></div><div class="situation-dossier-actions">${action}<button class="btn ghost" data-preview-close>Voltar à situação atual</button></div></section>`;
+    return `<section class="command-action situation-dossier-preview ${cardTypeClass(c.type)}"><div class="situation-dossier-head"><div><span>${esc(cardTypeLabel(c.type))}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><b>DOSSIÊ #${String(id).padStart(2,'0')}</b></div><button class="situation-dossier-close" data-preview-close aria-label="Fechar dossiê">×</button></div><div class="situation-dossier-grid"><div class="situation-dossier-media">${art}</div><div class="situation-dossier-copy"><h2>${esc(c.name)}</h2>${c.headline?`<h3>${esc(c.headline)}</h3>`:''}${c.brief?`<p class="situation-dossier-brief">${esc(c.brief)}</p>`:''}<div class="situation-dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div><div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></div></div><div class="situation-dossier-actions">${action}<button class="btn ghost" data-preview-close>Voltar à situação atual</button></div></section>`;
   }
 
   function dieGlyph(n){return ({1:'⚀',2:'⚁',3:'⚂',4:'⚃',5:'⚄',6:'⚅'})[Number(n)]||'🎲'}
@@ -422,7 +471,7 @@
     }else if(kind==='history'){
       title.textContent='Histórico recente';const log=pub.recent_log||[];body.innerHTML=log.length?`<div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')}</div>`:'<div class="history-empty">Nenhum registro recente.</div>';
     }else{
-      title.textContent='Como Jogar';body.innerHTML=`<div class="rules-tabs"><section><h4>Objetivo</h4><p>Fortaleça Economia, Redes, Diplomacia e Cultura. A soma forma sua Influência. Ao fim, um país equilibrado com todos os atributos em pelo menos 2 recebe +2.</p></section><section><h4>Rodada</h4><p>Evento Global → Desafio nas rodadas pares → Compra → Turnos nacionais → Cúpula Diplomática.</p></section><section><h4>Dossiês</h4><p>Abra uma carta para ler contexto, efeito e condições antes de jogá-la. Reações só aparecem quando seu gatilho acontece.</p></section><section><h4>Vantagem Geográfica</h4><p>Guarde até 2. Gaste 1 para <b>refazer uma rolagem sua de d6</b>, <b>reduzir em 1 uma perda de atributo</b> ou, durante a compra, <b>revelar 2 cartas, escolher 1 e descartar a outra</b>.</p></section><section><h4>Diplomacia</h4><p>Na Cúpula, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação ou não agir. Aceitar ou recusar uma proposta não gasta sua iniciativa. Na regra 0.4-C, vários Dossiês de Desenvolvimento recebem bônus maiores quando o país mantém Acordos, Blocos ou Relações Comerciais ativas.</p></section><section><h4>Glossário</h4><p><b>Relação Comercial:</b> Acordo ou Bloco ativo. <b>Sob Tensão:</b> o Acordo continua existindo, mas não concede bônus nem cumpre requisitos de Relação/Acordo até o fim da rodada. <b>Suspenso:</b> o Acordo ocupa limite, porém fica inativo até a próxima Cúpula. <b>Bloco em Crise:</b> bônus e proteções de Bloco ficam desligados até o fim da rodada. <b>Renovar:</b> compre 1 e descarte 1. <b>Recuperação Nacional:</b> eleve um atributo em 0 para 1 usando sua Ação Principal.</p></section></div><div class="actions"><button class="btn primary" id="replayTutorial">Rever tutorial neste dispositivo</button></div>`;
+      title.textContent='Como Jogar';body.innerHTML=`<div class="rules-tabs"><section><h4>Objetivo</h4><p><b>Termine a 8ª rodada com a maior Influência.</b> Influência é a soma de Economia, Redes, Diplomacia e Cultura. Se todos os quatro atributos estiverem em pelo menos 2 no final, você recebe +2 de Potência Equilibrada.</p></section><section><h4>O que fazer</h4><p>Leia o Evento, examine seus Dossiês e use 1 Ação Principal no seu turno. Depois acompanhe as ações dos outros governos e participe da Cúpula Diplomática ao fim da rodada.</p></section><section><h4>Rodada</h4><p>Evento Global → Desafio nas rodadas pares → Compra → Turnos nacionais → Cúpula Diplomática.</p></section><section><h4>Dossiês</h4><p><b>Desenvolvimento</b> fortalece o país; <b>Interferência</b> afeta outros governos; <b>Risco/Escolha</b> envolve decisão ou incerteza; <b>Reação</b> não é Ação Principal e só é usada quando seu gatilho ocorre.</p></section><section><h4>Vantagem Geográfica</h4><p>Guarde até 2. Gaste 1 para <b>refazer uma rolagem sua de d6</b>, <b>reduzir em 1 uma perda de atributo</b> ou, durante a compra, <b>revelar 2 cartas, escolher 1 e descartar a outra</b>.</p></section><section><h4>Diplomacia</h4><p>Na Cúpula, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação ou não agir. Aceitar ou recusar uma proposta não gasta sua iniciativa. Na regra 0.4-C, vários Dossiês de Desenvolvimento recebem bônus maiores quando o país mantém Acordos, Blocos ou Relações Comerciais ativas.</p></section><section><h4>Glossário</h4><p><b>Relação Comercial:</b> Acordo ou Bloco ativo. <b>Sob Tensão:</b> o Acordo continua existindo, mas não concede bônus nem cumpre requisitos de Relação/Acordo até o fim da rodada. <b>Suspenso:</b> o Acordo ocupa limite, porém fica inativo até a próxima Cúpula. <b>Bloco em Crise:</b> bônus e proteções de Bloco ficam desligados até o fim da rodada. <b>Renovar:</b> compre 1 e descarte 1. <b>Recuperação Nacional:</b> eleve um atributo em 0 para 1 usando sua Ação Principal.</p></section></div><div class="actions"><button class="btn primary" id="replayTutorial">Rever tutorial neste dispositivo</button></div>`;
       setTimeout(()=>document.getElementById('replayTutorial')?.addEventListener('click',()=>{localStorage.removeItem(tutorialSeenKey);state.onboardingActive=true;state.onboardingStep=0;closeCommandModal();mountOnboarding(false)}),0);
     }
     modal.classList.add('open');modal.setAttribute('aria-hidden','false');
@@ -438,7 +487,7 @@
 
   function commandCardHtml(id,pub,active){
     const c=CARD[id]||{id,name:`Carta ${id}`,type:'',tags:[],effect:''},reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country),status=reaction?'REAÇÃO':active?(valid?'PRONTO':'SEM ALVO'):'PLANEJAMENTO';
-    return `<article class="command-card dossier-card ${c.art?'has-art':''}">${c.art?`<img src="${esc(c.art)}" alt="">`:`<div class="dossier-thumb-placeholder">${cardTypeGlyph(c.type)}</div>`}<div class="command-card-top"><span>${esc(c.type)}</span><span>#${String(id).padStart(2,'0')}</span></div><h4>${esc(c.name)}</h4><p>${esc(c.headline||c.effect)}</p><div class="command-card-footer"><div class="tag-row">${(c.tags||[]).slice(0,2).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div><button class="btn compact ${active&&valid&&!reaction?'primary':'ghost'}" data-open-card="${id}">${status==='PRONTO'?'Abrir Dossiê':reaction?'Consultar Reação':status==='SEM ALVO'?'Consultar · sem alvo':'Consultar'}</button></div></article>`;
+    return `<article class="command-card dossier-card ${cardTypeClass(c.type)} ${c.art?'has-art':''}">${c.art?`<img src="${esc(c.art)}" alt="">`:`<div class="dossier-thumb-placeholder">${cardTypeGlyph(c.type)}</div>`}<div class="command-card-top"><span>${esc(cardTypeLabel(c.type))}</span><span>#${String(id).padStart(2,'0')}</span></div><h4>${esc(c.name)}</h4><p>${esc(c.headline||c.effect)}</p><div class="command-card-footer"><div class="tag-row">${(c.tags||[]).slice(0,2).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div><button class="btn compact ${active&&valid&&!reaction?'primary':'ghost'}" data-open-card="${id}">${status==='PRONTO'?'Abrir Dossiê':reaction?'Consultar Reação':status==='SEM ALVO'?'Consultar · sem alvo':'Consultar'}</button></div></article>`;
   }
   function showCardInSituation(id,pub){
     if(!CARD[id])return;
@@ -464,11 +513,11 @@
       if(stage==='platform'){buttons=`<button class="btn primary" data-pending="regulation">Regulação: +1 Diplomacia e renovar</button>`+(p.expansion_targets||[]).map(t=>`<button class="btn good" data-pending="expansion:net:${esc(t)}">Expansão: +1 Redes; ${esc(t)} +1 Cultura</button><button class="btn good" data-pending="expansion:cult:${esc(t)}">Expansão: +1 Cultura; ${esc(t)} +1 Cultura</button>`).join('');}
       return `<section class="command-action dossier-decision"><div class="state-kicker">DOSSIÊ EM ANÁLISE</div>${editorialCardHtml(CARD[id]||{id,name:'Carta '+id,type:'',tags:[],effect:''})}<h3>Escolha como o governo executará esta decisão</h3><div class="actions">${buttons||'<span class="muted">Nenhuma opção válida.</span>'}</div></section>`;
     }
-    if(['reaction_loss','reaction_dissolve','reaction_relation_state'].includes(p.kind)){const id=Number(priv.cardId||0);return `<section class="card action-panel reaction-panel" style="margin-top:16px"><div class="eyebrow">Reação disponível</div><h3>Você pode responder agora</h3>${id?cardHtml(id):''}<div class="actions"><button class="btn violet" data-pending="use">Usar Reação</button><button class="btn ghost" data-pending="decline">Não reagir</button></div></section>`}
+    if(['reaction_loss','reaction_dissolve','reaction_relation_state'].includes(p.kind)){const id=Number(priv.cardId||0);return `<section class="card action-panel reaction-panel" style="margin-top:16px"><div class="eyebrow">Reação disponível</div><h3>Você pode responder agora</h3>${id?editorialCardHtml(CARD[id]||{id,name:'Carta '+id,type:'Reação',tags:[],effect:''}):''}<div class="actions"><button class="btn violet" data-pending="use">Usar Reação</button><button class="btn ghost" data-pending="decline">Não reagir</button></div></section>`}
     if(p.kind==='agreement_replace_proposer')return `<section class="card action-panel"><div class="eyebrow">Limite de Acordos</div><h3>Escolha qual Acordo será substituído</h3><p class="muted">O novo Acordo com ${esc(p.target)} será proposto depois.</p><div class="actions">${(p.options||[]).map(t=>`<button class="btn danger" data-pending="${esc(t)}">Substituir Acordo com ${esc(t)}</button>`).join('')}</div></section>`;
     if(p.kind==='agreement_response'){const reps=p.target_replacement_options||[];return `<section class="command-action diplomatic-proposal"><div class="state-kicker">PROPOSTA DIPLOMÁTICA RECEBIDA</div><h2>${esc(p.proposer)} propõe um Acordo Comercial</h2>${reps.length?'<p class="muted">Você já possui 2 Acordos. Para aceitar, escolha qual será substituído.</p>':''}<div class="actions">${reps.length?reps.map(t=>`<button class="btn good" data-pending="accept_replace:${esc(t)}">Aceitar e substituir ${esc(t)}</button>`).join(''):'<button class="btn good" data-pending="accept">Aceitar</button>'}<button class="btn danger" data-pending="decline">Recusar</button></div></section>`}
     if(p.kind==='block_response')return `<section class="command-action diplomatic-proposal"><div class="state-kicker">PROPOSTA DE BLOCO RECEBIDA</div><h2>${esc(p.proposer)} quer aprofundar a integração e formar um Bloco com você</h2><div class="actions"><button class="btn good" data-pending="accept">Aceitar</button><button class="btn danger" data-pending="decline">Recusar</button></div></section>`;
-    if(p.kind==='trade_response'){const offered=Number(priv.offerCard||0);return `<section class="card action-panel"><div class="eyebrow">Troca Comercial</div><h3>${esc(priv.proposer||p.actor)} oferece uma carta</h3>${offered?cardHtml(offered):''}<p class="muted">Se aceitar, você escolherá uma carta da sua mão para entregar em troca. Depois, ambos renovam 1 carta.</p><div class="actions"><button class="btn good" data-pending="accept">Aceitar</button><button class="btn danger" data-pending="decline">Recusar</button></div></section>`}
+    if(p.kind==='trade_response'){const offered=Number(priv.offerCard||0);return `<section class="card action-panel"><div class="eyebrow">Troca Comercial</div><h3>${esc(priv.proposer||p.actor)} oferece uma carta</h3>${offered?editorialCardHtml(CARD[offered]||{id:offered,name:'Carta '+offered,type:'',tags:[],effect:''}):''}<p class="muted">Se aceitar, você escolherá uma carta da sua mão para entregar em troca. Depois, ambos renovam 1 carta.</p><div class="actions"><button class="btn good" data-pending="accept">Aceitar</button><button class="btn danger" data-pending="decline">Recusar</button></div></section>`}
     if(p.kind==='trade_return')return `<section class="card action-panel"><div class="eyebrow">Troca Comercial</div><h3>Escolha a carta que você entregará</h3>${handHtml(own?.hand||[],{buttonFor:id=>({button:'Entregar esta carta',data:`data-pending="${id}"`})})}</section>`;
     if(['safeguard_cost','safeguard_block_cost'].includes(p.kind))return `<section class="card action-panel"><div class="eyebrow">Cláusula de Salvaguarda</div><h3>Escolha 1 carta para descartar como custo</h3>${handHtml(own?.hand||[],{buttonFor:id=>({button:'Descartar como custo',data:`data-pending="${id}"`})})}</section>`;
     if(p.kind==='optional_renew')return `<section class="card action-panel"><div class="eyebrow">Renovação opcional</div><h3>${esc(p.reason||'Você pode renovar 1 carta')}</h3><div class="actions"><button class="btn violet" data-pending="yes">Renovar 1 carta</button><button class="btn ghost" data-pending="no">Manter minha mão</button></div></section>`;
@@ -523,16 +572,16 @@
     const active=activeList(pub),done=pub.diplomacy_done||[];
     if(isTeacher)return `<section class="command-action summit-state"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Negociações multilaterais em andamento</h1><div class="diplomacy-status-grid">${active.map(c=>`<div class="dip-status ${done.includes(c)?'done':''}"><b>${esc(c)}</b><span>${done.includes(c)?'✓ iniciativa concluída':'delegação negociando'}</span></div>`).join('')}</div></section>`;
     const me=state.me.country,c=pub.countries?.[me]||{},openingBonus=Boolean(c.openingCommercialBonus);
-    const agreements=publicAgreementPartners(pub,me),block=publicBlockPartner(pub,me);
+    const agreements=publicAgreementPartners(pub,me),block=publicAnyBlockPartner(pub,me);
     const agreementLocked=Boolean(pub.flags?.noAgreements||pub.flags?.noRelations||c.noNewAgreementRound);
     const unrelated=agreementLocked?[]:active.filter(x=>x!==me&&!publicRelation(pub,me,x)&&!pub.countries[x]?.noNewAgreementRound);
-    const blockLocked=Boolean(pub.flags?.noRelations||block),blockTargets=blockLocked?[]:active.filter(x=>x!==me&&!publicBlockPartner(pub,x));
+    const blockLocked=Boolean(pub.flags?.noRelations||block),blockTargets=blockLocked?[]:active.filter(x=>x!==me&&!publicAnyBlockPartner(pub,x));
     const tradeTargets=active.filter(x=>x!==me&&Number(pub.countries[x]?.hand_count||0)>0);
     const extraAvailable=Boolean(pub.flags?.extraAgreementRound&&c.extraAgreementAvailable&&!agreementLocked);
     const extraBox=extraAvailable?`<div class="summit-bonus extra-proposal"><b>EXPANSÃO DO COMÉRCIO MUNDIAL · PROPOSTA EXTRA</b><span>Esta proposta não consome sua iniciativa diplomática normal.</span><div class="actions">${unrelated.map(t=>`<button class="btn good compact" data-diplomacy="extra_agreement" data-target="${esc(t)}">Propor Acordo extra a ${esc(t)}</button>`).join('')||'<em>Sem alvo válido para o Acordo extra.</em>'}</div></div>`:'';
     if(done.includes(me))return `<section class="command-action summit-state"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Sua iniciativa normal foi concluída</h1><p>Você ainda pode receber e responder propostas de outros governos.${extraAvailable?' O Evento Global ainda lhe concede uma proposta extra de Acordo.':''}</p>${extraBox}<div class="diplomacy-status-grid">${active.map(x=>`<div class="dip-status ${done.includes(x)?'done':''}"><b>${esc(x)}</b><span>${done.includes(x)?'✓ concluída':'… negociando'}</span></div>`).join('')}</div></section>`;
     if(c.dipBlocked)return `<section class="command-action summit-state blocked"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Delegação sem mandato para novas iniciativas</h1><p>Uma restrição do Evento Global impede seu país de usar iniciativa nesta rodada. Ainda é possível responder propostas recebidas.</p>${extraBox}</section>`;
-    return `<section class="command-action summit-state"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Iniciativa diplomática disponível: 1</h1><p>Delegações internacionais estão reunidas. Escolha como ${esc(me)} atuará no cenário internacional.</p>${openingBonus?'<div class="summit-bonus"><b>Abertura Comercial ativa</b><span>Novo Acordo formado nesta Cúpula → ambos renovam 1 carta.</span></div>':''}${extraBox}<div class="summit-actions"><div class="summit-box"><b>PROPOR ACORDO</b><small>Crie uma Relação Comercial.</small>${unrelated.map(t=>`<button data-diplomacy="agreement" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo</em>'}</div><div class="summit-box"><b>PROPOR BLOCO</b><small>Aprofunde a integração.</small>${blockTargets.map(t=>`<button data-diplomacy="block" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo</em>'}</div><div class="summit-box trade"><b>TROCAR CARTA</b><small>Negocie 1 por 1.</small><select id="tradeTarget">${tradeTargets.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select><select id="tradeCard">${(own?.hand||[]).map(id=>`<option value="${id}">${esc(CARD[id]?.name||'Carta '+id)}</option>`).join('')}</select><button id="tradeSubmit" ${(!tradeTargets.length||!(own?.hand||[]).length)?'disabled':''}>Propor troca</button></div>${agreements.length?`<div class="summit-box danger"><b>ENCERRAR ACORDO</b><small>Finalize uma relação existente.</small>${agreements.map(t=>`<button data-diplomacy="end_agreement" data-target="${esc(t)}">Com ${esc(t)}</button>`).join('')}</div>`:''}${block?`<div class="summit-box danger"><b>SAIR DO BLOCO</b><small>Custo: −1 Diplomacia.</small><button data-diplomacy="exit_block">Com ${esc(block)}</button></div>`:''}<div class="summit-box pass"><b>NÃO REALIZAR INICIATIVA</b><small>Manter a posição atual.</small><button data-diplomacy="pass">Encerrar iniciativa</button></div></div></section>`;
+    return `<section class="command-action summit-state"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Iniciativa diplomática disponível: 1</h1><p>Delegações internacionais estão reunidas. Escolha como ${esc(me)} atuará no cenário internacional.</p>${openingBonus?'<div class="summit-bonus"><b>Abertura Comercial ativa</b><span>Novo Acordo formado nesta Cúpula → ambos renovam 1 carta.</span></div>':''}${extraBox}<div class="summit-actions"><div class="summit-box"><b>PROPOR ACORDO</b><small>Crie uma Relação Comercial.</small>${unrelated.map(t=>`<button data-diplomacy="agreement" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo</em>'}</div><div class="summit-box"><b>PROPOR BLOCO</b><small>Aprofunde a integração.</small>${blockTargets.map(t=>`<button data-diplomacy="block" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo</em>'}</div><div class="summit-box trade"><b>TROCAR CARTA</b><small>Negocie 1 por 1. O outro governo verá o efeito completo antes de aceitar.</small><select id="tradeTarget">${tradeTargets.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select><select id="tradeCard">${(own?.hand||[]).map(id=>`<option value="${id}">${esc(CARD[id]?.name||'Carta '+id)}</option>`).join('')}</select><div id="tradeOfferPreview" class="trade-offer-preview"></div><button id="tradeSubmit" ${(!tradeTargets.length||!(own?.hand||[]).length)?'disabled':''}>Propor troca</button></div>${agreements.length?`<div class="summit-box danger"><b>ENCERRAR ACORDO</b><small>Finalize uma relação existente.</small>${agreements.map(t=>`<button data-diplomacy="end_agreement" data-target="${esc(t)}">Com ${esc(t)}</button>`).join('')}</div>`:''}${block?`<div class="summit-box danger"><b>SAIR DO BLOCO</b><small>Custo: −1 Diplomacia.</small><button data-diplomacy="exit_block">Com ${esc(block)}</button></div>`:''}<div class="summit-box pass"><b>NÃO REALIZAR INICIATIVA</b><small>Manter a posição atual.</small><button data-diplomacy="pass">Encerrar iniciativa</button></div></div></section>`;
   }
 
   function renderOwnHand(own,pub){return renderCommandHand(own,pub)}
@@ -554,6 +603,9 @@
     document.querySelectorAll('[data-play-card]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('play_card',{roomId:state.room.id,cardId:Number(b.dataset.playCard)});await refreshSnapshot()}));
     document.querySelectorAll('[data-diplomacy]').forEach(b=>b.onclick=()=>withBusy(async()=>{const kind=b.dataset.diplomacy,target=b.dataset.target||null;if(kind==='end_agreement'&&target&&!confirm(`Encerrar o Acordo com ${target}?`))return;if(kind==='exit_block'&&!confirm('Sair do Bloco custa 1 Diplomacia. Confirmar?'))return;await api('diplomacy_action',{roomId:state.room.id,kind,target});await refreshSnapshot()}));
     document.getElementById('tradeSubmit')?.addEventListener('click',()=>withBusy(async()=>{const target=document.getElementById('tradeTarget')?.value,offerCard=Number(document.getElementById('tradeCard')?.value);if(!target||!offerCard)throw new Error('Escolha o país e a carta para oferecer.');await api('diplomacy_action',{roomId:state.room.id,kind:'trade',target,offerCard});await refreshSnapshot()}));
+    const tradeCardSelect=document.getElementById('tradeCard'),tradeOfferPreview=document.getElementById('tradeOfferPreview');
+    const updateTradePreview=()=>{if(!tradeCardSelect||!tradeOfferPreview)return;const c=CARD[Number(tradeCardSelect.value)];tradeOfferPreview.innerHTML=c?`<b>${esc(c.name)}</b><span>${esc(c.effect)}</span>`:''};
+    tradeCardSelect?.addEventListener('change',updateTradePreview);updateTradePreview();
     document.getElementById('playerReadyTurn')?.addEventListener('click',()=>withBusy(async()=>{await api('confirm_turn_ready',{roomId:state.room.id});await refreshSnapshot()}));
     if(isTeacher){
       const startNow=()=>withBusy(async()=>{await api('teacher_start_turn',{roomId:state.room.id});await refreshSnapshot()});

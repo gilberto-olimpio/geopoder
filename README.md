@@ -1,124 +1,163 @@
-# GeoPoder — Alpha 2.0e.2
+# GeoPoder — Alpha 2.0g
 
-## Hotfix de interface 2.0e.2
-
-Esta revisão é exclusivamente de UX/layout; o motor de regras 0.4-C e o backend permanecem os mesmos.
-
-- Dossiês do Governo ficaram mais compactos para devolver altura à Mesa de Situação.
-- Clicar em um Dossiê abre a leitura e a ação diretamente na Mesa de Situação, em formato horizontal.
-- Gabinete Nacional foi compactado para manter os quatro atributos, Influência e Vantagem visíveis.
-- Cenário Global prioriza nome e efeito mecânico do Evento, sem barra de rolagem permanente. Em telas baixas, elementos decorativos são reduzidos antes do texto de regra.
-- Situação Mundial, Diplomacia, Inteligência, Histórico e Como Jogar agora são janelas sobrepostas reais, corrigindo o painel que antes aparecia abaixo da navegação.
-- Há uma otimização específica para Chromebooks/laptops com viewport abaixo de 700 px de altura.
-
-
-**Nome interno:** Sala de Comando — Motor 0.4-C consolidado  
+**Subtítulo interno:** Comunicação, Acessibilidade e Clareza Pedagógica  
 **Regras:** 0.4-C  
-**Base:** Alpha 2.0e visual + motor multiplayer da 2.0d.3
+**Base:** Alpha 2.0e.2 (interface otimizada + motor 0.4-C)
 
-## O que esta versão conclui
+## Objetivo desta atualização
 
-A Alpha 2.0e.2 aplica ao motor as regras 0.4-C consolidadas depois da revisão das 28 cartas e dos 16 Eventos Globais. A interface de Sala de Comando, o onboarding e as cinco artes piloto permanecem.
+A 2.0g nasce do playtest real GEO-MLVR, em que a partida começou na 2.0e.1 e foi concluída após downgrade para uma interface equivalente à 2.0f. O foco desta versão não é acrescentar novas mecânicas, mas tornar visível o que já acontece no jogo: quem agiu, quem foi alvo, quais efeitos ocorreram e o que cada tipo de carta representa.
 
-### Estados diplomáticos
+## 1. Mesa de Situação — ações compartilhadas
 
-- **Acordo sob Tensão:** continua existindo e ocupando limite, mas não concede bônus nem cumpre requisitos de cartas `RELAÇÃO`/`ACORDO` até o fim da rodada.
-- **Acordo Suspenso:** continua existindo e ocupando limite, mas fica inativo para os dois países até o início da próxima Cúpula Diplomática.
-- **Bloco em Crise:** continua existindo, mas bônus e proteções de `BLOCO` ficam desativados até o fim da rodada.
-- **Cláusula de Salvaguarda:** pode cancelar Tensão, Suspensão ou Crise causada por carta/Evento, sem custo extra além de jogar a própria Reação.
+A Mesa de Situação agora possui um **Ação em Evidência** compartilhado por todos os clientes. Quando um governo executa um Dossiê, a tela informa:
 
-### Diplomacia
+- país que tomou a decisão;
+- Dossiê utilizado;
+- país-alvo, quando existir;
+- consequências de atributos e estados diplomáticos à medida que são resolvidas.
 
-- Acordos e Blocos permanecem difíceis de destruir involuntariamente: Interferências e Eventos agora preferem Tensão, Suspensão e Crise.
-- **Expansão do Comércio Mundial** concede uma proposta extra de Acordo **durante a Cúpula**, sem consumir a iniciativa normal.
-- **Cooperação Multilateral** recompensa a primeira iniciativa aceita do proponente; se a própria iniciativa já renovar o proponente, o Evento não empilha uma segunda renovação.
-- Suspensões terminam no início da Cúpula; Tensão e Crise terminam no fim da rodada.
+O Histórico continua existindo, mas deixa de ser o único lugar para descobrir o que aconteceu.
 
-### Cartas — mudanças centrais
+## 2. Alertas para o país afetado
 
-- #01 compara Redes do parceiro **antes** do ganho.
-- #02 recebe +2 Diplomacia com 1 Acordo utilizável; filtragem do topo só com 2.
-- #09 passa a ser coprodução cultural: +2 para quem joga e +1 para o parceiro.
-- #10 Sanções Econômicas não rompem Acordos.
-- #11 Barreiras Tarifárias: absorver (-1 Economia) ou retaliar (atacante -1 Economia, alvo -1 Diplomacia, Acordo sob Tensão).
-- #13 Guerra de Narrativas não pode mirar parceiro de Bloco.
-- #14 Pressão Geopolítica pode tensionar um Acordo em vez de encerrá-lo.
-- #15 parceiro de Bloco pode gastar 1 Vantagem para impedir a perda de Redes.
-- #16 Tensão no Bloco não pode ser usada contra o próprio Bloco; cria custo diplomático ou Crise temporária.
-- #17 Embargo Secundário suspende Acordo em vez de encerrá-lo.
-- #19 Retaliação Comercial tensiona Acordo em vez de encerrá-lo.
-- #22 Solidariedade do Bloco não funciona durante Crise.
-- #23 Salvaguarda protege estados diplomáticos temporários.
-- #25 IED: 5–6 = jogador +2 Economia; parceiro +1.
-- #28 decisões de rerrolagem com Vantagem são registradas de forma reservada e reveladas juntas.
+Foi criado um feed visual inspirado em boletins/notícias curtas. Quando um país sofre perda direta causada por outro governo, recebe um cartão em evidência com:
 
-### Eventos — mudanças centrais
+- **ISTO AFETOU SEU PAÍS**;
+- atacante;
+- origem da ação;
+- alteração de atributo antes → depois.
 
-- Ruptura das Cadeias: Economia, Suspensão de Acordo ou Crise de Bloco (quando não houver Acordo).
-- Guerra Comercial: Economia ou Acordo sob Tensão.
-- Embargo Internacional: Economia ou Suspensão; nenhum novo Acordo na rodada.
-- Crise de Confiança: relações permanecem, mas bônus diplomáticos das cartas ficam inativos.
-- Conflito Geopolítico Global: Acordos sob Tensão, Blocos em Crise, -1 Diplomacia e sem novas relações.
-- Expansão do Comércio Mundial: proposta extra na Cúpula.
-- Cooperação Multilateral: recompensa apenas iniciativa aceita e evita empilhamento de renovação.
+Reações também geram um alerta próprio. O sistema usa a linguagem visual da Sala de Comando, sem depender de uma rede social real.
 
-## Artes das cartas
+## 3. Agência Internacional
 
-A estratégia híbrida foi mantida:
+As últimas ações públicas aparecem em uma faixa compacta na parte inferior da Sala de Comando. Isso ajuda jogadores que não são o alvo a acompanhar a partida sem abrir o Histórico.
 
-- 5 Dossiês possuem arte piloto completa em `assets/cards/`:
-  - #04 Investimento Produtivo
-  - #06 Fórum Econômico Regional
-  - #12 Fuga de Capitais
-  - #13 Guerra de Narrativas
-  - #27 Abertura Comercial
-- As outras 23 cartas usam o layout definitivo e um placeholder visual de categoria. As artes finais podem ser adicionadas depois do playtest sem alterar o motor.
+## 4. Tutorial refeito
+
+O onboarding agora começa pelo objetivo da partida:
+
+> terminar a 8ª rodada com a maior Influência.
+
+Ele explica explicitamente que:
+
+- Influência = Economia + Redes + Diplomacia + Cultura;
+- todos os quatro atributos em pelo menos 2 ao final concedem +2 de Potência Equilibrada;
+- no turno, o jogador examina Dossiês e realiza uma Ação Principal;
+- Reações não são Ações Principais;
+- Eventos devem ser lidos antes da decisão;
+- ações dos demais governos devem ser acompanhadas na Mesa de Situação.
+
+A seção **Como Jogar** foi atualizada com a mesma lógica.
+
+## 5. Tipos de carta e acessibilidade
+
+Os Dossiês não são diferenciados apenas por cor. Cada família combina **cor + ícone + padrão de borda + texto explícito**:
+
+- **Desenvolvimento:** borda contínua + símbolo ▣;
+- **Interferência:** borda tracejada + símbolo de alvo;
+- **Reação:** borda dupla + símbolo de escudo e faixa “REAÇÃO”;
+- **Risco / Escolha:** borda pontilhada + símbolo ◆.
+
+Isso melhora a distinção para jogadores com daltonismo e também para projeção ou telas com qualidade de cor limitada.
+
+## 6. Legibilidade
+
+- textos da mão foram ampliados;
+- o Dossiê aberto na Mesa usa fonte maior para efeito mecânico;
+- o efeito do Evento Global recebeu prioridade e tamanho maior;
+- em telas baixas, elementos decorativos encolhem antes da regra;
+- a arte continua subordinada à leitura mecânica.
+
+## 7. Rolagens de dados
+
+Rolagens continuam usando o `dice_display` autoritativo do servidor e agora também entram no fluxo público de acontecimentos. Assim, resultados de cartas e disputas aparecem para os participantes ao mesmo tempo e permanecem registrados no feed recente.
+
+## 8. Troca de cartas
+
+A Cúpula mostra o **efeito completo da carta que o proponente está oferecendo** antes de enviar a proposta. O receptor recebe a carta em formato de Dossiê completo antes de aceitar ou recusar. O objetivo é testar novamente a mecânica antes de alterar seu balanceamento.
+
+## 9. Correções de integridade do motor
+
+### Máximo de um Bloco por país
+
+O servidor agora considera também um Bloco temporariamente inativo/suspenso ao verificar o limite. Há uma segunda validação defensiva no momento de formar o Bloco. Um país não pode terminar com dois Blocos ativos por causa de uma condição intermediária de estado.
+
+### Pressão Geopolítica
+
+A 2.0g preserva a regra 0.4-C: **Pressão Geopolítica não encerra Acordos**. O alvo escolhe entre perda de Diplomacia, descarte aleatório ou colocar o Acordo com o atacante sob Tensão, quando essa opção for válida.
+
+## 10. Telemetria de versão
+
+Novos eventos de telemetria incluem:
+
+- `game_version`;
+- `rules_version`;
+- `client_version`.
+
+O frontend envia sua versão ao backend em cada chamada. Isso torna futuros relatórios mais úteis quando houver troca de versão durante uma sessão.
+
+## 11. Feed estruturado no estado público
+
+O estado autoritativo passou a publicar:
+
+- `bulletins`: últimos acontecimentos estruturados;
+- `action_spotlight`: ação atualmente destacada;
+- `dice_display`: rolagem autoritativa já existente.
+
+Não há migration SQL: os campos vivem no JSON do estado da partida.
+
+## Artes
+
+Permanece a estratégia híbrida da 2.0e:
+
+- #04 Investimento Produtivo;
+- #06 Fórum Econômico Regional;
+- #12 Fuga de Capitais;
+- #13 Guerra de Narrativas;
+- #27 Abertura Comercial.
+
+As outras cartas usam placeholder e identidade de categoria até a produção das artes definitivas.
 
 ## Publicação
 
-### 1. Supabase
+### Supabase
 
-Substitua o conteúdo da Edge Function `game-api` pelo arquivo `game-api.ts` deste pacote e faça **Deploy**.
+Substitua a Edge Function pelo `game-api.ts` desta pasta e faça **Deploy**.
 
-**Não há migration SQL nova.** Os estados diplomáticos são armazenados no JSON autoritativo da partida.
+Não há migration SQL nova.
 
-### 2. GitHub Pages
+### GitHub Pages
 
 Substitua:
 
 - `index.html`
 - `app.js`
 - `styles.css`
-- `assets/`
+- pasta `assets/`
 
-**Mantenha o seu `config.js` atual.** Ele não está incluído no ZIP para evitar sobrescrever a configuração já funcional.
+**Preserve seu `config.js` atual.** O arquivo não está no pacote para evitar sobrescrever as chaves públicas já configuradas.
 
-O cache-bust desta versão é `?v=20e2`.
+Cache-bust: `20g`.
 
-## Compatibilidade
-
-Recomenda-se iniciar **uma sala nova** para testar a 2.0e.1. O backend mantém alguns caminhos de compatibilidade com snapshots antigos, mas as novas propriedades `tension`, `suspended` e `crisis` foram desenhadas para partidas iniciadas nesta versão.
-
-## Validação executada
+## Validação local executada
 
 - `node --check app.js`: OK.
-- `tsc --noEmit --noResolve --target ES2022 --module ESNext game-api.ts`: apenas o erro esperado de resolução do import `jsr:@supabase/server`, inexistente no TypeScript local; não foram encontrados outros erros de sintaxe/tipagem local.
-- Assets das cinco cartas piloto presentes.
-- Cache-bust atualizado para `20e2`.
-- A resolução docente de pendências também cobre a janela da **Cláusula de Salvaguarda** para Tensão, Suspensão e Crise.
+- TypeScript: sem erro local além da resolução esperada de `jsr:@supabase/server`, indisponível no `tsc` local.
+- 5 assets piloto presentes.
+- 28 Dossiês e 16 Eventos mantidos.
+- regra 0.4-C preservada.
 
-## Playtest recomendado
+## Playtest recomendado para a 2.0g
 
-Priorize testar deliberadamente:
-
-1. Acordo sob Tensão e retorno ao normal no fim da rodada.
-2. Suspensão e reativação no início da Cúpula.
-3. Bloco em Crise e desativação de bônus/proteções.
-4. Cláusula de Salvaguarda cancelando cada um dos três estados.
-5. Barreiras Tarifárias nas duas respostas.
-6. Ataque às Redes com Vantagem do parceiro de Bloco.
-7. Expansão do Comércio Mundial antes/depois da iniciativa normal.
-8. Cooperação Multilateral com Abertura Comercial e troca de cartas, verificando que não há renovação duplicada.
-9. Disputa de Influência com Vantagem em ambos os países.
-10. Guerra Comercial, Embargo Internacional e Conflito Geopolítico Global.
-
+1. Um jogador usa Interferência contra outro: confirmar se **todos** veem ator, carta e alvo.
+2. Confirmar se o alvo recebe **ISTO AFETOU SEU PAÍS** com a alteração numérica correta.
+3. Usar uma Reação e verificar distinção visual + alerta.
+4. Testar cartas de cada família sem depender apenas de cor.
+5. Ler cartas e Eventos em Chromebook sem zoom.
+6. Fazer uma troca de cartas e verificar se ambos entendem o que estão oferecendo/recebendo.
+7. Jogar Disputa de Influência e Grande Crise Financeira: confirmar dados simultâneos.
+8. Tentar formar um segundo Bloco com país que já possui Bloco: o servidor deve impedir.
+9. Usar Pressão Geopolítica contra parceiro de Acordo: o motor não deve encerrar o Acordo.
+10. Exportar o relatório e confirmar `game_version`, `rules_version` e `client_version` na telemetria nova.
