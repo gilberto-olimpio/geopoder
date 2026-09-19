@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0g';
+  const GAME_VERSION = 'Alpha 2.0g.1';
   const RULES_VERSION = '0.4-C';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -46,6 +46,10 @@
 
   let sb = null;
   let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set(),onboardingActive:false,onboardingStep:0,previewCardId:null};
+  const UI_SCALE_KEY='gp_ui_scale';
+  const UI_SCALE_VALUES=new Set(['compact','comfortable','large']);
+  function currentUiScale(){const v=localStorage.getItem(UI_SCALE_KEY)||'comfortable';return UI_SCALE_VALUES.has(v)?v:'comfortable'}
+  function applyUiScale(v=currentUiScale()){const value=UI_SCALE_VALUES.has(v)?v:'comfortable';document.documentElement.dataset.uiScale=value;localStorage.setItem(UI_SCALE_KEY,value);return value}
   let heartbeatTimer = null, refreshTimer = null, tickTimer = null, uiTimer = null;
   let tickInFlight = false;
 
@@ -83,7 +87,8 @@
   function editorialCardHtml(c,{expanded=false}={}){
     if(!c)return'';
     const art=c.art?`<img class="dossier-art" src="${esc(c.art)}" alt="Ilustração temática de ${esc(c.name)}">`:`<div class="dossier-art dossier-art-placeholder"><span>${cardTypeGlyph(c.type)}</span><small>DOCUMENTO DE GOVERNO</small></div>`;
-    return `<article class="dossier-full ${cardTypeClass(c.type)} ${expanded?'expanded':''}"><div class="dossier-classification"><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><span>DOSSIÊ #${String(c.id).padStart(2,'0')}</span></div><h3>${esc(c.name)}</h3>${art}${c.headline?`<div class="dossier-headline">${esc(c.headline)}</div>`:''}${c.brief?`<p class="dossier-brief">${esc(c.brief)}</p>`:''}<div class="dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div>${c.quote?`<blockquote>“${esc(c.quote)}”<cite>— ${esc(c.source||'Análise internacional')}</cite></blockquote>`:''}<div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></article>`;
+    const density=c.effect.length>210?'text-heavy':c.effect.length>135?'text-medium':'text-light';
+    return `<article class="dossier-full ${cardTypeClass(c.type)} ${density} ${expanded?'expanded':''}"><div class="dossier-classification"><span>${esc(c.type)}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><span>DOSSIÊ #${String(c.id).padStart(2,'0')}</span></div><h3>${esc(c.name)}</h3>${art}${c.headline?`<div class="dossier-headline">${esc(c.headline)}</div>`:''}${c.brief?`<p class="dossier-brief">${esc(c.brief)}</p>`:''}<div class="dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div>${c.quote?`<blockquote>“${esc(c.quote)}”<cite>— ${esc(c.source||'Análise internacional')}</cite></blockquote>`:''}<div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></article>`;
   }
   function currentCountry(pub,isTeacher){return isTeacher?null:state.me?.country||pub.active_country||null}
   function contextTip(pub,isTeacher,own){
@@ -136,6 +141,7 @@
   async function checkTeacherStatus(){if(!state.session||sessionIsAnonymous())return{authorized:false,profile:null};const d=await api('teacher_status');state.teacherProfile=d.authorized?d.profile:null;return d}
 
   async function init(){
+    applyUiScale();
     try{
       if(!CONFIG.SUPABASE_URL||!CONFIG.SUPABASE_PUBLISHABLE_KEY||/SEU-PROJETO|COLE_AQUI/.test(CONFIG.SUPABASE_URL+CONFIG.SUPABASE_PUBLISHABLE_KEY)){setConn('Configuração pendente','bad');showError('config.js ainda não está configurado','Preencha SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.');return}
       if(!window.supabase?.createClient){setConn('Biblioteca indisponível','bad');showError('Supabase JS não carregou','Verifique sua conexão.');return}
@@ -304,9 +310,9 @@
     </article>`).join('')}</aside>`;
   }
   function renderPublicWire(pub){
-    const feed=(pub.bulletins||[]).slice(-4).reverse();
+    const feed=(pub.bulletins||[]).slice(-2).reverse();
     if(!feed.length)return '';
-    return `<div class="public-wire"><span>AGÊNCIA INTERNACIONAL</span><div>${feed.map(b=>`<i>${bulletinIcon(b)} ${esc(b.title||b.body||'Atualização')}</i>`).join('')}</div></div>`;
+    return `<div class="public-wire"><span>AGÊNCIA INTERNACIONAL</span><div>${feed.map(b=>`<i>${bulletinIcon(b)} <b>${esc(b.title||'Atualização')}</b>${b.body?` <em>— ${esc(b.body)}</em>`:''}</i>`).join('')}</div></div>`;
   }
 
   function renderMatch(isTeacher){
@@ -374,7 +380,8 @@
   function renderCommandEvent(e,pub){
     if(!e)return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><div class="event-empty">Aguardando o próximo boletim internacional.</div>`;
     const kind=(e.kind||'Evento').toUpperCase(),quote=e.kind==='Oportunidade'?'“Toda abertura no sistema internacional cria espaço para novas estratégias.”':e.kind==='Crise'?'“Crises testam governos antes de testarem fronteiras.”':'“O cenário internacional muda; governos precisam escolher como responder.”',summary=e.kind==='Oportunidade'?'Governos identificam novas possibilidades de cooperação, crescimento e projeção internacional.':e.kind==='Crise'?'Tensões internacionais pressionam mercados, redes e decisões de governo em várias regiões.':'Uma mudança no cenário internacional exige respostas rápidas e escolhas estratégicas dos governos.';
-    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><p class="event-summary">${esc(summary)}</p><div class="event-effect-box"><b>EFEITO ATIVO</b><p>${esc(e.effect)}</p></div><blockquote>${quote}<cite>— Observatório Político Internacional</cite></blockquote></article>`;
+    const density=String(e.effect||'').length>190?'event-text-heavy':String(e.effect||'').length>120?'event-text-medium':'event-text-light';
+    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper ${density}"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><p class="event-summary">${esc(summary)}</p><div class="event-effect-box"><b>EFEITO NO JOGO</b><p>${esc(e.effect)}</p></div><blockquote>${quote}<cite>— Observatório Político Internacional</cite></blockquote></article>`;
   }
 
   function renderNationalCommand(pub,isTeacher){
@@ -403,8 +410,36 @@
 
   function renderSituationCommand(pub,isTeacher,own){
     const canPreview=!isTeacher&&state.previewCardId&&pub.phase==='turns'&&!pub.pending_public;
-    const center=canPreview?renderSituationDossier(Number(state.previewCardId),pub,own):renderPhasePanel(pub,isTeacher,own);
-    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>Analisar · planejar · decidir · governar</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${canPreview?'':renderActionSpotlight(pub,isTeacher)}${canPreview?'':renderDiceDisplay(pub.dice_display)}${canPreview?'':contextTip(pub,isTeacher,own)}<div class="situation-phase ${canPreview?'dossier-preview-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
+    const me=!isTeacher?state.me?.country:null;
+    const pendingForMe=!isTeacher&&pub.pending_public?.country===me;
+    const observingTurn=!isTeacher&&pub.phase==='turns'&&me&&me!==pub.active_country;
+    const observingPending=observingTurn&&pub.pending_public?.country&&pub.pending_public.country!==me;
+    const eventDice=!isTeacher&&pub.phase==='event'&&Boolean(pub.dice_display)&&!pendingForMe;
+    const diplomacyObserver=!isTeacher&&pub.phase==='diplomacy'&&Boolean(pub.action_spotlight)&&!pendingForMe;
+    const live=(observingTurn&&(pub.action_spotlight||pub.dice_display||(pub.bulletins||[]).length))||eventDice||diplomacyObserver;
+    const useLive=!canPreview&&live&&(eventDice||diplomacyObserver||observingPending||!pub.pending_public);
+    const center=canPreview?renderSituationDossier(Number(state.previewCardId),pub,own):useLive?renderLiveSituation(pub):renderPhasePanel(pub,isTeacher,own);
+    const floating=!canPreview&&!useLive;
+    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>${useLive?'Central de operações · acompanhe o mundo em movimento':'Analisar · planejar · decidir · governar'}</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${floating?renderActionSpotlight(pub,isTeacher):''}${floating?renderDiceDisplay(pub.dice_display):''}${floating?contextTip(pub,isTeacher,own):''}<div class="situation-phase ${canPreview?'dossier-preview-phase':''} ${useLive?'live-ops-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
+  }
+
+  function renderLiveSituation(pub){
+    const a=pub.action_spotlight;
+    const d=pub.dice_display;
+    const p=pub.pending_public;
+    const latest=(pub.bulletins||[]).slice(-1)[0];
+    if(d?.rolls?.length){
+      const consequences=(a?.consequences||[]).slice(-4);
+      const dice=renderDiceDisplay(d);
+      const outcomes=renderDiceOutcomeSummary(d);
+      return `<section class="command-action live-ops-board dice-live-board"><div class="state-kicker">RESOLUÇÃO COMPARTILHADA</div><h1>${esc(d.source||a?.card_name||'Rolagem pública')}</h1>${a?.actor?`<div class="live-route"><b>${esc(a.actor)}</b>${a.target?`<span>→</span><b>${esc(a.target)}</b>`:''}</div>`:''}${dice}${outcomes}${consequences.length?`<div class="live-consequences">${consequences.map(x=>`<div>${esc(x)}</div>`).join('')}</div>`:''}${p?`<div class="live-awaiting">Aguardando decisão de <b>${esc(p.country||'outro governo')}</b>: ${esc(pendingDescription(p))}</div>`:''}</section>`;
+    }
+    if(a){
+      const consequences=(a.consequences||[]).slice(-5);
+      return `<section class="command-action live-ops-board ${a.target===state.me?.country?'targets-me':''}"><div class="state-kicker">${a.target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'MOVIMENTO INTERNACIONAL'}</div><div class="live-route"><b>${esc(a.actor||'Sistema')}</b>${a.target?`<span>→</span><b>${esc(a.target)}</b>`:''}</div><h1>${esc(a.card_name||a.title||'Decisão em andamento')}</h1>${consequences.length?`<div class="live-consequences">${consequences.map(x=>`<div>${esc(x)}</div>`).join('')}</div>`:`<p class="live-pending-copy">${p?`Aguardando ${esc(p.country||'o governo responsável')} resolver: ${esc(pendingDescription(p))}`:'A resolução está sendo processada. O resultado aparecerá aqui.'}</p>`}${latest?.body?`<div class="live-last-result"><b>ÚLTIMO RESULTADO</b><span>${esc(latest.body)}</span></div>`:''}</section>`;
+    }
+    if(latest)return `<section class="command-action live-ops-board"><div class="state-kicker">ÚLTIMO ACONTECIMENTO</div><h1>${esc(latest.title||'Atualização internacional')}</h1>${latest.body?`<div class="live-last-result"><span>${esc(latest.body)}</span></div>`:''}<p class="live-pending-copy">Aguardando a próxima decisão de ${esc(pub.active_country||'outro governo')}.</p></section>`;
+    return `<section class="command-action state-briefing waiting-state"><div class="state-kicker">CENTRAL DE OPERAÇÕES</div><h2>Aguardando ${esc(pub.active_country||'outro governo')}</h2><p>A próxima ação aparecerá aqui com alvo, consequências e resultados.</p></section>`;
   }
 
   function renderSituationDossier(id,pub,own){
@@ -412,7 +447,16 @@
     const active=pub.phase==='turns'&&!pub.pending_public&&state.me.country===pub.active_country,reaction=REACTION_IDS_UI.has(id),valid=cardHasValidTarget(id,pub,state.me.country);
     const art=c.art?`<img src="${esc(c.art)}" alt="Ilustração temática de ${esc(c.name)}">`:`<div class="situation-dossier-art placeholder"><span>${cardTypeGlyph(c.type)}</span><small>DOSSIÊ DE GOVERNO</small></div>`;
     const action=reaction?'<div class="situation-dossier-note violet">Carta de Reação: será oferecida automaticamente quando o gatilho acontecer.</div>':active&&valid?`<button class="btn primary" data-preview-play="${id}">JOGAR ESTE DOSSIÊ</button>`:active&&!valid?'<div class="situation-dossier-note warn">Neste momento não existe alvo válido para esta carta.</div>':'<div class="situation-dossier-note">Planejamento: você poderá jogar este Dossiê quando chegar seu turno.</div>';
-    return `<section class="command-action situation-dossier-preview ${cardTypeClass(c.type)}"><div class="situation-dossier-head"><div><span>${esc(cardTypeLabel(c.type))}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><b>DOSSIÊ #${String(id).padStart(2,'0')}</b></div><button class="situation-dossier-close" data-preview-close aria-label="Fechar dossiê">×</button></div><div class="situation-dossier-grid"><div class="situation-dossier-media">${art}</div><div class="situation-dossier-copy"><h2>${esc(c.name)}</h2>${c.headline?`<h3>${esc(c.headline)}</h3>`:''}${c.brief?`<p class="situation-dossier-brief">${esc(c.brief)}</p>`:''}<div class="situation-dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div><div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></div></div><div class="situation-dossier-actions">${action}<button class="btn ghost" data-preview-close>Voltar à situação atual</button></div></section>`;
+    const density=c.effect.length>210?'text-heavy':c.effect.length>135?'text-medium':'text-light';
+    return `<section class="command-action situation-dossier-preview ${cardTypeClass(c.type)} ${density}"><div class="situation-dossier-head"><div><span>${esc(cardTypeLabel(c.type))}${c.tags?.length?' · '+esc(c.tags.join(' · ')):''}</span><b>DOSSIÊ #${String(id).padStart(2,'0')}</b></div><button class="situation-dossier-close" data-preview-close aria-label="Fechar dossiê">×</button></div><div class="situation-dossier-grid"><div class="situation-dossier-media">${art}</div><div class="situation-dossier-copy"><h2>${esc(c.name)}</h2>${c.headline?`<h3>${esc(c.headline)}</h3>`:''}${c.brief?`<p class="situation-dossier-brief">${esc(c.brief)}</p>`:''}<div class="situation-dossier-effect"><b>EFEITO NO JOGO</b><p>${esc(c.effect)}</p></div><div class="tag-row">${(c.tags||[]).map(t=>`<span class="mini-tag">${esc(t)}</span>`).join('')}</div></div></div><div class="situation-dossier-actions">${action}<button class="btn ghost" data-preview-close>Voltar à situação atual</button></div></section>`;
+  }
+
+  function renderDiceOutcomeSummary(d){
+    if(!d?.rolls?.length)return'';
+    if(String(d.source||'').includes('Grande Crise Financeira Global')){
+      return `<div class="dice-outcome-grid">${d.rolls.map(r=>{const n=Number(r.total??r.result);const result=n<=2?'−2 Economia':n<=4?'−1 Economia':'Sem perda';return `<div class="dice-outcome ${n<=2?'bad':n<=4?'warn':'good'}"><b>${esc(r.country||r.label||'País')}</b><span>${result}</span></div>`}).join('')}</div>`;
+    }
+    return'';
   }
 
   function dieGlyph(n){return ({1:'⚀',2:'⚁',3:'⚂',4:'⚃',5:'⚄',6:'⚅'})[Number(n)]||'🎲'}
@@ -471,8 +515,8 @@
     }else if(kind==='history'){
       title.textContent='Histórico recente';const log=pub.recent_log||[];body.innerHTML=log.length?`<div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')}</div>`:'<div class="history-empty">Nenhum registro recente.</div>';
     }else{
-      title.textContent='Como Jogar';body.innerHTML=`<div class="rules-tabs"><section><h4>Objetivo</h4><p><b>Termine a 8ª rodada com a maior Influência.</b> Influência é a soma de Economia, Redes, Diplomacia e Cultura. Se todos os quatro atributos estiverem em pelo menos 2 no final, você recebe +2 de Potência Equilibrada.</p></section><section><h4>O que fazer</h4><p>Leia o Evento, examine seus Dossiês e use 1 Ação Principal no seu turno. Depois acompanhe as ações dos outros governos e participe da Cúpula Diplomática ao fim da rodada.</p></section><section><h4>Rodada</h4><p>Evento Global → Desafio nas rodadas pares → Compra → Turnos nacionais → Cúpula Diplomática.</p></section><section><h4>Dossiês</h4><p><b>Desenvolvimento</b> fortalece o país; <b>Interferência</b> afeta outros governos; <b>Risco/Escolha</b> envolve decisão ou incerteza; <b>Reação</b> não é Ação Principal e só é usada quando seu gatilho ocorre.</p></section><section><h4>Vantagem Geográfica</h4><p>Guarde até 2. Gaste 1 para <b>refazer uma rolagem sua de d6</b>, <b>reduzir em 1 uma perda de atributo</b> ou, durante a compra, <b>revelar 2 cartas, escolher 1 e descartar a outra</b>.</p></section><section><h4>Diplomacia</h4><p>Na Cúpula, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação ou não agir. Aceitar ou recusar uma proposta não gasta sua iniciativa. Na regra 0.4-C, vários Dossiês de Desenvolvimento recebem bônus maiores quando o país mantém Acordos, Blocos ou Relações Comerciais ativas.</p></section><section><h4>Glossário</h4><p><b>Relação Comercial:</b> Acordo ou Bloco ativo. <b>Sob Tensão:</b> o Acordo continua existindo, mas não concede bônus nem cumpre requisitos de Relação/Acordo até o fim da rodada. <b>Suspenso:</b> o Acordo ocupa limite, porém fica inativo até a próxima Cúpula. <b>Bloco em Crise:</b> bônus e proteções de Bloco ficam desligados até o fim da rodada. <b>Renovar:</b> compre 1 e descarte 1. <b>Recuperação Nacional:</b> eleve um atributo em 0 para 1 usando sua Ação Principal.</p></section></div><div class="actions"><button class="btn primary" id="replayTutorial">Rever tutorial neste dispositivo</button></div>`;
-      setTimeout(()=>document.getElementById('replayTutorial')?.addEventListener('click',()=>{localStorage.removeItem(tutorialSeenKey);state.onboardingActive=true;state.onboardingStep=0;closeCommandModal();mountOnboarding(false)}),0);
+      title.textContent='Como Jogar';body.innerHTML=`<div class="rules-tabs"><section><h4>Objetivo</h4><p><b>Termine a 8ª rodada com a maior Influência.</b> Influência é a soma de Economia, Redes, Diplomacia e Cultura. Se todos os quatro atributos estiverem em pelo menos 2 no final, você recebe +2 de Potência Equilibrada.</p></section><section><h4>O que fazer</h4><p>Leia o Evento, examine seus Dossiês e use 1 Ação Principal no seu turno. Depois acompanhe as ações dos outros governos e participe da Cúpula Diplomática ao fim da rodada.</p></section><section><h4>Rodada</h4><p>Evento Global → Desafio nas rodadas pares → Compra → Turnos nacionais → Cúpula Diplomática.</p></section><section><h4>Dossiês</h4><p><b>Desenvolvimento</b> fortalece o país; <b>Interferência</b> afeta outros governos; <b>Risco/Escolha</b> envolve decisão ou incerteza; <b>Reação</b> não é Ação Principal e só é usada quando seu gatilho ocorre.</p></section><section><h4>Vantagem Geográfica</h4><p>Guarde até 2. Gaste 1 para <b>refazer uma rolagem sua de d6</b>, <b>reduzir em 1 uma perda de atributo</b> ou, durante a compra, <b>revelar 2 cartas, escolher 1 e descartar a outra</b>.</p></section><section><h4>Diplomacia</h4><p>Na Cúpula, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação ou não agir. Aceitar ou recusar uma proposta não gasta sua iniciativa. Na regra 0.4-C, vários Dossiês de Desenvolvimento recebem bônus maiores quando o país mantém Acordos, Blocos ou Relações Comerciais ativas.</p></section><section><h4>Glossário</h4><p><b>Relação Comercial:</b> Acordo ou Bloco ativo. <b>Sob Tensão:</b> o Acordo continua existindo, mas não concede bônus nem cumpre requisitos de Relação/Acordo até o fim da rodada. <b>Suspenso:</b> o Acordo ocupa limite, porém fica inativo até a próxima Cúpula. <b>Bloco em Crise:</b> bônus e proteções de Bloco ficam desligados até o fim da rodada. <b>Renovar:</b> compre 1 e descarte 1. <b>Recuperação Nacional:</b> eleve um atributo em 0 para 1 usando sua Ação Principal.</p></section><section><h4>Legibilidade da interface</h4><p>Escolha a escala que melhor se adapta ao tamanho físico da tela. A opção <b>Confortável</b> é a recomendada para notebooks; <b>Grande</b> prioriza leitura em monitores maiores e projeção.</p><div class="ui-scale-picker"><button class="btn ghost" data-ui-scale="compact">Compacta</button><button class="btn ghost" data-ui-scale="comfortable">Confortável</button><button class="btn ghost" data-ui-scale="large">Grande</button></div></section></div><div class="actions"><button class="btn primary" id="replayTutorial">Rever tutorial neste dispositivo</button></div>`;
+      setTimeout(()=>{document.getElementById('replayTutorial')?.addEventListener('click',()=>{localStorage.removeItem(tutorialSeenKey);state.onboardingActive=true;state.onboardingStep=0;closeCommandModal();mountOnboarding(false)});document.querySelectorAll('[data-ui-scale]').forEach(b=>{b.classList.toggle('primary',b.dataset.uiScale===currentUiScale());b.addEventListener('click',()=>{applyUiScale(b.dataset.uiScale);document.querySelectorAll('[data-ui-scale]').forEach(x=>x.classList.toggle('primary',x.dataset.uiScale===currentUiScale()));});});},0);
     }
     modal.classList.add('open');modal.setAttribute('aria-hidden','false');
   }

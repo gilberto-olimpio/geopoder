@@ -564,3 +564,206 @@ select option:disabled { color: #888; background: #eee; }
 @media(prefers-reduced-motion:reduce){
   .impact-toast,.action-spotlight{animation:none!important}
 }
+
+/* ==========================================================
+   Alpha 2.0g.1 — Mesa Viva, Resolução Compartilhada e Legibilidade
+   Regra de ouro: informação mecânica cresce; arte encolhe antes do texto.
+   A Mesa principal evita rolagem interna nos estados normais.
+   ========================================================== */
+html[data-ui-scale="compact"]{font-size:14px}
+html[data-ui-scale="comfortable"]{font-size:16px}
+html[data-ui-scale="large"]{font-size:18px}
+
+/* A grade utiliza melhor monitores de 15" a 27" sem transformar espaços extras em letra miúda. */
+@media(min-width:821px){
+  .government-room{
+    grid-template-columns:clamp(250px,18vw,330px) minmax(0,1fr) clamp(300px,22vw,400px)!important;
+    grid-template-rows:clamp(70px,8vh,88px) minmax(0,1fr) clamp(158px,19vh,190px) clamp(54px,6.5vh,66px)!important;
+    gap:clamp(6px,.55vw,10px)!important;
+    padding:clamp(6px,.55vw,10px)!important;
+  }
+  .government-top{grid-template-columns:minmax(300px,1.28fr) minmax(225px,.9fr) minmax(145px,.58fr) minmax(190px,.78fr) minmax(180px,.7fr)!important}
+}
+
+/* Tipografia global de jogo: rótulos ainda são secundários, mas deixam de ser microscópicos. */
+.panel-title b{font-size:clamp(.9rem,.78vw,1.05rem)!important}
+.panel-title small{font-size:clamp(.64rem,.56vw,.76rem)!important;line-height:1.22!important}
+.panel-title.compact b{font-size:clamp(.94rem,.86vw,1.12rem)!important}
+.panel-title.compact small{font-size:clamp(.63rem,.57vw,.76rem)!important}
+.gov-title{font-size:clamp(1.12rem,1.18vw,1.58rem)!important}
+.gov-title small{font-size:clamp(.68rem,.7vw,.92rem)!important}
+.gov-motto,.gov-country-ident span,.gov-team small,.gov-round small,.gov-online small{font-size:clamp(.58rem,.51vw,.72rem)!important}
+.gov-country-ident b{font-size:clamp(.96rem,.92vw,1.22rem)!important}
+.gov-team b{font-size:clamp(.82rem,.78vw,1.05rem)!important}
+.gov-round b{font-size:clamp(.7rem,.66vw,.88rem)!important}
+.gov-online>span{font-size:clamp(.62rem,.58vw,.78rem)!important}
+
+/* Gabinete — números são a informação principal. */
+.command-national{padding:clamp(9px,.72vw,14px)!important}
+.national-identity{padding:clamp(5px,.55vh,9px) 0!important}
+.national-identity h2{font-size:clamp(1.2rem,1.25vw,1.6rem)!important}
+.national-identity small,.national-identity span{font-size:clamp(.58rem,.52vw,.72rem)!important}
+.national-meters{gap:clamp(5px,.65vh,9px)!important}
+.gov-attr-head{font-size:clamp(.75rem,.68vw,.92rem)!important}
+.gov-attr-head b{font-size:clamp(1.16rem,1.05vw,1.45rem)!important}
+.gov-meter i{height:clamp(9px,1.25vh,14px)!important}
+.national-score-v2 b{font-size:clamp(.7rem,.62vw,.86rem)!important}
+.national-score-v2 strong{font-size:clamp(1.35rem,1.38vw,1.75rem)!important}
+.relation-title{font-size:clamp(.68rem,.59vw,.82rem)!important}
+.relation-list-v2{overflow:visible!important;gap:clamp(3px,.4vh,6px)!important}
+.relation-v2{font-size:clamp(.7rem,.62vw,.84rem)!important;padding:clamp(4px,.45vh,7px) 3px!important}
+.relation-v2 small{font-size:clamp(.62rem,.54vw,.74rem)!important}
+
+/* Cenário Global — não rola. O texto da regra tem prioridade sobre boletim/arte. */
+.command-event{padding:clamp(9px,.72vw,14px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.command-event .panel-title{flex:0 0 auto!important}
+.event-paper{height:auto!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:clamp(7px,.68vw,12px)!important}
+.event-paper-top{font-size:clamp(.6rem,.55vw,.75rem)!important;flex:0 0 auto!important}
+.event-paper h2{font-size:clamp(1.15rem,1.2vw,1.58rem)!important;line-height:1.04!important;margin:clamp(5px,.55vh,9px) 0!important;flex:0 0 auto!important}
+.event-visual{height:clamp(58px,10vh,100px)!important;min-height:0!important;flex:0 1 auto!important}
+.event-visual>span{font-size:clamp(1.6rem,2.2vw,2.5rem)!important}
+.event-visual small{font-size:clamp(.55rem,.5vw,.68rem)!important}
+.event-summary{font-size:clamp(.76rem,.69vw,.94rem)!important;line-height:1.32!important;margin:clamp(5px,.6vh,9px) 0!important;flex:0 0 auto!important}
+.event-effect-box{padding:clamp(7px,.7vw,11px)!important;flex:0 0 auto!important}
+.event-effect-box b{font-size:clamp(.68rem,.61vw,.82rem)!important;letter-spacing:.06em!important}
+.event-effect-box p{font-size:clamp(.92rem,.86vw,1.12rem)!important;line-height:1.38!important;margin:4px 0 0!important}
+.event-paper blockquote{font-size:clamp(.68rem,.61vw,.82rem)!important;line-height:1.25!important;margin:clamp(6px,.6vh,10px) 6px 0!important;flex:0 0 auto!important}
+.event-paper cite{font-size:clamp(.52rem,.46vw,.62rem)!important}
+.event-paper.event-text-medium .event-visual{height:clamp(48px,7vh,76px)!important}
+.event-paper.event-text-medium blockquote{display:none!important}
+.event-paper.event-text-heavy .event-visual{height:clamp(34px,5vh,54px)!important}
+.event-paper.event-text-heavy .event-visual>span{font-size:1.35rem!important}
+.event-paper.event-text-heavy .event-summary,.event-paper.event-text-heavy blockquote{display:none!important}
+
+/* Mesa de Situação — espaço principal e sem scroll interno nos estados de jogo. */
+.command-situation{padding:clamp(9px,.72vw,14px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.situation-topline{min-height:clamp(30px,4vh,42px)!important;flex:0 0 auto!important}
+.situation-active{font-size:clamp(.62rem,.56vw,.76rem)!important;padding:4px 8px!important}
+.situation-phase{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;padding:clamp(5px,.6vh,9px) 0!important;display:flex!important;align-items:stretch!important;justify-content:center!important}
+.situation-phase>.command-action,.situation-phase>.card.action-panel{width:100%!important;height:100%!important;min-height:0!important;margin:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+.command-action h1{font-size:clamp(1.55rem,1.75vw,2.25rem)!important;line-height:1.05!important}
+.command-action h2{font-size:clamp(1.15rem,1.22vw,1.62rem)!important;line-height:1.13!important}
+.command-action h3{font-size:clamp(1rem,1vw,1.3rem)!important}
+.command-action p{font-size:clamp(.86rem,.78vw,1.02rem)!important;line-height:1.42!important}
+.state-kicker{font-size:clamp(.68rem,.62vw,.84rem)!important;letter-spacing:.1em!important}
+.command-action .btn,.command-action button{font-size:clamp(.78rem,.7vw,.94rem)!important;min-height:clamp(36px,4.3vh,46px)!important}
+
+/* Dossiê aberto — formato horizontal adaptativo. Nunca cria barra de rolagem no efeito. */
+.situation-dossier-preview{justify-content:flex-start!important;padding:clamp(8px,.75vw,13px)!important;overflow:hidden!important}
+.situation-dossier-grid{grid-template-columns:minmax(120px,30%) minmax(0,1fr)!important;gap:clamp(9px,.8vw,15px)!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important}
+.situation-dossier-preview.text-medium .situation-dossier-grid{grid-template-columns:minmax(105px,23%) minmax(0,1fr)!important}
+.situation-dossier-preview.text-heavy .situation-dossier-grid{grid-template-columns:minmax(82px,16%) minmax(0,1fr)!important}
+.situation-dossier-media{height:100%!important;max-height:none!important;min-height:0!important}
+.situation-dossier-preview.text-heavy .situation-dossier-media img{object-position:center!important}
+.situation-dossier-copy{overflow:hidden!important;justify-content:center!important}
+.situation-dossier-copy h2{font-size:clamp(1.35rem,1.45vw,1.9rem)!important;line-height:1.05!important;margin:0 0 5px!important}
+.situation-dossier-copy h3{font-size:clamp(.9rem,.82vw,1.08rem)!important;line-height:1.22!important;margin:0 0 5px!important}
+.situation-dossier-brief{font-size:clamp(.78rem,.7vw,.94rem)!important;line-height:1.3!important;margin:0 0 6px!important;-webkit-line-clamp:2!important}
+.situation-dossier-preview.text-heavy .situation-dossier-brief{display:none!important}
+.situation-dossier-effect{overflow:visible!important;scrollbar-width:none!important;padding:clamp(8px,.75vw,12px)!important;margin-top:3px!important;flex:0 0 auto!important}
+.situation-dossier-effect b{font-size:clamp(.68rem,.61vw,.82rem)!important}
+.situation-dossier-effect p{font-size:clamp(.92rem,.85vw,1.12rem)!important;line-height:1.42!important;margin:4px 0 0!important}
+.situation-dossier-preview.text-heavy .situation-dossier-effect p{font-size:clamp(.86rem,.79vw,1.04rem)!important;line-height:1.36!important}
+.situation-dossier-head span,.situation-dossier-head b{font-size:clamp(.6rem,.55vw,.75rem)!important}
+.situation-dossier-actions{gap:9px!important;margin-top:clamp(5px,.55vh,9px)!important}
+.situation-dossier-actions>.btn,.situation-dossier-note{font-size:clamp(.72rem,.66vw,.88rem)!important;line-height:1.3!important}
+
+/* Cartas completas dentro de decisões pendentes também sacrificam arte e ambientação antes da regra. */
+.situation-phase .dossier-full{display:grid!important;grid-template-columns:minmax(90px,25%) minmax(0,1fr)!important;grid-template-rows:auto auto auto 1fr auto!important;column-gap:12px!important;max-height:100%!important;overflow:hidden!important;padding:8px!important}
+.situation-phase .dossier-full .dossier-classification,.situation-phase .dossier-full>h3,.situation-phase .dossier-full .dossier-headline,.situation-phase .dossier-full .dossier-brief,.situation-phase .dossier-full .dossier-effect,.situation-phase .dossier-full blockquote,.situation-phase .dossier-full .tag-row{grid-column:2!important}
+.situation-phase .dossier-full .dossier-art{grid-column:1!important;grid-row:1/7!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:cover!important}
+.situation-phase .dossier-full .dossier-classification{font-size:clamp(.62rem,.55vw,.76rem)!important}
+.situation-phase .dossier-full>h3{font-size:clamp(1.2rem,1.25vw,1.65rem)!important;margin:4px 0!important}
+.situation-phase .dossier-full .dossier-headline{font-size:clamp(.8rem,.73vw,.96rem)!important}
+.situation-phase .dossier-full .dossier-brief{font-size:clamp(.72rem,.66vw,.88rem)!important;line-height:1.28!important}
+.situation-phase .dossier-full .dossier-effect{overflow:visible!important;padding:7px 9px!important}
+.situation-phase .dossier-full .dossier-effect p{font-size:clamp(.88rem,.8vw,1.06rem)!important;line-height:1.38!important}
+.situation-phase .dossier-full.text-medium{grid-template-columns:minmax(78px,20%) minmax(0,1fr)!important}
+.situation-phase .dossier-full.text-heavy{grid-template-columns:minmax(64px,14%) minmax(0,1fr)!important}
+.situation-phase .dossier-full.text-medium blockquote,.situation-phase .dossier-full.text-heavy blockquote,.situation-phase .dossier-full.text-heavy .dossier-brief{display:none!important}
+
+/* Mesa Viva: quando não é a sua vez, toda a área central vira um quadro informativo. */
+.live-ops-phase{padding:5px 0!important}
+.live-ops-board{justify-content:center!important;align-items:center!important;text-align:center!important;background:radial-gradient(circle at 50% 38%,rgba(56,111,137,.16),transparent 47%),linear-gradient(180deg,rgba(8,31,44,.96),rgba(5,20,30,.98))!important;border:1px solid rgba(215,169,62,.46)!important}
+.live-ops-board.targets-me{border-color:#e17a68!important;box-shadow:inset 0 0 0 1px rgba(255,112,92,.18),0 0 34px rgba(167,54,43,.17)!important}
+.live-route{display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.5vw,24px);font-size:clamp(1.05rem,1.1vw,1.45rem);margin:4px 0 8px;color:#f1e9d8}
+.live-route span{color:#e2b84e;font-size:1.5em}
+.live-ops-board>h1{margin:2px 0 9px!important;text-transform:uppercase!important;max-width:94%}
+.live-consequences{width:min(92%,760px);display:grid;gap:clamp(5px,.7vh,9px);margin:4px auto}
+.live-consequences>div,.live-last-result{border:1px solid #557185;background:rgba(7,24,35,.76);padding:clamp(8px,.8vw,13px);font:700 clamp(.86rem,.82vw,1.08rem)/1.35 Inter,Arial,sans-serif;color:#edf3f5}
+.live-last-result{display:flex;flex-direction:column;gap:3px;margin-top:7px}
+.live-last-result b{font-size:.7em;letter-spacing:.08em;color:#e6bd59}
+.live-pending-copy,.live-awaiting{font-size:clamp(.82rem,.76vw,1rem)!important;color:#bdcbd2!important;margin:5px auto 0!important;max-width:86%}
+.live-awaiting{border-top:1px solid #3d5664;padding-top:8px}
+
+/* Rolagens agrupadas ocupam o centro e mostram todos os países lado a lado. */
+.live-ops-board .dice-result-banner{width:min(96%,900px);margin:4px auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;padding:clamp(10px,1vw,16px)!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.live-ops-board .dice-result-copy{align-items:center!important;min-width:0!important}
+.live-ops-board .dice-result-copy span{font-size:clamp(.7rem,.65vw,.86rem)!important}
+.live-ops-board .dice-result-copy b{font-size:clamp(1.05rem,1.05vw,1.4rem)!important}
+.live-ops-board .dice-result-rolls{width:100%;justify-content:center!important;display:grid!important;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;gap:clamp(8px,1vw,14px)!important;margin-top:10px}
+.live-ops-board .dice-result-unit{justify-content:center!important;min-height:clamp(86px,12vh,125px);padding:clamp(8px,.9vw,14px)!important;background:rgba(3,12,24,.62)!important}
+.live-ops-board .dice-face-animated{font-size:clamp(3rem,4.4vw,5.3rem)!important}
+.live-ops-board .dice-result-unit b{font-size:clamp(.78rem,.73vw,.98rem)!important}
+.live-ops-board .dice-result-unit strong{font-size:clamp(1.4rem,1.6vw,2rem)!important}
+
+/* Último informe continua acessível, mas não compete com a Mesa Viva. */
+.command-recent{min-height:clamp(25px,3.4vh,34px)!important;padding:4px 8px!important}
+.command-recent span,.recent-link{font-size:clamp(.56rem,.5vw,.68rem)!important}
+.command-recent b{font-size:clamp(.68rem,.62vw,.84rem)!important}
+
+/* Agência internacional passa a exibir título + resultado. */
+.public-wire{height:clamp(28px,3.4vh,36px)!important;bottom:clamp(54px,6.5vh,66px)!important}
+.public-wire>span{font-size:clamp(.54rem,.49vw,.68rem)!important;padding:0 10px!important}
+.public-wire>div{gap:20px!important;padding:0 12px!important}
+.public-wire i{font-size:clamp(.62rem,.57vw,.78rem)!important;line-height:1!important}
+.public-wire i b{color:#f1e6ca}.public-wire i em{color:#9fd3ea;font-style:normal}
+
+/* Mão: menor que a Mesa, mas ainda legível. */
+.command-bottom{padding:clamp(6px,.6vw,10px)!important}
+.dossier-dock-head span{font-size:clamp(.68rem,.61vw,.82rem)!important}
+.dossier-dock-head b,.dossier-dock-head small{font-size:clamp(.58rem,.52vw,.72rem)!important}
+.dossier-card h4{font-size:clamp(.68rem,.65vw,.86rem)!important;line-height:1.12!important}
+.dossier-card p{font-size:clamp(.58rem,.55vw,.73rem)!important;line-height:1.2!important;-webkit-line-clamp:2!important}
+.dossier-card .command-card-top{font-size:clamp(.48rem,.44vw,.62rem)!important}
+.dossier-card .btn{font-size:clamp(.55rem,.51vw,.68rem)!important;min-height:clamp(23px,3vh,31px)!important}
+.dossier-card>img,.dossier-thumb-placeholder{height:clamp(30px,5.2vh,52px)!important;min-height:clamp(30px,5.2vh,52px)!important}
+
+/* Navegação e modal secundário também ganham tipografia utilizável à distância. */
+.gov-nav-btn>b{font-size:clamp(.62rem,.57vw,.78rem)!important}
+.gov-nav-btn>small{font-size:clamp(.48rem,.43vw,.6rem)!important}
+.gov-nav-btn>span{font-size:clamp(1.05rem,1.2vw,1.45rem)!important}
+.command-modal-card{font-size:clamp(.88rem,.78vw,1rem)!important}
+.command-modal-body{font-size:inherit!important}
+.rules-tabs p,.history-list,.diplomacy-row,.intel-summary{font-size:clamp(.82rem,.74vw,.96rem)!important;line-height:1.4!important}
+.ui-scale-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ui-scale-picker .btn.primary{background:#274a64!important;border-color:#6fb7dc!important;color:#fff!important}
+
+/* Em telas baixas, comprimimos arte e ambientação — não a regra. */
+@media(max-height:720px) and (min-width:821px){
+  .government-room{grid-template-rows:66px minmax(0,1fr) 148px 50px!important}
+  .gov-motto,.gov-online small,.gov-nav-btn>small{display:none!important}
+  .event-visual{height:38px!important}.event-visual>span{font-size:1.25rem!important}
+  .event-summary,.event-paper blockquote{display:none!important}
+  .event-effect-box p{font-size:clamp(.86rem,.8vw,1rem)!important;line-height:1.3!important}
+  .situation-dossier-preview.text-medium .situation-dossier-media,.situation-dossier-preview.text-heavy .situation-dossier-media{opacity:.88}
+  .situation-dossier-copy h2{font-size:clamp(1.2rem,1.3vw,1.55rem)!important}
+  .situation-dossier-brief{display:none!important}
+  .public-wire{bottom:50px!important;height:25px!important}
+}
+
+/* Telefones continuam empilhados e podem rolar a página; a regra sem scroll interno é para a Sala desktop/Chromebook. */
+@media(max-width:820px){
+  html[data-ui-scale="large"]{font-size:16px}
+  .situation-phase{overflow:visible!important}
+  .situation-phase>.command-action,.situation-phase>.card.action-panel{height:auto!important;overflow:visible!important}
+  .situation-dossier-grid,.situation-dossier-preview.text-medium .situation-dossier-grid,.situation-dossier-preview.text-heavy .situation-dossier-grid{grid-template-columns:1fr!important}
+  .situation-dossier-media{max-height:180px!important}
+  .situation-phase .dossier-full{display:block!important;overflow:visible!important}
+  .situation-phase .dossier-full .dossier-art{height:150px!important}
+  .live-ops-board .dice-result-rolls{grid-template-columns:1fr 1fr!important}
+  .public-wire{display:none!important}
+}
+.dice-outcome-grid{width:min(96%,900px);display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin:2px auto 6px}
+.dice-outcome{border:1px solid #557185;background:#0a2431;padding:7px 9px;display:flex;justify-content:space-between;gap:8px;align-items:center;font:700 clamp(.72rem,.68vw,.9rem)/1.2 Inter,Arial,sans-serif}
+.dice-outcome.good{border-color:#4c9675}.dice-outcome.good span{color:#78d9a9}.dice-outcome.warn{border-color:#a48744}.dice-outcome.warn span{color:#e8ca76}.dice-outcome.bad{border-color:#a8534d}.dice-outcome.bad span{color:#f09a8d}
