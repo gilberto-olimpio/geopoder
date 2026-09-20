@@ -1,4 +1,4 @@
-# GeoPoder — Alpha 2.0g.2b
+# GeoPoder — Alpha 2.0g.2c
 
 **Subtítulo interno:** Cúpula Internacional melhorada  
 **Regras:** 0.4-C  
@@ -27,6 +27,15 @@ A revisão 2.0g.2 consolida essa arquitetura e corrige o principal gargalo resta
 - ações alheias surgem por alguns segundos como **Nota Oficial** sob o Evento da Rodada, sem cobrir a Mesa;
 - **Inteligência** agora resume apenas o estado estratégico atual;
 - **Histórico** virou uma linha do tempo de ações, alvos e consequências, com até 40 boletins públicos da partida.
+
+### Hotfix 2.0g.2c — Notas sobrepostas e decisões sempre clicáveis
+
+- a **Nota Oficial** agora aparece como cartão temporário sobre o Cenário Global, sem reduzir o Evento nem disputar altura com ele;
+- a Nota mostra o texto completo, desaparece automaticamente e também pode ser fechada clicando no cartão ou no botão ×;
+- Reações usam um resumo horizontal sem arte decorativa, priorizando efeito mecânico e botões;
+- Renovação, descarte, custo de Salvaguarda e devolução de Troca usam uma grade própria de seleção;
+- até quatro cartas ficam na mesma linha; mãos de cinco ou seis cartas usam duas linhas compactas;
+- os botões de responder, descartar, entregar ou manter ficam dentro da área visível da Mesa de Situação.
 
 ## 1. Cúpula Internacional melhorada
 
@@ -127,12 +136,12 @@ Substitua:
 
 **Preserve seu `config.js`.** Ele não está incluído no pacote.
 
-Cache-bust de `app.js` e `styles.css`: `20g2b`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
+Cache-bust de `app.js` e `styles.css`: `20g2c`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
 
 ## 11. Teste recomendado
 
 1. Abrir Dossiês curtos e longos em 1366×768 e Full HD: confirmar ausência de scroll na Mesa.
-2. Observar uma ação sem relação com seu país: ela deve surgir brevemente como Nota Oficial sob o Evento, sem cobrir a Mesa.
+2. Observar uma ação sem relação com seu país: ela deve surgir brevemente como Nota Oficial sobre o Cenário Global, com texto completo e fechamento por clique.
 3. Receber uma ação de outro país: o informe direcionado deve abrir na Mesa e poder ser fechado.
 4. Jogar **Disputa de Influência**: dois dados devem ficar lado a lado e os botões de manter ou rerrolar devem permanecer visíveis.
 5. Resolver **Grande Crise Financeira Global** com 3 ou 4 países: todos os resultados e o botão de aceitar devem caber juntos.
@@ -144,6 +153,7 @@ Cache-bust de `app.js` e `styles.css`: `20g2b`. A referência de `config.js` per
 11. Abrir a Cúpula em 1366×768 e confirmar que Acordo, Bloco, Troca e Não realizar ação estão simultaneamente visíveis e clicáveis.
 12. Propor, aceitar e recusar Acordos, Blocos e Trocas; confirmar que Mesa e Agência mostram também o resultado.
 13. Abrir Inteligência e Histórico: o primeiro deve mostrar o estado atual; o segundo, a sequência de boletins da partida.
+14. Abrir uma Reação e uma Renovação com quatro cartas em 1366×768 e 1366×617: todos os botões devem permanecer visíveis e clicáveis.
 
 ## Validação estática executada
 
