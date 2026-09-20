@@ -767,3 +767,82 @@ html[data-ui-scale="large"]{font-size:18px}
 .dice-outcome-grid{width:min(96%,900px);display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin:2px auto 6px}
 .dice-outcome{border:1px solid #557185;background:#0a2431;padding:7px 9px;display:flex;justify-content:space-between;gap:8px;align-items:center;font:700 clamp(.72rem,.68vw,.9rem)/1.2 Inter,Arial,sans-serif}
 .dice-outcome.good{border-color:#4c9675}.dice-outcome.good span{color:#78d9a9}.dice-outcome.warn{border-color:#a48744}.dice-outcome.warn span{color:#e8ca76}.dice-outcome.bad{border-color:#a8534d}.dice-outcome.bad span{color:#f09a8d}
+
+/* ==========================================================
+   Alpha 2.0g.2 — Cúpula Internacional melhorada
+   Cadeia pública completa e opções diplomáticas sempre acessíveis.
+   ========================================================== */
+.resolution-chain{width:min(100%,1040px);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr) auto minmax(0,1fr) auto minmax(0,1.35fr) auto minmax(0,1.7fr);align-items:stretch;gap:clamp(4px,.5vw,9px);margin:clamp(5px,.75vh,10px) auto;font-family:Inter,Arial,sans-serif;text-align:left}
+.resolution-step{min-width:0;border:1px solid #49677a;background:rgba(5,22,33,.86);padding:clamp(7px,.7vw,11px);display:flex;flex-direction:column;justify-content:center;gap:3px}
+.resolution-step small{color:#7fb7d5;font-size:clamp(.56rem,.5vw,.68rem);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.resolution-step b{color:#f2eee4;font-size:clamp(.76rem,.72vw,.96rem);line-height:1.25;overflow-wrap:anywhere}
+.resolution-step.step-5{border-color:#987d3d;background:rgba(55,43,20,.64)}
+.resolution-step.step-5 small{color:#e8c466}
+.resolution-arrow{align-self:center;color:#ddb64e;font-size:clamp(1rem,1.15vw,1.45rem);font-weight:900}
+.resolution-chain.compact{margin:4px 0 1px;gap:3px;width:100%}
+.resolution-chain.compact .resolution-step{padding:5px 6px}
+.resolution-chain.compact .resolution-step small{font-size:clamp(.48rem,.43vw,.58rem)}
+.resolution-chain.compact .resolution-step b{font-size:clamp(.62rem,.57vw,.76rem)}
+.resolution-chain.compact .resolution-arrow{font-size:.85rem}
+.action-spotlight .resolution-chain{grid-column:1/-1}
+.action-spotlight .spotlight-main,.action-spotlight .spotlight-card,.action-spotlight .spotlight-consequences{display:none!important}
+.live-ops-board .resolution-chain{flex:0 0 auto}
+.dice-panel .dice-result-banner{width:100%;flex-direction:column;align-items:stretch!important}
+.dice-panel .dice-result-copy{min-width:0;align-items:center}
+.dice-panel .dice-result-rolls{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));justify-content:stretch;gap:6px}
+.dice-panel .dice-result-unit{justify-content:center;min-width:0}
+.shared-event-decision .dice-outcome-grid{width:100%;grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}
+
+/* A Cúpula usa uma faixa principal de quatro ações e uma faixa secundária
+   curta. Assim Acordo, Bloco, Troca e Não agir continuam clicáveis em 1366×768. */
+.summit-state{padding:clamp(7px,.65vw,11px)!important;gap:clamp(5px,.6vh,9px)!important;overflow:hidden!important;text-align:left!important}
+.summit-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;border-bottom:1px solid rgba(215,169,62,.3);padding-bottom:5px}
+.summit-heading h1{font-size:clamp(1.05rem,1.15vw,1.45rem)!important;margin:1px 0 0!important}
+.summit-heading>strong{flex:0 0 auto;border:1px solid #846d38;background:#2d2717;color:#f0d47c;padding:6px 9px;font:800 clamp(.66rem,.61vw,.8rem)/1.1 Inter,Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.summit-flags{display:flex;align-items:stretch;gap:6px;flex:0 0 auto;min-width:0}
+.summit-flags:empty{display:none}
+.summit-flags .summit-bonus{flex:1 1 0;max-width:none;margin:0!important;padding:5px 7px!important;display:flex;align-items:center;gap:6px;min-width:0;font-size:clamp(.62rem,.57vw,.76rem)!important}
+.summit-flags .extra-proposal{flex:2 1 0;flex-wrap:wrap}
+.summit-target-pills{display:grid;grid-template-columns:repeat(auto-fit,minmax(68px,1fr));gap:4px;min-width:0}
+.summit-flags .summit-target-pills{display:flex;flex:1 1 260px;flex-wrap:wrap}
+.summit-flags .summit-target-pills button{flex:1 1 92px;min-height:27px!important;padding:4px 6px!important;font-size:clamp(.61rem,.55vw,.72rem)!important}
+.summit-primary{width:100%;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;margin:0!important;flex:1 1 auto;min-height:0;align-items:stretch}
+.summit-primary .summit-box{min-height:0!important;height:100%;padding:clamp(6px,.58vw,9px)!important;gap:4px!important;overflow:hidden}
+.summit-primary .summit-box>b{font-size:clamp(.72rem,.66vw,.86rem)!important}
+.summit-primary .summit-box>small{font-size:clamp(.61rem,.55vw,.73rem)!important;line-height:1.2;min-height:2.4em}
+.summit-primary .summit-box button,.summit-primary .summit-box select{font-size:clamp(.65rem,.59vw,.78rem)!important;line-height:1.15;padding:5px 6px!important;min-height:29px!important;width:100%;white-space:normal}
+.summit-primary .summit-box.trade select{padding:4px 5px!important;min-height:27px!important}
+.summit-primary .trade-offer-preview{margin:1px 0!important;padding:5px 6px!important;gap:2px!important;overflow:visible!important;min-height:0}
+.summit-primary .trade-offer-preview b{font-size:clamp(.66rem,.6vw,.79rem)!important}
+.summit-primary .trade-offer-preview span{font-size:clamp(.61rem,.55vw,.73rem)!important;line-height:1.22!important;color:#e0e7e9!important}
+.summit-primary .summit-box.pass{justify-content:flex-start}
+.summit-primary .summit-box.pass button{margin-top:auto}
+.summit-secondary{display:flex;gap:6px;flex:0 0 auto;min-height:0}
+.summit-secondary-action{flex:1 1 0;border:1px solid #7a3f3f;background:#341b20;padding:5px 7px;display:flex;align-items:center;justify-content:space-between;gap:7px;font-family:Inter,Arial,sans-serif}
+.summit-secondary-action>b{font-size:clamp(.61rem,.56vw,.74rem);color:#f0dede}
+.summit-secondary-action>span{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.summit-secondary-action button{border:1px solid #8e5151;background:#5a2528;color:#fff;padding:4px 7px;min-height:27px;font-size:clamp(.61rem,.55vw,.72rem);cursor:pointer}
+
+@media(max-height:720px) and (min-width:821px){
+  .summit-state{gap:4px!important;padding:6px 8px!important}
+  .summit-heading{padding-bottom:3px}.summit-heading h1{font-size:1rem!important}
+  .summit-flags .summit-bonus{padding:3px 5px!important}
+  .summit-primary .summit-box{padding:5px!important}
+  .summit-primary .summit-box>small{min-height:0}
+  .summit-primary .trade-offer-preview span{font-size:.59rem!important;line-height:1.15!important}
+}
+
+@media(max-width:1050px) and (min-width:821px){
+  .resolution-chain{gap:3px}.resolution-step{padding:6px}.resolution-arrow{font-size:.9rem}
+  .summit-primary .summit-box>small{display:none}
+}
+
+@media(max-width:820px){
+  .resolution-chain,.resolution-chain.compact{grid-template-columns:1fr;gap:4px}
+  .resolution-arrow{display:none}
+  .summit-state{overflow:visible!important}
+  .summit-heading{align-items:flex-start;flex-direction:column}
+  .summit-flags,.summit-secondary{flex-direction:column}
+  .summit-primary{grid-template-columns:1fr 1fr!important;flex:none}
+  .summit-primary .summit-box{height:auto}
+}
