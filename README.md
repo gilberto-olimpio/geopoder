@@ -10,6 +10,14 @@ Esta atualização é voltada à leitura da partida em tempo real. A Mesa de Sit
 
 A revisão 2.0g.2 consolida essa arquitetura e corrige o principal gargalo restante da 2.0g.1: todas as opções da Cúpula Internacional permanecem visíveis e acionáveis na área central de Chromebooks e notebooks, sem empurrar “Formar Bloco”, “Acordo” ou “Não realizar ação” para fora da tela.
 
+### Hotfix de continuidade do playtest
+
+- a área de Troca não exibe mais o efeito completo dentro do cartão compacto, evitando sobreposição entre seletores e botões;
+- o botão **Ver efeito** abre o Dossiê selecionado em uma janela sobreposta, sem abandonar a Cúpula;
+- depois de uma proposta ser aceita ou recusada, a Mesa Viva mostra o resultado e oferece **Voltar à Cúpula · continuar negociações**;
+- dispensar o informe é local para cada aparelho e não apaga o registro nem interfere nas iniciativas dos demais países;
+- um novo acontecimento diplomático volta a abrir automaticamente a Mesa Viva.
+
 ## 1. Cúpula Internacional melhorada
 
 A Cúpula foi reorganizada em faixas compactas:
@@ -109,7 +117,7 @@ Substitua:
 
 **Preserve seu `config.js`.** Ele não está incluído no pacote.
 
-Cache-bust de `app.js` e `styles.css`: `20g2`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
+Cache-bust de `app.js` e `styles.css`: `20g2a`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
 
 ## 11. Teste recomendado
 

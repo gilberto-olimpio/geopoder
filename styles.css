@@ -787,6 +787,7 @@ html[data-ui-scale="large"]{font-size:18px}
 .action-spotlight .resolution-chain{grid-column:1/-1}
 .action-spotlight .spotlight-main,.action-spotlight .spotlight-card,.action-spotlight .spotlight-consequences{display:none!important}
 .live-ops-board .resolution-chain{flex:0 0 auto}
+.resume-summit{flex:0 0 auto;margin-top:clamp(10px,1.4vh,18px)!important;padding:8px 14px!important;width:min(100%,430px);border-color:#d7ad49!important;background:linear-gradient(180deg,#765d23,#443514)!important;color:#fff3c7!important;font-weight:900!important;letter-spacing:.035em}
 .dice-panel .dice-result-banner{width:100%;flex-direction:column;align-items:stretch!important}
 .dice-panel .dice-result-copy{min-width:0;align-items:center}
 .dice-panel .dice-result-rolls{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));justify-content:stretch;gap:6px}
@@ -812,6 +813,10 @@ html[data-ui-scale="large"]{font-size:18px}
 .summit-primary .summit-box>small{font-size:clamp(.61rem,.55vw,.73rem)!important;line-height:1.2;min-height:2.4em}
 .summit-primary .summit-box button,.summit-primary .summit-box select{font-size:clamp(.65rem,.59vw,.78rem)!important;line-height:1.15;padding:5px 6px!important;min-height:29px!important;width:100%;white-space:normal}
 .summit-primary .summit-box.trade select{padding:4px 5px!important;min-height:27px!important}
+.summit-trade-actions{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:auto}
+.summit-trade-actions button{min-width:0!important;margin:0!important}
+.summit-trade-actions #tradePreviewBtn{background:#243b49!important;border-color:#5b7a8b!important}
+.summit-trade-actions #tradeSubmit{background:#0c4b64!important;border-color:#5b9db8!important;font-weight:800}
 .summit-primary .trade-offer-preview{margin:1px 0!important;padding:5px 6px!important;gap:2px!important;overflow:visible!important;min-height:0}
 .summit-primary .trade-offer-preview b{font-size:clamp(.66rem,.6vw,.79rem)!important}
 .summit-primary .trade-offer-preview span{font-size:clamp(.61rem,.55vw,.73rem)!important;line-height:1.22!important;color:#e0e7e9!important}
@@ -828,8 +833,10 @@ html[data-ui-scale="large"]{font-size:18px}
   .summit-heading{padding-bottom:3px}.summit-heading h1{font-size:1rem!important}
   .summit-flags .summit-bonus{padding:3px 5px!important}
   .summit-primary .summit-box{padding:5px!important}
-  .summit-primary .summit-box>small{min-height:0}
+  .summit-primary .summit-box>small{display:none!important;min-height:0}
   .summit-primary .trade-offer-preview span{font-size:.59rem!important;line-height:1.15!important}
+  .summit-primary .summit-box.trade select{min-height:25px!important;padding:3px 5px!important}
+  .summit-trade-actions button{min-height:27px!important;padding:3px 4px!important}
 }
 
 @media(max-width:1050px) and (min-width:821px){

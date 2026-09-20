@@ -45,7 +45,7 @@
   const REACTION_IDS_UI = new Set([18,19,20,21,22,23]);
 
   let sb = null;
-  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set(),onboardingActive:false,onboardingStep:0,previewCardId:null};
+  let state = {session:null,teacherProfile:null,room:null,me:null,players:[],match:null,privateStates:[],channel:null,busy:false,dashboard:null,historyDetail:null,resumeSnapshot:null,interrupting:false,deferTeacherRender:false,roomPreview:null,seenDiceIds:new Set(),onboardingActive:false,onboardingStep:0,previewCardId:null,dismissedSpotlightId:null};
   const UI_SCALE_KEY='gp_ui_scale';
   const UI_SCALE_VALUES=new Set(['compact','comfortable','large']);
   function currentUiScale(){const v=localStorage.getItem(UI_SCALE_KEY)||'comfortable';return UI_SCALE_VALUES.has(v)?v:'comfortable'}
@@ -163,7 +163,7 @@
 
   function renderHome(){
     document.body.classList.remove('in-match');
-    stopRoomWatch();state.room=null;state.me=null;state.players=[];state.match=null;state.privateStates=[];state.historyDetail=null;state.resumeSnapshot=null;state.roomPreview=null;setConn(navigator.onLine?'Conectado':'Sem internet',navigator.onLine?'ok':'bad');
+    stopRoomWatch();state.room=null;state.me=null;state.players=[];state.match=null;state.privateStates=[];state.historyDetail=null;state.resumeSnapshot=null;state.roomPreview=null;state.dismissedSpotlightId=null;setConn(navigator.onLine?'Conectado':'Sem internet',navigator.onLine?'ok':'bad');
     const teacherLogged=Boolean(state.session&&!sessionIsAnonymous()&&state.teacherProfile);
     screen.innerHTML=`<div class="card hero"><div class="eyebrow">GeoPoder · ${GAME_VERSION}</div><h2>Entre na partida</h2><p class="muted">O GeoPoder funciona com <b>3 ou 4 equipes</b>, cada uma em seu próprio aparelho. O acesso do professor é autenticado.</p></div><div class="grid two" style="margin-top:16px"><section class="card role-card"><h3>🌍 Equipe</h3><div class="field"><label>Código da sala</label><input id="roomCode" maxlength="8" placeholder="GEO-AB12" style="text-transform:uppercase"></div><div class="field"><label>Nome da equipe</label><input id="teamName" maxlength="60" placeholder="Ex.: Equipe Global"></div><div class="field"><label>País</label><select id="country">${COUNTRIES.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div id="countryAvailability" class="muted tiny" style="margin-top:6px">Digite o código da sala para consultar os países disponíveis.</div></div><div class="actions"><button class="btn good" id="joinRoom">Entrar na sala</button></div></section><section class="card role-card teacher-entry"><div class="eyebrow">Acesso restrito</div><h3>🎓 Área do Professor</h3><p class="muted">Criação de salas, histórico, telemetria e controles do playtest.</p><div class="actions"><button class="btn violet" id="teacherEntry">${teacherLogged?'Abrir painel':'Entrar como professor'}</button></div></section></div>`;
 
@@ -419,11 +419,13 @@
     const observingTurn=!isTeacher&&pub.phase==='turns'&&me&&me!==pub.active_country;
     const observingPending=observingTurn&&pub.pending_public?.country&&pub.pending_public.country!==me;
     const eventDice=!isTeacher&&pub.phase==='event'&&Boolean(pub.dice_display)&&!pendingForMe;
-    const diplomacyObserver=!isTeacher&&pub.phase==='diplomacy'&&Boolean(pub.action_spotlight)&&!pendingForMe;
+    const spotlightId=String(pub.action_spotlight?.id||'');
+    const spotlightDismissed=Boolean(spotlightId&&state.dismissedSpotlightId===spotlightId);
+    const diplomacyObserver=!isTeacher&&pub.phase==='diplomacy'&&Boolean(pub.action_spotlight)&&!pendingForMe&&!spotlightDismissed;
     const live=(observingTurn&&(pub.action_spotlight||pub.dice_display||(pub.bulletins||[]).length))||eventDice||diplomacyObserver;
     const useLive=!canPreview&&live&&(eventDice||diplomacyObserver||observingPending||!pub.pending_public);
     const center=canPreview?renderSituationDossier(Number(state.previewCardId),pub,own):useLive?renderLiveSituation(pub):renderPhasePanel(pub,isTeacher,own);
-    const floating=!canPreview&&!useLive;
+    const floating=!canPreview&&!useLive&&!spotlightDismissed;
     return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>${useLive?'Central de operações · acompanhe o mundo em movimento':'Analisar · planejar · decidir · governar'}</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${floating?renderActionSpotlight(pub,isTeacher):''}${floating?renderDiceDisplay(pub.dice_display):''}${floating?contextTip(pub,isTeacher,own):''}<div class="situation-phase ${canPreview?'dossier-preview-phase':''} ${useLive?'live-ops-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
   }
 
@@ -444,7 +446,8 @@
       const consequences=(a.consequences||[]).slice(-5);
       const decision=p?`Aguardando ${p.country||'o governo responsável'}: ${pendingDescription(p)}`:(a.decision||'Resolvida');
       const resultConsequences=consequences.length?consequences:(latest?.body?[latest.body]:[]);
-      return `<section class="command-action live-ops-board ${a.target===state.me?.country?'targets-me':''}"><div class="state-kicker">${a.target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'MOVIMENTO INTERNACIONAL'}</div>${renderResolutionChain({actor:a.actor||'Sistema',card:a.card_name||a.title||'Decisão em andamento',target:a.target||'Sistema internacional',decision,consequences:resultConsequences})}</section>`;
+      const resume=pub.phase==='diplomacy'?'<button class="btn primary resume-summit" data-resume-summit>VOLTAR À CÚPULA · CONTINUAR NEGOCIAÇÕES</button>':'';
+      return `<section class="command-action live-ops-board ${a.target===state.me?.country?'targets-me':''}"><div class="state-kicker">${a.target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'MOVIMENTO INTERNACIONAL'}</div>${renderResolutionChain({actor:a.actor||'Sistema',card:a.card_name||a.title||'Decisão em andamento',target:a.target||'Sistema internacional',decision,consequences:resultConsequences})}${resume}</section>`;
     }
     if(latest)return `<section class="command-action live-ops-board"><div class="state-kicker">ÚLTIMO ACONTECIMENTO</div><h1>${esc(latest.title||'Atualização internacional')}</h1>${latest.body?`<div class="live-last-result"><span>${esc(latest.body)}</span></div>`:''}<p class="live-pending-copy">Aguardando a próxima decisão de ${esc(pub.active_country||'outro governo')}.</p></section>`;
     return `<section class="command-action state-briefing waiting-state"><div class="state-kicker">CENTRAL DE OPERAÇÕES</div><h2>Aguardando ${esc(pub.active_country||'outro governo')}</h2><p>A próxima ação aparecerá aqui com alvo, consequências e resultados.</p></section>`;
@@ -531,6 +534,14 @@
   function influenceLeadersUI(pub){let best=-1,out=[];for(const c of activeList(pub)){const d=pub.countries?.[c]||{},v=Number(d.eco||0)+Number(d.net||0)+Number(d.dip||0)+Number(d.cult||0);if(v>best){best=v;out=[c]}else if(v===best)out.push(c)}return out}
 
   function closeCommandModal(){const m=document.getElementById('commandModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')}}
+
+  function openCardConsultation(id){
+    const c=CARD[Number(id)],modal=document.getElementById('commandModal'),title=document.getElementById('commandModalTitle'),body=document.getElementById('commandModalBody');
+    if(!c||!modal||!title||!body)return;
+    title.textContent=`Dossiê oferecido · ${c.name}`;
+    body.innerHTML=editorialCardHtml(c,{expanded:true});
+    modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+  }
 
   function renderCommandHand(own,pub){
     const active=pub.phase==='turns'&&!pub.pending_public&&state.me.country===pub.active_country,cards=own?.hand||[];
@@ -634,7 +645,7 @@
     if(done.includes(me))return `<section class="command-action summit-state"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Sua iniciativa normal foi concluída</h1><p>Você ainda pode receber e responder propostas de outros governos.${extraAvailable?' O Evento Global ainda lhe concede uma proposta extra de Acordo.':''}</p>${extraBox}<div class="diplomacy-status-grid">${active.map(x=>`<div class="dip-status ${done.includes(x)?'done':''}"><b>${esc(x)}</b><span>${done.includes(x)?'✓ concluída':'… negociando'}</span></div>`).join('')}</div></section>`;
     if(c.dipBlocked)return `<section class="command-action summit-state blocked"><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Delegação sem mandato para novas iniciativas</h1><p>Uma restrição do Evento Global impede seu país de usar iniciativa nesta rodada. Ainda é possível responder propostas recebidas.</p>${extraBox}</section>`;
     const secondary=(agreements.length||block)?`<div class="summit-secondary">${agreements.length?`<div class="summit-secondary-action danger"><b>ENCERRAR ACORDO</b><span>${agreements.map(t=>`<button data-diplomacy="end_agreement" data-target="${esc(t)}">Com ${esc(t)}</button>`).join('')}</span></div>`:''}${block?`<div class="summit-secondary-action danger"><b>SAIR DO BLOCO · −1 Diplomacia</b><span><button data-diplomacy="exit_block">Com ${esc(block)}</button></span></div>`:''}</div>`:'';
-    return `<section class="command-action summit-state"><div class="summit-heading"><div><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Escolha a iniciativa de ${esc(me)}</h1></div><strong>1 iniciativa disponível</strong></div><div class="summit-flags">${openingBonus?'<div class="summit-bonus"><b>Abertura Comercial</b><span>Novo Acordo → ambos renovam 1 carta.</span></div>':''}${extraBox}</div><div class="summit-actions summit-primary"><div class="summit-box"><b>PROPOR ACORDO</b><small>Crie uma Relação Comercial.</small><div class="summit-target-pills">${unrelated.map(t=>`<button data-diplomacy="agreement" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo válido</em>'}</div></div><div class="summit-box"><b>PROPOR BLOCO</b><small>Limite: 1 Bloco por país.</small><div class="summit-target-pills">${blockTargets.map(t=>`<button data-diplomacy="block" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo válido</em>'}</div></div><div class="summit-box trade"><b>TROCAR CARTA</b><small>O receptor verá o efeito completo antes de aceitar.</small><select id="tradeTarget" aria-label="País para troca">${tradeTargets.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select><select id="tradeCard" aria-label="Carta oferecida">${(own?.hand||[]).map(id=>`<option value="${id}">${esc(CARD[id]?.name||'Carta '+id)}</option>`).join('')}</select><div id="tradeOfferPreview" class="trade-offer-preview"></div><button id="tradeSubmit" ${(!tradeTargets.length||!(own?.hand||[]).length)?'disabled':''}>Propor troca</button></div><div class="summit-box pass"><b>NÃO REALIZAR AÇÃO</b><small>Conclua a iniciativa sem alterar relações.</small><button data-diplomacy="pass">Encerrar iniciativa</button></div></div>${secondary}</section>`;
+    return `<section class="command-action summit-state"><div class="summit-heading"><div><div class="state-kicker">CÚPULA INTERNACIONAL</div><h1>Escolha a iniciativa de ${esc(me)}</h1></div><strong>1 iniciativa disponível</strong></div><div class="summit-flags">${openingBonus?'<div class="summit-bonus"><b>Abertura Comercial</b><span>Novo Acordo → ambos renovam 1 carta.</span></div>':''}${extraBox}</div><div class="summit-actions summit-primary"><div class="summit-box"><b>PROPOR ACORDO</b><small>Crie uma Relação Comercial.</small><div class="summit-target-pills">${unrelated.map(t=>`<button data-diplomacy="agreement" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo válido</em>'}</div></div><div class="summit-box"><b>PROPOR BLOCO</b><small>Limite: 1 Bloco por país.</small><div class="summit-target-pills">${blockTargets.map(t=>`<button data-diplomacy="block" data-target="${esc(t)}">${esc(t)}</button>`).join('')||'<em>Sem alvo válido</em>'}</div></div><div class="summit-box trade"><b>TROCAR CARTA</b><small>Escolha o país e o Dossiê oferecido.</small><select id="tradeTarget" aria-label="País para troca">${tradeTargets.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select><select id="tradeCard" aria-label="Carta oferecida">${(own?.hand||[]).map(id=>`<option value="${id}">${esc(CARD[id]?.name||'Carta '+id)}</option>`).join('')}</select><div class="summit-trade-actions"><button id="tradePreviewBtn" type="button" ${!(own?.hand||[]).length?'disabled':''}>Ver efeito</button><button id="tradeSubmit" ${(!tradeTargets.length||!(own?.hand||[]).length)?'disabled':''}>Propor troca</button></div></div><div class="summit-box pass"><b>NÃO REALIZAR AÇÃO</b><small>Conclua a iniciativa sem alterar relações.</small><button data-diplomacy="pass">Encerrar iniciativa</button></div></div>${secondary}</section>`;
   }
 
   function renderOwnHand(own,pub){return renderCommandHand(own,pub)}
@@ -656,9 +667,10 @@
     document.querySelectorAll('[data-play-card]').forEach(b=>b.onclick=()=>withBusy(async()=>{await api('play_card',{roomId:state.room.id,cardId:Number(b.dataset.playCard)});await refreshSnapshot()}));
     document.querySelectorAll('[data-diplomacy]').forEach(b=>b.onclick=()=>withBusy(async()=>{const kind=b.dataset.diplomacy,target=b.dataset.target||null;if(kind==='end_agreement'&&target&&!confirm(`Encerrar o Acordo com ${target}?`))return;if(kind==='exit_block'&&!confirm('Sair do Bloco custa 1 Diplomacia. Confirmar?'))return;await api('diplomacy_action',{roomId:state.room.id,kind,target});await refreshSnapshot()}));
     document.getElementById('tradeSubmit')?.addEventListener('click',()=>withBusy(async()=>{const target=document.getElementById('tradeTarget')?.value,offerCard=Number(document.getElementById('tradeCard')?.value);if(!target||!offerCard)throw new Error('Escolha o país e a carta para oferecer.');await api('diplomacy_action',{roomId:state.room.id,kind:'trade',target,offerCard});await refreshSnapshot()}));
-    const tradeCardSelect=document.getElementById('tradeCard'),tradeOfferPreview=document.getElementById('tradeOfferPreview');
-    const updateTradePreview=()=>{if(!tradeCardSelect||!tradeOfferPreview)return;const c=CARD[Number(tradeCardSelect.value)];tradeOfferPreview.innerHTML=c?`<b>${esc(c.name)}</b><span>${esc(c.effect)}</span>`:''};
-    tradeCardSelect?.addEventListener('change',updateTradePreview);updateTradePreview();
+    const tradeCardSelect=document.getElementById('tradeCard'),tradePreviewBtn=document.getElementById('tradePreviewBtn');
+    const updateTradePreviewButton=()=>{const c=CARD[Number(tradeCardSelect?.value)];if(tradePreviewBtn){tradePreviewBtn.disabled=!c;tradePreviewBtn.title=c?`Consultar efeito de ${c.name}`:'Nenhum Dossiê selecionado';}};
+    tradeCardSelect?.addEventListener('change',updateTradePreviewButton);tradePreviewBtn?.addEventListener('click',()=>openCardConsultation(Number(tradeCardSelect?.value)));updateTradePreviewButton();
+    document.querySelectorAll('[data-resume-summit]').forEach(b=>b.onclick=()=>{state.dismissedSpotlightId=String(pub.action_spotlight?.id||'');renderRoom()});
     document.getElementById('playerReadyTurn')?.addEventListener('click',()=>withBusy(async()=>{await api('confirm_turn_ready',{roomId:state.room.id});await refreshSnapshot()}));
     if(isTeacher){
       const startNow=()=>withBusy(async()=>{await api('teacher_start_turn',{roomId:state.room.id});await refreshSnapshot()});
