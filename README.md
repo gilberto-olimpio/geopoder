@@ -1,180 +1,122 @@
-# GeoPoder — Alpha 2.0g.2d
+# GeoPoder Alpha 3.0a
 
-**Subtítulo interno:** Cúpula Internacional melhorada  
-**Regras:** 0.4-C  
-**Base:** Alpha 2.0g, derivada da Alpha 2.0e.2
+## Fundação Digital Native
 
-## Objetivo
+**Regras:** 0.6-DN  
+**Base técnica:** Alpha 2.0g.2d  
+**Formato:** multiplayer digital para 3 ou 4 equipes reais
 
-Esta atualização é voltada à leitura da partida em tempo real. A Mesa de Situação passa a funcionar como quadro principal de acompanhamento quando não é a vez do jogador. O objetivo é que um aluno consiga entender rapidamente quem agiu, contra quem, qual Dossiê foi usado, quais dados foram rolados e quais consequências ocorreram, sem depender do Histórico nem de barras pequenas.
+Esta versão inicia a transição do GeoPoder para um jogo concebido diretamente para o ambiente digital. O motor continua responsável pelas regras, validações e transições; a interface mostra decisões concretas e suas consequências. As correções de legibilidade, Cúpula, rolagens, Reações, reconexão e telemetria da Alpha 2.0g.2d foram preservadas.
 
-A revisão 2.0g.2 consolida essa arquitetura e corrige o principal gargalo restante da 2.0g.1: todas as opções da Cúpula Internacional permanecem visíveis e acionáveis na área central de Chromebooks e notebooks, sem empurrar “Formar Bloco”, “Acordo” ou “Não realizar ação” para fora da tela.
+## O que mudou
 
-### Hotfix de continuidade do playtest
+### 1. Dois formatos de partida
 
-- a área de Troca não exibe mais o efeito completo dentro do cartão compacto, evitando sobreposição entre seletores e botões;
-- o botão **Ver efeito** abre o Dossiê selecionado em uma janela sobreposta, sem abandonar a Cúpula;
-- depois de uma proposta ser aceita ou recusada, a Mesa Viva mostra o resultado e oferece **Voltar à Cúpula · continuar negociações**;
-- dispensar o informe é local para cada aparelho e não apaga o registro nem interfere nas iniciativas dos demais países;
-- um novo acontecimento diplomático volta a abrir automaticamente a Mesa Viva.
+O professor escolhe a configuração no lobby antes de iniciar:
 
-### Hotfix 2.0g.2b — Mesa desobstruída
+- **Completa:** 8 rodadas e 4 Desafios Geográficos;
+- **Sala de aula:** 6 rodadas e 3 Desafios Geográficos.
 
-- **Último Informe** foi removido da Mesa: a Agência Internacional e o Histórico assumem esse registro;
-- uma decisão de rolagem ocupa uma única camada, mantendo os botões de aceitar ou rerrolar sempre visíveis;
-- a Ação em Evidência usa uma frase direta, dados lado a lado, consequência e um botão para voltar à Mesa;
-- o informe central só abre para o país afetado ou para o autor de uma ação que afetou outro país;
-- ações alheias surgem por alguns segundos como **Nota Oficial** sob o Evento da Rodada, sem cobrir a Mesa;
-- **Inteligência** agora resume apenas o estado estratégico atual;
-- **Histórico** virou uma linha do tempo de ações, alvos e consequências, com até 40 boletins públicos da partida.
+O modo escolhido é salvo no estado da partida e na telemetria. A interface, o encerramento do motor e o relatório usam o número configurado de rodadas.
 
-### Hotfix 2.0g.2c — Notas sobrepostas e decisões sempre clicáveis
+### 2. Modelo inicial Digital 0.6
 
-- a **Nota Oficial** agora aparece como cartão temporário sobre o Cenário Global, sem reduzir o Evento nem disputar altura com ele;
-- a Nota mostra o texto completo, desaparece automaticamente e também pode ser fechada clicando no cartão ou no botão ×;
-- Reações usam um resumo horizontal sem arte decorativa, priorizando efeito mecânico e botões;
-- Renovação, descarte, custo de Salvaguarda e devolução de Troca usam uma grade própria de seleção;
-- até quatro cartas ficam na mesma linha; mãos de cinco ou seis cartas usam duas linhas compactas;
-- os botões de responder, descartar, entregar ou manter ficam dentro da área visível da Mesa de Situação.
+O modelo padrão passa de `3–2–2–0` para `3–2–1–1`. Cada país mantém sete pontos, um atributo forte e fragilidades reconhecíveis, mas nenhuma equipe começa obrigada a gastar a primeira Ação Principal em Recuperação Nacional.
 
-### Hotfix 2.0g.2d — Cartas legíveis e Gabinete estável
+O professor pode selecionar **Comparação 0.4-C · 3–2–2–0**. Essa opção existe para comparar partidas e verificar, pela telemetria, se o novo modelo realmente reduz aberturas automáticas.
 
-- cartas de escolha na Mesa, sobretudo no descarte, usam texto mecânico e títulos maiores;
-- até quatro cartas continuam simultaneamente visíveis; mãos de cinco ou seis priorizam legibilidade e permitem rolagem somente dentro da grade excepcional de escolha;
-- o Gabinete Nacional ganhou orçamento vertical próprio e não transborda quando a interface muda para Confortável ou Grande;
-- em telas baixas, elementos decorativos do Gabinete cedem espaço antes dos atributos e das Relações Atuais;
-- o relatório de playtest passa a mostrar medianas de tempo, mais resistentes a pausas, além das médias;
-- partidas atualizadas durante a execução registram separadamente a versão inicial e a versão final observada;
-- a confirmação final de uma disputa não duplica o informe de dados quando ninguém rerrolou.
+### 3. Desafios ligados à partida
 
-## 1. Cúpula Internacional melhorada
+Os Desafios das rodadas pares agora são escolhidos considerando:
 
-A Cúpula foi reorganizada em faixas compactas:
+- o Evento Global vigente;
+- a existência de Acordos ou Blocos;
+- os Desafios já usados na sessão.
 
-- quatro ações principais sempre visíveis: Acordo, Bloco, Troca e Não realizar ação;
-- ações de encerramento em uma faixa secundária curta;
-- proposta extra do Evento em uma faixa própria;
-- indicação explícita do limite de 1 Bloco por país;
-- alvos em botões compactos e legíveis;
-- efeito da carta oferecida na troca inteiramente visível.
+A tela apresenta um pequeno texto de contexto antes da questão. O relatório registra o gatilho usado para selecionar o Desafio. As 12 questões e seus gabaritos foram preservados.
 
-## 2. Mesa Viva
+### 4. Cúpula com leitura contextual
 
-Durante o turno de outro país, a Mesa de Situação deixa de mostrar apenas uma tela de espera. Ela apresenta uma cadeia explícita:
+Antes de concluir a iniciativa, o gabinete recebe uma leitura curta sobre oportunidades observáveis:
 
-- ator → ação ou Dossiê → alvo → decisão → consequência.
+- quantos Dossiês da mão podem se beneficiar de Acordo;
+- quantos dependem de Bloco;
+- quando a Troca pode ser útil;
+- quando não existe oportunidade diplomática evidente e passar é uma decisão válida.
 
-A ação resolvida permanece na área central até ser substituída por um novo acontecimento relevante.
+O motor também registra, no início da Cúpula e em cada iniciativa, quais alvos diplomáticos estavam disponíveis. Isso permite distinguir falta de opções de falta de interesse.
 
-## 3. Dados compartilhados e agrupados
+### 5. Modo Projetor
 
-O `dice_display` agora agrega rolagens da mesma fonte na mesma rodada em vez de substituir o resultado anterior. Isso permite:
+O painel do professor ganhou **Modo Projetor**. Ele mostra apenas dados públicos:
 
-- Disputa de Influência com os dois dados lado a lado;
-- Grande Crise Financeira Global com os dados dos 3 ou 4 países no mesmo quadro;
-- rerrolagens substituindo apenas o resultado do país que rerrolou, sem apagar os demais.
+- rodada, fase e Evento Global;
+- atributos e Influência dos países;
+- relações internacionais;
+- progresso do Desafio ou da Cúpula;
+- últimos boletins públicos.
 
-Na Grande Crise Financeira, a Mesa também traduz o dado para a consequência econômica correspondente.
+Nenhuma mão, Dossiê privado ou decisão secreta é exibida.
 
-## 4. Leitura global da interface
+### 6. Relatório de experimento
 
-A tipografia foi revista para notebooks, monitores maiores e projeção. Em vez de reduzir continuamente as fontes para fazer o conteúdo caber, a interface reduz elementos secundários primeiro.
+O relatório docente e a exportação Markdown agora destacam:
 
-Prioridades:
+- modo e quantidade de rodadas;
+- modelo inicial utilizado;
+- número de Recuperações Nacionais;
+- turnos passados sem Dossiê;
+- Cúpulas em que não houve proposta;
+- mediana do tempo de resposta aos Desafios;
+- indicadores anteriores de cartas, ritmo e diplomacia.
 
-1. regra e consequência mecânica;
-2. números e decisões;
-3. título e identificação;
-4. arte e ambientação;
-5. textos editoriais opcionais.
+## O que não entrou nesta versão
 
-## 5. Escala manual
+- bots ou países controlados pelo computador;
+- novos países, cartas, Eventos ou artes;
+- modo individual;
+- alteração de banco de dados;
+- migração integral dos estados diplomáticos persistentes das Regras 0.5-A.
 
-Em **Como Jogar > Legibilidade da interface**, o jogador pode escolher:
+Os países não ocupados continuam fora da sessão. A prioridade desta versão é testar a fundação Digital Native com equipes reais antes de ampliar o conteúdo ou automatizar jogadores.
 
-- Compacta;
-- Confortável (padrão);
-- Grande.
-
-A preferência fica salva no navegador.
-
-## 6. Dossiês sem rolagem na Mesa
-
-O Dossiê aberto usa layout horizontal adaptativo. Conforme o texto cresce:
-
-- a coluna da imagem diminui;
-- textos de ambientação podem desaparecer;
-- o efeito mecânico permanece visível;
-- a área de efeito deixa de usar scroll interno nos estados normais.
-
-Cartas com texto longo recebem automaticamente classes `text-medium` ou `text-heavy`.
-
-## 7. Eventos Globais
-
-O painel Cenário Global também foi reorganizado para priorizar leitura. Eventos de texto longo reduzem a arte e ocultam ambientação antes de reduzir a regra. O efeito principal ganhou fonte maior e o painel evita scroll interno em desktop/Chromebook.
-
-## 8. Agência Internacional
-
-A faixa inferior continua existindo como apoio, mas agora mostra **ação + resultado/consequência**. Propostas, aceitações, recusas, trocas e a decisão de não agir geram boletins completos. A Mesa Viva continua sendo o espaço central.
-
-## 9. Correções do motor
-
-### Proteção Logística
-
-`blockEcoShields` é zerado antes de qualquer transição de rodada, inclusive no encerramento da 8ª rodada, e novamente no início defensivo do próximo Evento. A proteção gerada por **Logística Integrada** não atravessa para a rodada seguinte.
-
-### Relações escolhidas por um mesmo Evento
-
-Eventos como **Guerra Comercial**, **Ruptura das Cadeias Globais** e **Embargo Internacional** não permitem que a mesma relação seja comprometida duas vezes durante a resolução do mesmo Evento. Além de recalcular as opções, o servidor revalida a relação escolhida no momento da resposta.
-
-Não há migration SQL: esse estado vive no JSON autoritativo da partida.
-
-## 10. Compatibilidade e publicação
+## Publicação
 
 ### Supabase
 
-Substitua a Edge Function por `game-api.ts` e faça Deploy.
+Substitua a Edge Function atual por `game-api.ts` e faça o deploy.
 
 ### GitHub Pages
 
 Substitua:
 
-- `index.html`
-- `app.js`
-- `styles.css`
-- pasta `assets/`
+- `index.html`;
+- `app.js`;
+- `styles.css`;
+- pasta `assets/`.
 
-**Preserve seu `config.js`.** Ele não está incluído no pacote.
+Preserve seu `config.js`. Ele não está incluído no pacote.
 
-Cache-bust de `app.js` e `styles.css`: `20g2d`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
+Não há migration SQL nesta atualização. As novas configurações vivem no JSON autoritativo da partida e na telemetria já existente.
 
-## 11. Teste recomendado
+## Teste dirigido recomendado
 
-1. Abrir Dossiês curtos e longos em 1366×768 e Full HD: confirmar ausência de scroll na Mesa.
-2. Observar uma ação sem relação com seu país: ela deve surgir brevemente como Nota Oficial sobre o Cenário Global, com texto completo e fechamento por clique.
-3. Receber uma ação de outro país: o informe direcionado deve abrir na Mesa e poder ser fechado.
-4. Jogar **Disputa de Influência**: dois dados devem ficar lado a lado e os botões de manter ou rerrolar devem permanecer visíveis.
-5. Resolver **Grande Crise Financeira Global** com 3 ou 4 países: todos os resultados e o botão de aceitar devem caber juntos.
-6. Usar Vantagem para rerrolar: apenas o dado daquele país deve ser atualizado.
-7. Jogar **Logística Integrada**, avançar a rodada e confirmar que a proteção não persiste.
-8. Em **Guerra Comercial** ou **Ruptura das Cadeias**, tentar selecionar uma relação já escolhida anteriormente pelo mesmo Evento: ela não deve continuar disponível.
-9. Alternar entre escalas Compacta, Confortável e Grande.
-10. Testar Cenário Global com Evento de texto longo.
-11. Abrir a Cúpula em 1366×768 e confirmar que Acordo, Bloco, Troca e Não realizar ação estão simultaneamente visíveis e clicáveis.
-12. Propor, aceitar e recusar Acordos, Blocos e Trocas; confirmar que Mesa e Agência mostram também o resultado.
-13. Abrir Inteligência e Histórico: o primeiro deve mostrar o estado atual; o segundo, a sequência de boletins da partida.
-14. Abrir uma Reação e uma Renovação com quatro cartas em 1366×768 e 1366×617: texto e botões devem permanecer legíveis, visíveis e clicáveis.
-15. Forçar uma mão de cinco ou seis cartas: a rolagem deve existir apenas dentro da grade de escolha, sem cortar nenhuma carta ou botão.
-16. Alternar Compacta, Confortável e Grande com três relações ativas: o Gabinete deve conservar atributos, placar e Relações Atuais dentro do painel.
+1. Criar uma sala completa com o modelo Digital 0.6 e confirmar atributos `3–2–1–1`.
+2. Criar uma sala curta e confirmar encerramento após a 6ª rodada.
+3. Criar uma sala de comparação e confirmar atributos `3–2–2–0`.
+4. Em rodada par, verificar se o Desafio mostra contexto relacionado ao Evento.
+5. Abrir a Cúpula com Dossiês de Acordo ou Bloco na mão e verificar a leitura do conselho.
+6. Passar na Cúpula e conferir no relatório se a iniciativa e as oportunidades foram registradas.
+7. Ativar o Modo Projetor e confirmar que nenhuma mão privada aparece.
+8. Manter o Modo Projetor aberto durante troca de fase e confirmar atualização automática.
+9. Exportar Markdown, CSV e JSON e conferir a configuração da partida.
+10. Repetir os testes críticos da 2.0g.2d: Disputa de Influência, Grande Crise Financeira, Reações, Renovação, Cúpula e Gabinete em telas baixas.
 
-## Validação estática executada
+## Arquivos
 
-- `node --check app.js`: OK.
-- `node --experimental-strip-types --check game-api.ts`: OK.
-- Regras, 28 Dossiês, 16 Eventos e 12 Desafios comparados com a 2.0g.1: preservados.
-- Limite de 1 Bloco por país: preservado no cliente e revalidado no servidor.
-- `config.js`: referência preservada e arquivo não incluído.
-- 28 Dossiês mantidos.
-- 16 Eventos mantidos.
-- 5 artes piloto preservadas.
-- `config.js` não incluído.
+- `index.html` — entrada e cache-bust `30a`;
+- `app.js` — interface, Modo Projetor e relatório;
+- `styles.css` — estilos da configuração, contexto e projeção;
+- `game-api.ts` — motor autoritativo e telemetria;
+- `assets/cards/` — cinco artes piloto preservadas;
+- `tests/static-regression.mjs` — verificações estruturais do pacote.
