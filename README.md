@@ -1,4 +1,4 @@
-# GeoPoder — Alpha 2.0g.2
+# GeoPoder — Alpha 2.0g.2b
 
 **Subtítulo interno:** Cúpula Internacional melhorada  
 **Regras:** 0.4-C  
@@ -17,6 +17,16 @@ A revisão 2.0g.2 consolida essa arquitetura e corrige o principal gargalo resta
 - depois de uma proposta ser aceita ou recusada, a Mesa Viva mostra o resultado e oferece **Voltar à Cúpula · continuar negociações**;
 - dispensar o informe é local para cada aparelho e não apaga o registro nem interfere nas iniciativas dos demais países;
 - um novo acontecimento diplomático volta a abrir automaticamente a Mesa Viva.
+
+### Hotfix 2.0g.2b — Mesa desobstruída
+
+- **Último Informe** foi removido da Mesa: a Agência Internacional e o Histórico assumem esse registro;
+- uma decisão de rolagem ocupa uma única camada, mantendo os botões de aceitar ou rerrolar sempre visíveis;
+- a Ação em Evidência usa uma frase direta, dados lado a lado, consequência e um botão para voltar à Mesa;
+- o informe central só abre para o país afetado ou para o autor de uma ação que afetou outro país;
+- ações alheias surgem por alguns segundos como **Nota Oficial** sob o Evento da Rodada, sem cobrir a Mesa;
+- **Inteligência** agora resume apenas o estado estratégico atual;
+- **Histórico** virou uma linha do tempo de ações, alvos e consequências, com até 40 boletins públicos da partida.
 
 ## 1. Cúpula Internacional melhorada
 
@@ -117,22 +127,23 @@ Substitua:
 
 **Preserve seu `config.js`.** Ele não está incluído no pacote.
 
-Cache-bust de `app.js` e `styles.css`: `20g2a`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
+Cache-bust de `app.js` e `styles.css`: `20g2b`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
 
 ## 11. Teste recomendado
 
 1. Abrir Dossiês curtos e longos em 1366×768 e Full HD: confirmar ausência de scroll na Mesa.
-2. Observar o turno de outro país: a Mesa deve virar Central de Operações.
-3. Jogar **Disputa de Influência**: dois dados devem ficar lado a lado.
-4. Resolver **Grande Crise Financeira Global** com 3 ou 4 países: todos os resultados devem permanecer juntos.
-5. Usar Vantagem para rerrolar: apenas o dado daquele país deve ser atualizado.
-6. Jogar **Logística Integrada**, avançar a rodada e confirmar que a proteção não persiste.
-7. Em **Guerra Comercial** ou **Ruptura das Cadeias**, tentar selecionar uma relação já escolhida anteriormente pelo mesmo Evento: ela não deve continuar disponível.
-8. Alternar entre escalas Compacta, Confortável e Grande.
-9. Testar Cenário Global com Evento de texto longo.
-10. Abrir a Cúpula em 1366×768 e confirmar que Acordo, Bloco, Troca e Não realizar ação estão simultaneamente visíveis e clicáveis.
-11. Propor, aceitar e recusar Acordos, Blocos e Trocas; confirmar que Mesa e Agência mostram também o resultado.
-12. Testar janela secundária e Histórico; scroll continua permitido nessas telas extensas.
+2. Observar uma ação sem relação com seu país: ela deve surgir brevemente como Nota Oficial sob o Evento, sem cobrir a Mesa.
+3. Receber uma ação de outro país: o informe direcionado deve abrir na Mesa e poder ser fechado.
+4. Jogar **Disputa de Influência**: dois dados devem ficar lado a lado e os botões de manter ou rerrolar devem permanecer visíveis.
+5. Resolver **Grande Crise Financeira Global** com 3 ou 4 países: todos os resultados e o botão de aceitar devem caber juntos.
+6. Usar Vantagem para rerrolar: apenas o dado daquele país deve ser atualizado.
+7. Jogar **Logística Integrada**, avançar a rodada e confirmar que a proteção não persiste.
+8. Em **Guerra Comercial** ou **Ruptura das Cadeias**, tentar selecionar uma relação já escolhida anteriormente pelo mesmo Evento: ela não deve continuar disponível.
+9. Alternar entre escalas Compacta, Confortável e Grande.
+10. Testar Cenário Global com Evento de texto longo.
+11. Abrir a Cúpula em 1366×768 e confirmar que Acordo, Bloco, Troca e Não realizar ação estão simultaneamente visíveis e clicáveis.
+12. Propor, aceitar e recusar Acordos, Blocos e Trocas; confirmar que Mesa e Agência mostram também o resultado.
+13. Abrir Inteligência e Histórico: o primeiro deve mostrar o estado atual; o segundo, a sequência de boletins da partida.
 
 ## Validação estática executada
 

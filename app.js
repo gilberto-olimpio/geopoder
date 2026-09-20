@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 2.0g.2';
+  const GAME_VERSION = 'Alpha 2.0g.2b';
   const RULES_VERSION = '0.4-C';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -281,38 +281,6 @@
     if(b?.kind==='benefit')return '+';
     return '›';
   }
-  function renderActionSpotlight(pub,isTeacher){
-    const a=pub.action_spotlight;
-    const p=pub.pending_public;
-    if(!a && !p)return '';
-    const actor=a?.actor||p?.actor||p?.proposer||null;
-    const target=a?.target||p?.target||null;
-    const card=a?.card_name||(a?.card_id?CARD[a.card_id]?.name:null)||p?.source||null;
-    const consequences=(a?.consequences||[]).slice(-3);
-    const decision=p?`Aguardando ${p.country||'decisão'}: ${pendingDescription(p)}`:(consequences.length?'Resolvida':'Em resolução');
-    return `<section class="action-spotlight ${target===state.me?.country?'targets-me':''}">
-      <div class="spotlight-kicker">${target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'AÇÃO EM EVIDÊNCIA'}</div>
-      ${renderResolutionChain({actor:actor||'Sistema',card:card||'Decisão',target:target||'Sistema internacional',decision,consequences,compact:true})}
-    </section>`;
-  }
-
-  function renderResolutionChain({actor='Sistema',card='Decisão',target='Sistema internacional',decision='Em resolução',consequences=[],compact=false}={}){
-    const result=(consequences||[]).length?(consequences||[]).slice(-3).join(' · '):'Resultado aguardado';
-    const steps=[['ATOR',actor],['AÇÃO / CARTA',card],['ALVO',target],['DECISÃO',decision],['CONSEQUÊNCIA',result]];
-    return `<div class="resolution-chain ${compact?'compact':''}" aria-label="Cadeia de resolução">${steps.map((x,i)=>`<div class="resolution-step step-${i+1}"><small>${esc(x[0])}</small><b>${esc(x[1])}</b></div>${i<steps.length-1?'<span class="resolution-arrow" aria-hidden="true">→</span>':''}`).join('')}</div>`;
-  }
-  function renderImpactToasts(pub,isTeacher){
-    if(isTeacher||!state.me?.country)return '';
-    const me=state.me.country;
-    const feed=(pub.bulletins||[]).slice(-5).filter(b=>b.target===me && ['impact','reaction'].includes(b.kind)).slice(-2).reverse();
-    if(!feed.length)return '';
-    return `<aside class="impact-toasts" aria-live="assertive">${feed.map(b=>`<article class="impact-toast ${b.kind||''}">
-      <div class="impact-toast-top"><span>${bulletinIcon(b)}</span><b>${b.kind==='reaction'?'RESPOSTA DIPLOMÁTICA':'ISTO AFETOU SEU PAÍS'}</b></div>
-      <h4>${esc(b.title||b.source||'Novo acontecimento')}</h4>
-      ${b.actor?`<p><strong>${esc(b.actor)}</strong>${b.source?` · ${esc(b.source)}`:''}</p>`:''}
-      ${b.body?`<div class="impact-body">${esc(b.body)}</div>`:''}
-    </article>`).join('')}</aside>`;
-  }
   function renderPublicWire(pub){
     const feed=(pub.bulletins||[]).slice(-2).reverse();
     if(!feed.length)return '';
@@ -336,7 +304,7 @@
       </header>
       <aside class="command-national gov-panel">${renderNationalCommand(pub,isTeacher)}</aside>
       <main class="command-situation gov-panel">${renderSituationCommand(pub,isTeacher,own)}</main>
-      <aside class="command-event gov-panel ${eventTone(pub.current_event)}">${renderCommandEvent(pub.current_event,pub)}</aside>
+      <aside class="command-event gov-panel ${eventTone(pub.current_event)}">${renderCommandEvent(pub.current_event,pub,isTeacher)}</aside>
       <section class="command-bottom gov-panel">${isTeacher?renderTeacherDock(pub):renderCommandHand(own,pub)}</section>
       <footer class="government-nav">
         <button class="gov-nav-btn active" data-command-modal="world"><span>◎</span><b>SITUAÇÃO MUNDIAL</b><small>Panorama do sistema</small></button>
@@ -347,7 +315,6 @@
         <button class="gov-nav-btn exit" id="leaveActive"><span>↪</span><b>${isTeacher?'PAINEL':'SAIR'}</b><small>${isTeacher?'Gestão docente':'Deixar a sala'}</small></button>
       </footer>
       <div class="command-modal" id="commandModal" aria-hidden="true"><div class="command-modal-card"><div class="command-modal-head"><div><small>ARQUIVO DE GOVERNO</small><h3 id="commandModalTitle">Detalhes</h3></div><button class="btn ghost compact" id="commandModalClose">Fechar</button></div><div id="commandModalBody" class="command-modal-body"></div></div></div>
-      ${renderImpactToasts(pub,isTeacher)}
       ${renderPublicWire(pub)}
     </div>`;
     document.getElementById('leaveActive').onclick=()=>leaveCurrentRoom(isTeacher);
@@ -381,11 +348,26 @@
 
   function eventTone(e){if(!e)return'event-neutral';const k=(e.kind||'').toLowerCase();return k.includes('crise')?'event-crisis':k.includes('oportun')?'event-opportunity':'event-adverse'}
 
-  function renderCommandEvent(e,pub){
-    if(!e)return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><div class="event-empty">Aguardando o próximo boletim internacional.</div>`;
+  function renderGovernmentPost(pub,isTeacher){
+    const me=isTeacher?null:state.me?.country,now=Date.now();
+    const item=(pub.bulletins||[]).slice().reverse().find(b=>{
+      if(!b||b.kind==='dice')return false;
+      const age=now-Date.parse(b.at||0);if(!Number.isFinite(age)||age<0||age>15000)return false;
+      return isTeacher||(![b.actor,b.target].filter(Boolean).includes(me));
+    });
+    if(!item)return'';
+    const account=item.actor?`@Governo_${String(item.actor).replace(/\s+/g,'_')}`:'@AgenciaGeoPoder';
+    let text=[item.title,item.body].filter(Boolean).join('. ').replace(/\.\s*\./g,'.');
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    return `<aside class="government-post" role="status" aria-live="polite"><div><span>◉ NOTA OFICIAL</span><b>${esc(account)}</b></div><p>${esc(text||'Novo movimento no cenário internacional.')}</p></aside>`;
+  }
+
+  function renderCommandEvent(e,pub,isTeacher=false){
+    const post=renderGovernmentPost(pub,isTeacher);
+    if(!e)return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><div class="event-empty">Aguardando o próximo boletim internacional.</div>${post}`;
     const kind=(e.kind||'Evento').toUpperCase(),quote=e.kind==='Oportunidade'?'“Toda abertura no sistema internacional cria espaço para novas estratégias.”':e.kind==='Crise'?'“Crises testam governos antes de testarem fronteiras.”':'“O cenário internacional muda; governos precisam escolher como responder.”',summary=e.kind==='Oportunidade'?'Governos identificam novas possibilidades de cooperação, crescimento e projeção internacional.':e.kind==='Crise'?'Tensões internacionais pressionam mercados, redes e decisões de governo em várias regiões.':'Uma mudança no cenário internacional exige respostas rápidas e escolhas estratégicas dos governos.';
     const density=String(e.effect||'').length>190?'event-text-heavy':String(e.effect||'').length>120?'event-text-medium':'event-text-light';
-    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper ${density}"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><p class="event-summary">${esc(summary)}</p><div class="event-effect-box"><b>EFEITO NO JOGO</b><p>${esc(e.effect)}</p></div><blockquote>${quote}<cite>— Observatório Político Internacional</cite></blockquote></article>`;
+    return `<div class="panel-title"><span>◎</span><div><b>CENÁRIO GLOBAL</b><small>Eventos que moldam o amanhã</small></div></div><article class="event-paper ${density} ${post?'with-government-post':''}"><div class="event-paper-top"><span>EVENTO DA RODADA</span><b>${esc(kind)}</b></div><h2>${esc(e.name)}</h2><div class="event-visual"><span>🌐</span><small>BOLETIM INTERNACIONAL · RODADA ${pub.round}</small></div><p class="event-summary">${esc(summary)}</p><div class="event-effect-box"><b>EFEITO NO JOGO</b><p>${esc(e.effect)}</p></div><blockquote>${quote}<cite>— Observatório Político Internacional</cite></blockquote></article>${post}`;
   }
 
   function renderNationalCommand(pub,isTeacher){
@@ -407,49 +389,35 @@
     return `<div class="command-section-label">Controle docente</div><h2>Sala ${esc(state.room.code)}</h2><div class="teacher-phase"><b>${esc(phaseTitle(pub))}</b><span>Rodada ${pub.round}/8</span></div><div class="teacher-controls">${controls||'<span class="muted small">Aguardando ação dos estudantes.</span>'}<button class="btn danger" id="interruptSession">Interromper sessão</button></div><div class="teacher-hint">Sem cronômetro automático. O professor controla o ritmo e pode encerrar turnos ou fases.</div>`;
   }
 
-  function renderCommandRecent(pub){
-    const last=(pub.recent_log||[]).slice(-1)[0];
-    return `<div class="command-recent"><span>▤ ÚLTIMO INFORME</span><b title="${last?esc(last.text||last):'Nenhuma ação recente.'}">${last?esc(last.text||last):'Nenhuma ação recente.'}</b><button class="recent-link" data-command-modal="history">VER TODOS</button></div>`;
-  }
-
   function renderSituationCommand(pub,isTeacher,own){
     const canPreview=!isTeacher&&state.previewCardId&&pub.phase==='turns'&&!pub.pending_public;
     const me=!isTeacher?state.me?.country:null;
     const pendingForMe=!isTeacher&&pub.pending_public?.country===me;
-    const observingTurn=!isTeacher&&pub.phase==='turns'&&me&&me!==pub.active_country;
-    const observingPending=observingTurn&&pub.pending_public?.country&&pub.pending_public.country!==me;
-    const eventDice=!isTeacher&&pub.phase==='event'&&Boolean(pub.dice_display)&&!pendingForMe;
+    const action=pub.action_spotlight;
     const spotlightId=String(pub.action_spotlight?.id||'');
     const spotlightDismissed=Boolean(spotlightId&&state.dismissedSpotlightId===spotlightId);
-    const diplomacyObserver=!isTeacher&&pub.phase==='diplomacy'&&Boolean(pub.action_spotlight)&&!pendingForMe&&!spotlightDismissed;
-    const live=(observingTurn&&(pub.action_spotlight||pub.dice_display||(pub.bulletins||[]).length))||eventDice||diplomacyObserver;
-    const useLive=!canPreview&&live&&(eventDice||diplomacyObserver||observingPending||!pub.pending_public);
+    const affectsMe=Boolean(action&&me&&(action.target===me||(action.actor===me&&action.target&&action.target!==me)));
+    const useLive=!canPreview&&!pendingForMe&&!spotlightDismissed&&Boolean(action&&(isTeacher||affectsMe));
     const center=canPreview?renderSituationDossier(Number(state.previewCardId),pub,own):useLive?renderLiveSituation(pub):renderPhasePanel(pub,isTeacher,own);
-    const floating=!canPreview&&!useLive&&!spotlightDismissed;
-    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>${useLive?'Central de operações · acompanhe o mundo em movimento':'Analisar · planejar · decidir · governar'}</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div>${floating?renderActionSpotlight(pub,isTeacher):''}${floating?renderDiceDisplay(pub.dice_display):''}${floating?contextTip(pub,isTeacher,own):''}<div class="situation-phase ${canPreview?'dossier-preview-phase':''} ${useLive?'live-ops-phase':''}">${center}</div>${renderCommandRecent(pub)}`;
+    return `<div class="situation-topline"><div class="panel-title compact"><span>✦</span><div><b>MESA DE SITUAÇÃO</b><small>${useLive?'Informe direcionado ao seu governo':'Analisar · planejar · decidir · governar'}</small></div></div>${pub.active_country?`<span class="situation-active">EM FOCO · ${esc(pub.active_country)}</span>`:''}</div><div class="situation-phase ${canPreview?'dossier-preview-phase':''} ${useLive?'live-ops-phase':''}">${center}</div>`;
   }
 
   function renderLiveSituation(pub){
     const a=pub.action_spotlight;
     const d=pub.dice_display;
     const p=pub.pending_public;
-    const latest=(pub.bulletins||[]).slice(-1)[0];
-    if(d?.rolls?.length){
-      const consequences=(a?.consequences||[]).slice(-4);
-      const dice=renderDiceDisplay(d);
-      const outcomes=renderDiceOutcomeSummary(d);
-      const diceTargets=(d.rolls||[]).map(r=>r.country||r.label).filter(Boolean).join(', ')||a?.target||'Sistema internacional';
-      const decision=p?`Aguardando ${p.country||'outro governo'}: ${pendingDescription(p)}`:'Resultados revelados';
-      return `<section class="command-action live-ops-board dice-live-board"><div class="state-kicker">RESOLUÇÃO COMPARTILHADA</div>${renderResolutionChain({actor:a?.actor||'Sistema',card:d.source||a?.card_name||'Rolagem pública',target:diceTargets,decision,consequences})}${dice}${outcomes}</section>`;
-    }
     if(a){
       const consequences=(a.consequences||[]).slice(-5);
-      const decision=p?`Aguardando ${p.country||'o governo responsável'}: ${pendingDescription(p)}`:(a.decision||'Resolvida');
-      const resultConsequences=consequences.length?consequences:(latest?.body?[latest.body]:[]);
-      const resume=pub.phase==='diplomacy'?'<button class="btn primary resume-summit" data-resume-summit>VOLTAR À CÚPULA · CONTINUAR NEGOCIAÇÕES</button>':'';
-      return `<section class="command-action live-ops-board ${a.target===state.me?.country?'targets-me':''}"><div class="state-kicker">${a.target===state.me?.country?'AÇÃO CONTRA SEU PAÍS':'MOVIMENTO INTERNACIONAL'}</div>${renderResolutionChain({actor:a.actor||'Sistema',card:a.card_name||a.title||'Decisão em andamento',target:a.target||'Sistema internacional',decision,consequences:resultConsequences})}${resume}</section>`;
+      const related=(pub.bulletins||[]).slice().reverse().find(b=>b.kind!=='dice'&&b.actor===a.actor&&(!a.target||b.target===a.target));
+      const resultConsequences=consequences.length?consequences:(related?.body?[related.body]:[]);
+      const verb=a.kind==='diplomacy'?'realizou':'usou';
+      const preposition=a.kind==='diplomacy'?'com':'em';
+      const sentence=`${a.actor||'O sistema'} ${verb} ${a.card_name||a.title||'uma decisão'}${a.target?` ${preposition} ${a.target}`:''}.`;
+      const rolls=d?.rolls?.length?`<div class="spotlight-dice-sentence"><b>Resultado da rolagem:</b>${d.rolls.map((r,i)=>{const raw=Number(r.result),mod=Number(r.modifier||0),total=Number(r.total??raw);return `<span class="spotlight-die"><i>${dieGlyph(raw)}</i><strong>${raw}${mod?` ${mod>0?'+':'−'} ${Math.abs(mod)} = ${total}`:''}</strong><small>${esc(r.country||r.label||'Dado')}</small></span>${i<d.rolls.length-1?'<em>e</em>':''}`}).join('')}</div>`:'';
+      const decision=p?`<p class="spotlight-awaiting">Aguardando ${esc(p.country||'o governo responsável')}: ${esc(pendingDescription(p))}</p>`:'';
+      const label=pub.phase==='diplomacy'?'VOLTAR À CÚPULA · CONTINUAR NEGOCIAÇÕES':'FECHAR INFORME · VOLTAR À MESA';
+      return `<section class="command-action live-ops-board natural-spotlight ${a.target===state.me?.country?'targets-me':''}"><div class="state-kicker">${a.target===state.me?.country?'INFORME QUE AFETA SEU PAÍS':'RESULTADO DA SUA AÇÃO'}</div><h2>${esc(sentence)}</h2>${rolls}${resultConsequences.length?`<div class="spotlight-consequence"><b>CONSEQUÊNCIA</b><span>${resultConsequences.map(esc).join(' · ')}</span></div>`:''}${decision}<button class="btn primary dismiss-spotlight" data-dismiss-spotlight>${label}</button></section>`;
     }
-    if(latest)return `<section class="command-action live-ops-board"><div class="state-kicker">ÚLTIMO ACONTECIMENTO</div><h1>${esc(latest.title||'Atualização internacional')}</h1>${latest.body?`<div class="live-last-result"><span>${esc(latest.body)}</span></div>`:''}<p class="live-pending-copy">Aguardando a próxima decisão de ${esc(pub.active_country||'outro governo')}.</p></section>`;
     return `<section class="command-action state-briefing waiting-state"><div class="state-kicker">CENTRAL DE OPERAÇÕES</div><h2>Aguardando ${esc(pub.active_country||'outro governo')}</h2><p>A próxima ação aparecerá aqui com alvo, consequências e resultados.</p></section>`;
   }
 
@@ -522,9 +490,10 @@
     }else if(kind==='diplomacy'){
       title.textContent='Ministério das Relações Exteriores';const rels=Object.entries(pub.relations||{});body.innerHTML=rels.length?`<div class="diplomacy-map">${rels.map(([k,r])=>{const[a,b]=k.split('|');return `<div class="diplomacy-row"><b>${esc(a)} ↔ ${esc(b)}</b><span class="badge ${r.type==='block'?'good':'violet'}">${r.type==='block'?'Bloco Econômico':'Acordo Comercial'}</span>${r.suspended?'<span class="badge warn">Suspenso</span>':r.tension?'<span class="badge warn">Sob tensão</span>':r.crisis?'<span class="badge warn">Em crise</span>':''}</div>`}).join('')}</div>`:'<div class="history-empty">Ainda não existem Acordos ou Blocos.</div>';
     }else if(kind==='intelligence'){
-      title.textContent='Central de Inteligência';const log=pub.recent_log||[];body.innerHTML=`<div class="intel-summary"><div><small>FASE ATUAL</small><b>${esc(phaseTitle(pub))}</b></div><div><small>EVENTO</small><b>${esc(pub.current_event?.name||'—')}</b></div><div><small>LÍDER(ES) DE INFLUÊNCIA</small><b>${esc(influenceLeadersUI(pub).join(', ')||'—')}</b></div></div><h4>Últimos informes</h4><div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')||'<div>Nenhum informe.</div>'}</div>`;
+      const rels=Object.keys(pub.relations||{}).length;
+      title.textContent='Central de Inteligência';body.innerHTML=`<div class="intel-summary"><div><small>FASE ATUAL</small><b>${esc(phaseTitle(pub))}</b></div><div><small>EVENTO</small><b>${esc(pub.current_event?.name||'—')}</b></div><div><small>LÍDER(ES) DE INFLUÊNCIA</small><b>${esc(influenceLeadersUI(pub).join(', ')||'—')}</b></div><div><small>GOVERNO EM FOCO</small><b>${esc(pub.active_country||'—')}</b></div><div><small>RELAÇÕES ATIVAS</small><b>${rels}</b></div><div><small>RODADA</small><b>${Number(pub.round||0)} / 8</b></div></div><div class="intelligence-note"><b>LEITURA ESTRATÉGICA ATUAL</b><p>Este painel resume o estado presente da partida. Para consultar ações e consequências já ocorridas, use o Histórico.</p></div>`;
     }else if(kind==='history'){
-      title.textContent='Histórico recente';const log=pub.recent_log||[];body.innerHTML=log.length?`<div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')}</div>`:'<div class="history-empty">Nenhum registro recente.</div>';
+      title.textContent='Histórico da partida';const bulletins=pub.bulletins||[],log=pub.recent_log||[];body.innerHTML=bulletins.length?`<div class="history-timeline">${bulletins.slice().reverse().map(b=>`<article><div><span>${bulletinIcon(b)}</span><b>${esc(b.title||b.source||'Acontecimento')}</b><small>RODADA ${Number(b.round||pub.round||0)}</small></div>${b.body?`<p>${esc(b.body)}</p>`:''}${b.actor||b.target?`<footer>${b.actor?`ATOR · ${esc(b.actor)}`:''}${b.target?` <i>→</i> ALVO · ${esc(b.target)}`:''}</footer>`:''}</article>`).join('')}</div>`:log.length?`<div class="history-list">${log.slice().reverse().map(x=>`<div>${esc(x.text||x)}</div>`).join('')}</div>`:'<div class="history-empty">Nenhum registro recente.</div>';
     }else{
       title.textContent='Como Jogar';body.innerHTML=`<div class="rules-tabs"><section><h4>Objetivo</h4><p><b>Termine a 8ª rodada com a maior Influência.</b> Influência é a soma de Economia, Redes, Diplomacia e Cultura. Se todos os quatro atributos estiverem em pelo menos 2 no final, você recebe +2 de Potência Equilibrada.</p></section><section><h4>O que fazer</h4><p>Leia o Evento, examine seus Dossiês e use 1 Ação Principal no seu turno. Depois acompanhe as ações dos outros governos e participe da Cúpula Diplomática ao fim da rodada.</p></section><section><h4>Rodada</h4><p>Evento Global → Desafio nas rodadas pares → Compra → Turnos nacionais → Cúpula Diplomática.</p></section><section><h4>Dossiês</h4><p><b>Desenvolvimento</b> fortalece o país; <b>Interferência</b> afeta outros governos; <b>Risco/Escolha</b> envolve decisão ou incerteza; <b>Reação</b> não é Ação Principal e só é usada quando seu gatilho ocorre.</p></section><section><h4>Vantagem Geográfica</h4><p>Guarde até 2. Gaste 1 para <b>refazer uma rolagem sua de d6</b>, <b>reduzir em 1 uma perda de atributo</b> ou, durante a compra, <b>revelar 2 cartas, escolher 1 e descartar a outra</b>.</p></section><section><h4>Diplomacia</h4><p>Na Cúpula, cada país recebe 1 iniciativa para propor Acordo, formar Bloco, trocar carta, encerrar relação ou não agir. Aceitar ou recusar uma proposta não gasta sua iniciativa. Na regra 0.4-C, vários Dossiês de Desenvolvimento recebem bônus maiores quando o país mantém Acordos, Blocos ou Relações Comerciais ativas.</p></section><section><h4>Glossário</h4><p><b>Relação Comercial:</b> Acordo ou Bloco ativo. <b>Sob Tensão:</b> o Acordo continua existindo, mas não concede bônus nem cumpre requisitos de Relação/Acordo até o fim da rodada. <b>Suspenso:</b> o Acordo ocupa limite, porém fica inativo até a próxima Cúpula. <b>Bloco em Crise:</b> bônus e proteções de Bloco ficam desligados até o fim da rodada. <b>Renovar:</b> compre 1 e descarte 1. <b>Recuperação Nacional:</b> eleve um atributo em 0 para 1 usando sua Ação Principal.</p></section><section><h4>Legibilidade da interface</h4><p>Escolha a escala que melhor se adapta ao tamanho físico da tela. A opção <b>Confortável</b> é a recomendada para notebooks; <b>Grande</b> prioriza leitura em monitores maiores e projeção.</p><div class="ui-scale-picker"><button class="btn ghost" data-ui-scale="compact">Compacta</button><button class="btn ghost" data-ui-scale="comfortable">Confortável</button><button class="btn ghost" data-ui-scale="large">Grande</button></div></section></div><div class="actions"><button class="btn primary" id="replayTutorial">Rever tutorial neste dispositivo</button></div>`;
       setTimeout(()=>{document.getElementById('replayTutorial')?.addEventListener('click',()=>{localStorage.removeItem(tutorialSeenKey);state.onboardingActive=true;state.onboardingStep=0;closeCommandModal();mountOnboarding(false)});document.querySelectorAll('[data-ui-scale]').forEach(b=>{b.classList.toggle('primary',b.dataset.uiScale===currentUiScale());b.addEventListener('click',()=>{applyUiScale(b.dataset.uiScale);document.querySelectorAll('[data-ui-scale]').forEach(x=>x.classList.toggle('primary',x.dataset.uiScale===currentUiScale()));});});},0);
@@ -670,7 +639,7 @@
     const tradeCardSelect=document.getElementById('tradeCard'),tradePreviewBtn=document.getElementById('tradePreviewBtn');
     const updateTradePreviewButton=()=>{const c=CARD[Number(tradeCardSelect?.value)];if(tradePreviewBtn){tradePreviewBtn.disabled=!c;tradePreviewBtn.title=c?`Consultar efeito de ${c.name}`:'Nenhum Dossiê selecionado';}};
     tradeCardSelect?.addEventListener('change',updateTradePreviewButton);tradePreviewBtn?.addEventListener('click',()=>openCardConsultation(Number(tradeCardSelect?.value)));updateTradePreviewButton();
-    document.querySelectorAll('[data-resume-summit]').forEach(b=>b.onclick=()=>{state.dismissedSpotlightId=String(pub.action_spotlight?.id||'');renderRoom()});
+    document.querySelectorAll('[data-dismiss-spotlight]').forEach(b=>b.onclick=()=>{state.dismissedSpotlightId=String(pub.action_spotlight?.id||'');renderRoom()});
     document.getElementById('playerReadyTurn')?.addEventListener('click',()=>withBusy(async()=>{await api('confirm_turn_ready',{roomId:state.room.id});await refreshSnapshot()}));
     if(isTeacher){
       const startNow=()=>withBusy(async()=>{await api('teacher_start_turn',{roomId:state.room.id});await refreshSnapshot()});
