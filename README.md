@@ -1,4 +1,4 @@
-# GeoPoder — Alpha 2.0g.2c
+# GeoPoder — Alpha 2.0g.2d
 
 **Subtítulo interno:** Cúpula Internacional melhorada  
 **Regras:** 0.4-C  
@@ -36,6 +36,16 @@ A revisão 2.0g.2 consolida essa arquitetura e corrige o principal gargalo resta
 - Renovação, descarte, custo de Salvaguarda e devolução de Troca usam uma grade própria de seleção;
 - até quatro cartas ficam na mesma linha; mãos de cinco ou seis cartas usam duas linhas compactas;
 - os botões de responder, descartar, entregar ou manter ficam dentro da área visível da Mesa de Situação.
+
+### Hotfix 2.0g.2d — Cartas legíveis e Gabinete estável
+
+- cartas de escolha na Mesa, sobretudo no descarte, usam texto mecânico e títulos maiores;
+- até quatro cartas continuam simultaneamente visíveis; mãos de cinco ou seis priorizam legibilidade e permitem rolagem somente dentro da grade excepcional de escolha;
+- o Gabinete Nacional ganhou orçamento vertical próprio e não transborda quando a interface muda para Confortável ou Grande;
+- em telas baixas, elementos decorativos do Gabinete cedem espaço antes dos atributos e das Relações Atuais;
+- o relatório de playtest passa a mostrar medianas de tempo, mais resistentes a pausas, além das médias;
+- partidas atualizadas durante a execução registram separadamente a versão inicial e a versão final observada;
+- a confirmação final de uma disputa não duplica o informe de dados quando ninguém rerrolou.
 
 ## 1. Cúpula Internacional melhorada
 
@@ -136,7 +146,7 @@ Substitua:
 
 **Preserve seu `config.js`.** Ele não está incluído no pacote.
 
-Cache-bust de `app.js` e `styles.css`: `20g2c`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
+Cache-bust de `app.js` e `styles.css`: `20g2d`. A referência de `config.js` permanece inalterada em `20g1`, e o arquivo não faz parte do pacote.
 
 ## 11. Teste recomendado
 
@@ -153,7 +163,9 @@ Cache-bust de `app.js` e `styles.css`: `20g2c`. A referência de `config.js` per
 11. Abrir a Cúpula em 1366×768 e confirmar que Acordo, Bloco, Troca e Não realizar ação estão simultaneamente visíveis e clicáveis.
 12. Propor, aceitar e recusar Acordos, Blocos e Trocas; confirmar que Mesa e Agência mostram também o resultado.
 13. Abrir Inteligência e Histórico: o primeiro deve mostrar o estado atual; o segundo, a sequência de boletins da partida.
-14. Abrir uma Reação e uma Renovação com quatro cartas em 1366×768 e 1366×617: todos os botões devem permanecer visíveis e clicáveis.
+14. Abrir uma Reação e uma Renovação com quatro cartas em 1366×768 e 1366×617: texto e botões devem permanecer legíveis, visíveis e clicáveis.
+15. Forçar uma mão de cinco ou seis cartas: a rolagem deve existir apenas dentro da grade de escolha, sem cortar nenhuma carta ou botão.
+16. Alternar Compacta, Confortável e Grande com três relações ativas: o Gabinete deve conservar atributos, placar e Relações Atuais dentro do painel.
 
 ## Validação estática executada
 

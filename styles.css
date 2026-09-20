@@ -840,12 +840,13 @@ html[data-ui-scale="large"]{font-size:18px}
 .compact-decision-panel>.decision-note{margin:0!important;font-size:clamp(.64rem,.6vw,.76rem)!important;line-height:1.25!important}.decision-actions{width:100%;margin-top:auto!important;flex:0 0 auto!important;justify-content:flex-start!important;gap:8px!important}.decision-actions>.btn{min-width:130px}
 .card-setup-actions{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:5px!important}.card-setup-actions>.btn{min-width:0!important;min-height:clamp(29px,3.6vh,36px)!important;padding:5px 7px!important;font-size:clamp(.61rem,.57vw,.74rem)!important}
 
-/* Escolha de carta: até quatro em uma linha; cinco ou seis em duas linhas compactas. */
+/* Escolha de carta: leitura vem antes da miniaturização. Até quatro cartas
+   ficam simultaneamente visíveis; mãos maiores rolam só dentro da grade. */
 .choice-card-grid{width:100%;flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--choice-cols),minmax(0,1fr));gap:clamp(5px,.55vw,8px);overflow:hidden}
 .choice-card{min-width:0;min-height:0;display:flex;flex-direction:column;border:2px solid #9c8350;background:#e6dabc;color:#211f1b;padding:clamp(6px,.55vw,9px);overflow:hidden}
 .choice-card.type-interference{border-style:dashed;border-color:#c46d5d}.choice-card.type-reaction{border-style:double;border-color:#6eabc9}.choice-card.type-risk{border-style:dotted;border-color:#bb803c}
-.choice-card>div{display:flex;justify-content:space-between;gap:5px;font:800 clamp(.46rem,.43vw,.57rem)/1 Inter,Arial,sans-serif;text-transform:uppercase;color:#725c2c}.choice-card h4{margin:5px 0 3px!important;font:800 clamp(.72rem,.7vw,.92rem)/1.08 Georgia,serif;text-transform:uppercase}.choice-card p{margin:0!important;color:#3f3a31!important;font-size:clamp(.58rem,.55vw,.72rem)!important;line-height:1.22!important;overflow-wrap:anywhere}.choice-card .btn{width:100%;min-height:clamp(27px,3.4vh,34px)!important;margin-top:auto!important;padding:5px 6px!important;font-size:clamp(.58rem,.54vw,.7rem)!important;background:#149fdd!important;border-color:#68caf2!important;color:#04131b!important;font-weight:850!important}
-.choice-card-grid.many-cards{grid-template-rows:repeat(2,minmax(0,1fr))}.choice-card-grid.many-cards .choice-card{padding:5px 7px}.choice-card-grid.many-cards .choice-card h4{font-size:clamp(.65rem,.62vw,.8rem)!important;margin:3px 0 2px!important}.choice-card-grid.many-cards .choice-card p{font-size:clamp(.51rem,.48vw,.62rem)!important;line-height:1.12!important}.choice-card-grid.many-cards .choice-card .btn{min-height:25px!important;padding:3px 5px!important}
+.choice-card>div{display:flex;justify-content:space-between;gap:5px;font:800 clamp(.55rem,.49vw,.66rem)/1 Inter,Arial,sans-serif;text-transform:uppercase;color:#725c2c}.choice-card h4{margin:6px 0 4px!important;font:800 clamp(.86rem,.78vw,1.02rem)/1.1 Georgia,serif;text-transform:uppercase}.choice-card p{margin:0 0 5px!important;color:#3f3a31!important;font-size:clamp(.72rem,.67vw,.86rem)!important;line-height:1.28!important;overflow-wrap:anywhere}.choice-card .btn{width:100%;min-height:clamp(29px,3.6vh,36px)!important;margin-top:auto!important;padding:5px 6px!important;font-size:clamp(.66rem,.6vw,.78rem)!important;background:#149fdd!important;border-color:#68caf2!important;color:#04131b!important;font-weight:850!important}
+.choice-card-grid.many-cards{grid-template-rows:none;grid-auto-rows:minmax(170px,auto);overflow-y:auto;padding-right:3px;scrollbar-width:thin}.choice-card-grid.many-cards .choice-card{min-height:170px;padding:6px 8px;overflow:visible}.choice-card-grid.many-cards .choice-card h4{font-size:clamp(.76rem,.69vw,.9rem)!important;margin:4px 0 3px!important}.choice-card-grid.many-cards .choice-card p{font-size:clamp(.63rem,.58vw,.75rem)!important;line-height:1.2!important}.choice-card-grid.many-cards .choice-card .btn{min-height:27px!important;padding:4px 5px!important}
 
 /* Inteligência olha o presente; Histórico guarda a sequência de acontecimentos. */
 .intelligence-note{border:1px solid #3d6375;background:#0a2634;padding:11px 12px}.intelligence-note b{font-size:.67rem;letter-spacing:.08em;color:#e0b958}.intelligence-note p{margin:5px 0 0;color:#c8d5da;line-height:1.45}
@@ -855,7 +856,50 @@ html[data-ui-scale="large"]{font-size:18px}
   .natural-spotlight{gap:5px!important;padding:8px 10px!important}.natural-spotlight>h2{font-size:1rem!important}.spotlight-dice-sentence{padding:4px 0!important}.spotlight-die{padding:3px 6px!important}.spotlight-die i{font-size:1.75rem!important}.spotlight-consequence{padding:5px 8px!important}.dismiss-spotlight{padding:5px 10px!important}
   .government-post{inset:34px 7px 7px;padding:10px 12px;gap:7px}.government-post p{font-size:.82rem!important;line-height:1.3!important}.government-post>div{padding-bottom:5px}.government-post button{width:24px;height:24px}
   .compact-decision-panel,.card-choice-panel{padding:6px 8px!important;gap:3px!important}.decision-card-summary{padding:5px 7px;grid-template-columns:minmax(125px,23%) minmax(0,1fr);column-gap:8px}.decision-card-summary>h4{font-size:.86rem!important;margin-top:5px!important}.decision-card-summary>section{padding:5px 7px;margin-top:4px}.decision-card-summary>section p{font-size:.61rem!important;line-height:1.2!important}.decision-actions>.btn{min-height:29px!important;padding:5px 8px!important}
-  .choice-card-grid{gap:4px}.choice-card{padding:5px 6px}.choice-card h4{font-size:.64rem!important;margin:3px 0 2px!important}.choice-card p{font-size:.5rem!important;line-height:1.13!important}.choice-card .btn{min-height:25px!important;padding:3px 4px!important;font-size:.52rem!important}.card-choice-panel>h3{font-size:.78rem!important}.choice-card-grid.many-cards .choice-card p{font-size:.46rem!important;line-height:1.08!important}
+  .choice-card-grid{gap:4px}.choice-card{padding:5px 6px}.choice-card h4{font-size:.78rem!important;margin:3px 0 2px!important}.choice-card p{font-size:.68rem!important;line-height:1.18!important}.choice-card .btn{min-height:27px!important;padding:4px!important;font-size:.61rem!important}.card-choice-panel>h3{font-size:.82rem!important}.choice-card-grid.many-cards{grid-auto-rows:minmax(155px,auto)}.choice-card-grid.many-cards .choice-card{min-height:155px}.choice-card-grid.many-cards .choice-card p{font-size:.59rem!important;line-height:1.15!important}
+}
+
+/* O Gabinete possui orçamento vertical próprio. A escala de conforto amplia
+   o restante da interface sem empurrar Relações Atuais para fora do painel. */
+@media(min-width:821px){
+  .command-national>.panel-title,.national-identity,.national-meters,.national-score-strip,.relation-title{flex:0 0 auto}
+  .command-national .panel-title b{font-size:clamp(13px,.78vw,16px)!important}
+  .command-national .panel-title small{font-size:clamp(8px,.5vw,11px)!important}
+  .national-identity{padding:clamp(4px,.5vh,7px) 0!important}
+  .national-identity h2{font-size:clamp(18px,1.25vw,24px)!important}
+  .national-identity small,.national-identity span{font-size:clamp(9px,.52vw,11px)!important}
+  .national-meters{gap:clamp(3px,.48vh,6px)!important}
+  .gov-attr-head{font-size:clamp(11px,.68vw,14px)!important}
+  .gov-attr-head b{font-size:clamp(16px,1.05vw,21px)!important}
+  .gov-meter i{height:clamp(7px,1vh,11px)!important}
+  .national-score-v2 b{font-size:clamp(10px,.62vw,13px)!important}
+  .national-score-v2 strong{font-size:clamp(18px,1.25vw,25px)!important}
+  .relation-title{font-size:clamp(10px,.59vw,13px)!important}
+  .relation-list-v2{flex:1 1 auto;min-height:0;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;gap:2px!important;scrollbar-width:thin}
+  .relation-v2{font-size:clamp(10px,.62vw,13px)!important;padding:3px 2px!important;min-height:20px!important}
+  .relation-v2 small{font-size:clamp(9px,.54vw,11px)!important}
+}
+
+@media(max-height:700px) and (min-width:821px){
+  .command-national{padding:7px 9px!important}
+  .command-national .panel-title{padding-bottom:3px!important}
+  .command-national .panel-title small{display:none!important}
+  .national-identity{padding:2px 0 3px!important}
+  .national-identity .country-seal{display:none!important}
+  .national-identity span{display:none!important}
+  .national-identity h2{font-size:18px!important}
+  .national-meters{gap:2px!important}
+  .gov-attr-head{font-size:11px!important;line-height:1!important}
+  .gov-attr-head b{font-size:15px!important}
+  .gov-meter{margin-top:1px!important}
+  .gov-meter i{height:7px!important}
+  .national-score-strip{margin-top:3px!important;padding-top:3px!important;gap:4px!important}
+  .national-score-strip .national-score-v2{padding:3px 4px!important}
+  .national-score-v2 b{font-size:9px!important}
+  .national-score-v2 strong{font-size:16px!important}
+  .relation-title{margin-top:1px!important;padding:3px 0 2px!important;font-size:9px!important}
+  .relation-v2{min-height:17px!important;padding:1px 2px!important;font-size:10px!important}
+  .relation-v2 small{font-size:8px!important}
 }
 
 /* A Cúpula usa uma faixa principal de quatro ações e uma faixa secundária
