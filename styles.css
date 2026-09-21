@@ -967,7 +967,7 @@ html[data-ui-scale="large"]{font-size:18px}
   .summit-primary .summit-box{height:auto}
 }
 
-/* Alpha 3.0a · Digital Native */
+/* Alpha 3.0b · Digital Native */
 .match-config{margin-top:18px;padding-top:16px;border-top:1px solid rgba(148,163,184,.24);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .match-config>div{display:grid;gap:6px;padding:14px;border:1px solid rgba(148,163,184,.2);border-radius:14px;background:rgba(15,23,42,.42)}
 .match-config label{font-weight:800;color:#f8fafc}.match-config small{color:#a8b3c7;line-height:1.35}.match-config select{width:100%}
@@ -988,3 +988,36 @@ html[data-ui-scale="large"]{font-size:18px}
 .projector-relations,.projector-feed{display:grid;gap:8px;margin-top:10px}.projector-relations>div,.projector-feed>div{display:grid;gap:2px;padding:8px 10px;border-radius:9px;background:rgba(148,163,184,.08)}.projector-relations span,.projector-feed span{font-size:.78rem;color:#cbd5e1}
 @media(max-width:1100px){.projector-countries{grid-template-columns:repeat(2,minmax(0,1fr))}.projector-lower{grid-template-columns:1fr}.summit-advice{grid-template-columns:1fr}.summit-advice span+span{border-left:0;padding-left:0}.match-config{grid-template-columns:1fr}}
 @media(max-height:720px) and (min-width:821px){.summit-advice{margin-top:2px;padding:4px 6px;font-size:.62rem;gap:5px}.summit-advice span:nth-of-type(2){display:none}}
+
+/* Alpha 3.0b · relações persistentes, Cúpula sequencial e enquadramento */
+.dip-status.current{border-color:#d7a93e;background:#302817;box-shadow:inset 3px 0 0 #d7a93e}.dip-status.current span{color:#f7d982}
+.summit-repair{display:grid;grid-template-columns:auto minmax(150px,1fr) minmax(220px,1.4fr);gap:9px;align-items:center;padding:8px 10px;border:1px solid #9b6b2d;background:#352714;color:#f7e5bb}
+.summit-repair>b{font-size:.68rem;letter-spacing:.08em}.summit-repair>span{font:600 .68rem/1.25 Inter,Arial,sans-serif;color:#dfcda7}.summit-repair>div{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.cabinet-action.replace{border-color:#c89238;background:linear-gradient(180deg,#493816,#30240f)}
+
+/* Decisões com 3 ou mais cartas sempre mantêm o botão de descarte alcançável. */
+.situation-phase>.card-choice-panel{justify-content:flex-start!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-gutter:stable;padding-bottom:14px!important}
+.situation-phase>.card-choice-panel .choice-card-grid{flex:0 0 auto;min-height:min-content;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;overflow:visible!important}
+.situation-phase>.card-choice-panel .choice-card{min-height:150px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+.situation-phase>.card-choice-panel .choice-card p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.situation-phase>.card-choice-panel .choice-card .btn{position:sticky;bottom:0}
+
+/* Questões e alternativas longas podem rolar dentro da Mesa de Situação. */
+.situation-phase>.intelligence-brief{justify-content:flex-start!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-gutter:stable}
+.situation-phase>.intelligence-brief h2{flex:0 0 auto;overflow-wrap:anywhere}
+.situation-phase>.intelligence-brief .intel-options{flex:0 0 auto;padding-bottom:8px}
+.situation-phase>.intelligence-brief .intel-option span{overflow-wrap:anywhere}
+
+/* O painel público cabe em uma única tela; relações e boletins rolam internamente. */
+.projector-view{height:100dvh;min-height:0!important;overflow:hidden;box-sizing:border-box;padding:clamp(10px,1.5vh,20px) clamp(16px,3vw,48px)!important;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:clamp(8px,1.2vh,14px)}
+.projector-view>header{padding-bottom:clamp(7px,1vh,12px)!important;gap:clamp(12px,2vw,24px)!important}.projector-view h1{font-size:clamp(1.25rem,2.2vw,2rem)!important}
+.projector-event{margin-top:0!important;padding:clamp(10px,1.3vh,16px) clamp(14px,2vw,22px)!important}.projector-event h2{font-size:clamp(1.1rem,2vw,1.7rem)!important;margin:.15rem 0 .25rem!important}.projector-event p{font-size:clamp(.74rem,1vw,.9rem)!important;line-height:1.3!important}
+.projector-countries{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))!important;gap:clamp(7px,1vw,12px)!important;margin-top:0!important}.projector-countries article{padding:clamp(8px,1vw,13px)!important}.projector-countries article>strong{font-size:clamp(1.35rem,2vw,1.8rem)!important;margin:6px 0!important}.projector-countries li{padding:4px 6px!important;font-size:clamp(.66rem,.75vw,.76rem)!important}
+.projector-lower{min-height:0;margin-top:0!important;gap:clamp(8px,1.2vw,14px)!important}.projector-lower>article{min-height:0;overflow:hidden;padding:clamp(10px,1.2vw,15px)!important;display:flex;flex-direction:column}.projector-relations,.projector-feed{min-height:0;overflow-y:auto;scrollbar-width:thin;gap:6px!important;margin-top:7px!important}.projector-relations>div,.projector-feed>div{padding:6px 8px!important}.projector-relations span,.projector-feed span{font-size:clamp(.66rem,.75vw,.76rem)!important}
+
+@media(max-height:700px) and (min-width:821px){
+  .projector-view{padding-top:8px!important;padding-bottom:8px!important;gap:7px!important}.projector-view>header{padding-bottom:6px!important}.projector-event{padding:8px 12px!important}.projector-event p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.projector-countries article{padding:7px!important}.projector-countries article>strong{margin:3px 0!important}.projector-lower>article{padding:8px!important}
+  .situation-phase>.card-choice-panel .choice-card{min-height:135px}.situation-phase>.card-choice-panel .choice-card p{-webkit-line-clamp:2}
+}
+
+@media(max-width:820px){.summit-repair{grid-template-columns:1fr}.summit-repair>div{justify-content:flex-start}.situation-phase>.card-choice-panel,.situation-phase>.intelligence-brief{overflow:visible!important}.projector-view{height:auto;min-height:100dvh!important;overflow:visible}.projector-lower{grid-template-columns:1fr}.projector-lower>article{overflow:visible}.projector-relations,.projector-feed{overflow:visible}}

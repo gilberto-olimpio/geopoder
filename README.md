@@ -1,122 +1,95 @@
-# GeoPoder Alpha 3.0a
+# GeoPoder Alpha 3.0b
 
-## Fundação Digital Native
+## Relações Persistentes
 
-**Regras:** 0.6-DN  
-**Base técnica:** Alpha 2.0g.2d  
+**Regras:** 0.7-DN  
+**Base técnica:** Alpha 3.0a  
 **Formato:** multiplayer digital para 3 ou 4 equipes reais
 
-Esta versão inicia a transição do GeoPoder para um jogo concebido diretamente para o ambiente digital. O motor continua responsável pelas regras, validações e transições; a interface mostra decisões concretas e suas consequências. As correções de legibilidade, Cúpula, rolagens, Reações, reconexão e telemetria da Alpha 2.0g.2d foram preservadas.
+Esta versão foi elaborada a partir de duas partidas técnicas da Alpha 3.0a: GEO-YF98 (8 rodadas) e GEO-4B8J (6 rodadas). Elas não foram realizadas com alunos; portanto, os resultados de acerto, tempo e estratégia servem apenas para verificar o sistema, não para tirar conclusões pedagógicas.
 
-## O que mudou
+## O que foi corrigido
 
-### 1. Dois formatos de partida
+### 1. Efeitos das escolhas de Evento
 
-O professor escolhe a configuração no lobby antes de iniciar:
+O relatório da GEO-4B8J mostrou que todos escolheram perder Economia no Embargo Internacional, mas a perda não ocorreu. A causa estava na fila de resolução: a consequência era colocada depois do encerramento do Evento e não chegava a ser executada.
 
-- **Completa:** 8 rodadas e 4 Desafios Geográficos;
-- **Sala de aula:** 6 rodadas e 3 Desafios Geográficos.
+As consequências escolhidas agora entram imediatamente na fila, antes do encerramento. A correção vale para perdas, ganhos, renovação e alterações de relações produzidas por Eventos.
 
-O modo escolhido é salvo no estado da partida e na telemetria. A interface, o encerramento do motor e o relatório usam o número configurado de rodadas.
+### 2. Relações persistentes
 
-### 2. Modelo inicial Digital 0.6
+Tensão, Suspensão e Crise não desaparecem automaticamente na rodada seguinte. Elas desativam os benefícios da relação até que um dos parceiros use sua iniciativa na Cúpula para repará-la.
 
-O modelo padrão passa de `3–2–2–0` para `3–2–1–1`. Cada país mantém sete pontos, um atributo forte e fragilidades reconhecíveis, mas nenhuma equipe começa obrigada a gastar a primeira Ação Principal em Recuperação Nacional.
+Se a mesma relação sofrer um segundo abalo antes do reparo, ela é dissolvida. A mudança passa a ser registrada como estado persistente, reparo ou dissolução na telemetria e nos boletins públicos.
 
-O professor pode selecionar **Comparação 0.4-C · 3–2–2–0**. Essa opção existe para comparar partidas e verificar, pela telemetria, se o novo modelo realmente reduz aberturas automáticas.
+### 3. Cúpula em ordem de iniciativa
 
-### 3. Desafios ligados à partida
+As iniciativas diplomáticas deixam de acontecer ao mesmo tempo. Cada país age na ordem dos turnos nacionais; os demais acompanham ou respondem a propostas sem gastar sua própria iniciativa.
 
-Os Desafios das rodadas pares agora são escolhidos considerando:
+A interface informa quem está em foco, quem já concluiu e quem ainda aguarda. Reparar uma relação consome a iniciativa diplomática do país.
 
-- o Evento Global vigente;
-- a existência de Acordos ou Blocos;
-- os Desafios já usados na sessão.
+### 4. Dossiê sem alvo válido
 
-A tela apresenta um pequeno texto de contexto antes da questão. O relatório registra o gatilho usado para selecionar o Desafio. As 12 questões e seus gabaritos foram preservados.
+Quando nenhum Dossiê da mão possui alvo válido, o jogador pode substituir um deles: descarta 1, compra 1 e encerra a Ação Principal. A opção só aparece quando realmente não há carta principal utilizável.
 
-### 4. Cúpula com leitura contextual
+O relatório distingue agora:
 
-Antes de concluir a iniciativa, o gabinete recebe uma leitura curta sobre oportunidades observáveis:
+- turnos iniciados sem Dossiê utilizável;
+- substituições realizadas;
+- passes voluntários e passes por falta de opção.
 
-- quantos Dossiês da mão podem se beneficiar de Acordo;
-- quantos dependem de Bloco;
-- quando a Troca pode ser útil;
-- quando não existe oportunidade diplomática evidente e passar é uma decisão válida.
+### 5. Telas baixas e Modo Projetor
 
-O motor também registra, no início da Cúpula e em cada iniciativa, quais alvos diplomáticos estavam disponíveis. Isso permite distinguir falta de opções de falta de interesse.
+As áreas de descarte e de Desafio ganharam rolagem interna para que os botões permaneçam acessíveis. O painel público foi reorganizado para caber na altura disponível e manter Relações Internacionais e Últimos Boletins visíveis em áreas roláveis.
 
-### 5. Modo Projetor
+## O que foi preservado
 
-O painel do professor ganhou **Modo Projetor**. Ele mostra apenas dados públicos:
-
-- rodada, fase e Evento Global;
-- atributos e Influência dos países;
-- relações internacionais;
-- progresso do Desafio ou da Cúpula;
-- últimos boletins públicos.
-
-Nenhuma mão, Dossiê privado ou decisão secreta é exibida.
-
-### 6. Relatório de experimento
-
-O relatório docente e a exportação Markdown agora destacam:
-
-- modo e quantidade de rodadas;
-- modelo inicial utilizado;
-- número de Recuperações Nacionais;
-- turnos passados sem Dossiê;
-- Cúpulas em que não houve proposta;
-- mediana do tempo de resposta aos Desafios;
-- indicadores anteriores de cartas, ritmo e diplomacia.
-
-## O que não entrou nesta versão
-
-- bots ou países controlados pelo computador;
-- novos países, cartas, Eventos ou artes;
-- modo individual;
-- alteração de banco de dados;
-- migração integral dos estados diplomáticos persistentes das Regras 0.5-A.
-
-Os países não ocupados continuam fora da sessão. A prioridade desta versão é testar a fundação Digital Native com equipes reais antes de ampliar o conteúdo ou automatizar jogadores.
+- modos Completa (8 rodadas) e Sala de aula (6 rodadas);
+- modelos Digital 0.6 e Comparação 0.4-C;
+- 12 Desafios Geográficos e seus gabaritos;
+- cartas, Eventos, países e cinco artes piloto;
+- Modo Projetor e exportação Markdown, CSV e JSON;
+- banco de dados atual, sem nova migration SQL.
 
 ## Publicação
 
-### Supabase
+### 1. Supabase
 
-Substitua a Edge Function atual por `game-api.ts` e faça o deploy.
+Substitua a Edge Function atual por `game-api.ts` e faça o deploy primeiro.
 
-### GitHub Pages
+### 2. GitHub Pages
 
-Substitua:
+Depois substitua:
 
 - `index.html`;
 - `app.js`;
 - `styles.css`;
 - pasta `assets/`.
 
-Preserve seu `config.js`. Ele não está incluído no pacote.
+Preserve seu `config.js`; ele não está incluído no pacote.
 
-Não há migration SQL nesta atualização. As novas configurações vivem no JSON autoritativo da partida e na telemetria já existente.
+Não há migration SQL. Inicie uma sala nova para testar a 3.0b; partidas antigas preservam o estado e a versão em que foram criadas.
 
 ## Teste dirigido recomendado
 
-1. Criar uma sala completa com o modelo Digital 0.6 e confirmar atributos `3–2–1–1`.
-2. Criar uma sala curta e confirmar encerramento após a 6ª rodada.
-3. Criar uma sala de comparação e confirmar atributos `3–2–2–0`.
-4. Em rodada par, verificar se o Desafio mostra contexto relacionado ao Evento.
-5. Abrir a Cúpula com Dossiês de Acordo ou Bloco na mão e verificar a leitura do conselho.
-6. Passar na Cúpula e conferir no relatório se a iniciativa e as oportunidades foram registradas.
-7. Ativar o Modo Projetor e confirmar que nenhuma mão privada aparece.
-8. Manter o Modo Projetor aberto durante troca de fase e confirmar atualização automática.
-9. Exportar Markdown, CSV e JSON e conferir a configuração da partida.
-10. Repetir os testes críticos da 2.0g.2d: Disputa de Influência, Grande Crise Financeira, Reações, Renovação, Cúpula e Gabinete em telas baixas.
+1. Iniciar uma partida curta com três países e confirmar o Evento da rodada 1.
+2. Em um Evento com escolha de perda, escolher a perda e conferir atributo, boletim e telemetria.
+3. Criar um Acordo, aplicar Tensão ou Suspensão e avançar a rodada: o estado deve permanecer.
+4. Reparar a relação na Cúpula e confirmar que a iniciativa foi consumida.
+5. Aplicar dois abalos antes do reparo e confirmar a dissolução da relação.
+6. Na Cúpula, confirmar que somente o país em foco consegue iniciar uma ação.
+7. Dar a um país apenas Dossiês sem alvo e confirmar a opção de substituição.
+8. Testar descarte e Desafio em tela de notebook baixa.
+9. Abrir o Modo Projetor e verificar Relações e Boletins sem sair da tela.
+10. Exportar o relatório e conferir os novos indicadores e eventos de reparo.
 
 ## Arquivos
 
-- `index.html` — entrada e cache-bust `30a`;
-- `app.js` — interface, Modo Projetor e relatório;
-- `styles.css` — estilos da configuração, contexto e projeção;
+- `index.html` — entrada e cache-bust `30b`;
+- `app.js` — interface, relatório e fluxo sequencial da Cúpula;
+- `styles.css` — correções para telas baixas e projeção;
 - `game-api.ts` — motor autoritativo e telemetria;
+- `ANALISE_DOS_TESTES.md` — comparação das duas partidas que orientaram a versão;
 - `assets/cards/` — cinco artes piloto preservadas;
-- `tests/static-regression.mjs` — verificações estruturais do pacote.
+- `tests/static-regression.mjs` — verificações estruturais do pacote;
+- `tests/ui-smoke.mjs` — verificação visual automatizada quando o navegador está disponível.
