@@ -967,7 +967,7 @@ html[data-ui-scale="large"]{font-size:18px}
   .summit-primary .summit-box{height:auto}
 }
 
-/* Alpha 3.0b · Digital Native */
+/* Alpha 3.0c · Digital Native */
 .match-config{margin-top:18px;padding-top:16px;border-top:1px solid rgba(148,163,184,.24);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .match-config>div{display:grid;gap:6px;padding:14px;border:1px solid rgba(148,163,184,.2);border-radius:14px;background:rgba(15,23,42,.42)}
 .match-config label{font-weight:800;color:#f8fafc}.match-config small{color:#a8b3c7;line-height:1.35}.match-config select{width:100%}
@@ -989,7 +989,7 @@ html[data-ui-scale="large"]{font-size:18px}
 @media(max-width:1100px){.projector-countries{grid-template-columns:repeat(2,minmax(0,1fr))}.projector-lower{grid-template-columns:1fr}.summit-advice{grid-template-columns:1fr}.summit-advice span+span{border-left:0;padding-left:0}.match-config{grid-template-columns:1fr}}
 @media(max-height:720px) and (min-width:821px){.summit-advice{margin-top:2px;padding:4px 6px;font-size:.62rem;gap:5px}.summit-advice span:nth-of-type(2){display:none}}
 
-/* Alpha 3.0b · relações persistentes, Cúpula sequencial e enquadramento */
+/* Alpha 3.0c · integridade de versão sobre a base de relações persistentes */
 .dip-status.current{border-color:#d7a93e;background:#302817;box-shadow:inset 3px 0 0 #d7a93e}.dip-status.current span{color:#f7d982}
 .summit-repair{display:grid;grid-template-columns:auto minmax(150px,1fr) minmax(220px,1.4fr);gap:9px;align-items:center;padding:8px 10px;border:1px solid #9b6b2d;background:#352714;color:#f7e5bb}
 .summit-repair>b{font-size:.68rem;letter-spacing:.08em}.summit-repair>span{font:600 .68rem/1.25 Inter,Arial,sans-serif;color:#dfcda7}.summit-repair>div{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}

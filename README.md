@@ -1,53 +1,48 @@
-# GeoPoder Alpha 3.0b
+# GeoPoder Alpha 3.0c
 
-## Relações Persistentes
+## Integridade de Versão
 
 **Regras:** 0.7-DN  
-**Base técnica:** Alpha 3.0a  
+**Base técnica:** Alpha 3.0b  
 **Formato:** multiplayer digital para 3 ou 4 equipes reais
 
-Esta versão foi elaborada a partir de duas partidas técnicas da Alpha 3.0a: GEO-YF98 (8 rodadas) e GEO-4B8J (6 rodadas). Elas não foram realizadas com alunos; portanto, os resultados de acerto, tempo e estratégia servem apenas para verificar o sistema, não para tirar conclusões pedagógicas.
+Esta versão foi organizada a partir da comparação das sessões técnicas GEO-FN3V e GEO-SWNS. Nenhuma delas foi realizada com alunos; seus dados servem para validar o sistema, não para concluir algo sobre aprendizagem ou dificuldade.
 
-## O que foi corrigido
+## O que mudou
 
-### 1. Efeitos das escolhas de Evento
+### 1. Bloqueio de cliente desatualizado
 
-O relatório da GEO-4B8J mostrou que todos escolheram perder Economia no Embargo Internacional, mas a perda não ocorreu. A causa estava na fila de resolução: a consequência era colocada depois do encerramento do Evento e não chegava a ser executada.
+O servidor recusa ações de qualquer cliente cuja versão seja diferente da versão publicada. A tela informa que a atualização é obrigatória e oferece um botão para recarregar. A ação antiga não altera o estado da partida.
 
-As consequências escolhidas agora entram imediatamente na fila, antes do encerramento. A correção vale para perdas, ganhos, renovação e alterações de relações produzidas por Eventos.
+Consultas de painel, histórico e snapshot permanecem disponíveis para diagnóstico, mas criar, entrar, jogar ou comandar a partida exige a 3.0c.
 
-### 2. Relações persistentes
+### 2. Integridade de versão no relatório
 
-Tensão, Suspensão e Crise não desaparecem automaticamente na rodada seguinte. Elas desativam os benefícios da relação até que um dos parceiros use sua iniciativa na Cúpula para repará-la.
+O painel da partida e o relatório Markdown mostram as versões realmente observadas nas ações de cada país. Se algum aparelho agir com uma versão diferente da versão da partida, o relatório exibe um alerta explícito.
 
-Se a mesma relação sofrer um segundo abalo antes do reparo, ela é dissolvida. A mudança passa a ser registrada como estado persistente, reparo ou dissolução na telemetria e nos boletins públicos.
+### 3. Grande Crise Financeira Global
 
-### 3. Cúpula em ordem de iniciativa
+A perda de Economia resultante do dado agora entra antes do encerramento do Evento:
 
-As iniciativas diplomáticas deixam de acontecer ao mesmo tempo. Cada país age na ordem dos turnos nacionais; os demais acompanham ou respondem a propostas sem gastar sua própria iniciativa.
+- resultado 1–2: perde 2 de Economia;
+- resultado 3–4: perde 1 de Economia;
+- resultado 5–6: sem perda.
 
-A interface informa quem está em foco, quem já concluiu e quem ainda aguarda. Reparar uma relação consome a iniciativa diplomática do país.
+A correção cobre tanto a aceitação do dado inicial quanto a rerrolagem com Vantagem.
 
-### 4. Dossiê sem alvo válido
+### 4. Diagnóstico de respostas rejeitadas
 
-Quando nenhum Dossiê da mão possui alvo válido, o jogador pode substituir um deles: descarta 1, compra 1 e encerra a Ação Principal. A opção só aparece quando realmente não há carta principal utilizável.
-
-O relatório distingue agora:
-
-- turnos iniciados sem Dossiê utilizável;
-- substituições realizadas;
-- passes voluntários e passes por falta de opção.
-
-### 5. Telas baixas e Modo Projetor
-
-As áreas de descarte e de Desafio ganharam rolagem interna para que os botões permaneçam acessíveis. O painel público foi reorganizado para caber na altura disponível e manter Relações Internacionais e Últimos Boletins visíveis em áreas roláveis.
+Quando uma resposta a uma decisão pendente falhar, a telemetria registra `PENDING_RESPONSE_REJECTED`, incluindo o tipo da decisão e a mensagem técnica. Isso permitirá investigar uma nova ocorrência como a primeira tentativa da Cláusula de Salvaguarda na GEO-SWNS.
 
 ## O que foi preservado
 
+- regras 0.7-DN e balanceamento da Alpha 3.0b;
+- relações persistentes, reparo e dissolução após segundo abalo;
+- Cúpula sequencial na ordem dos turnos;
+- substituição de Dossiê quando a mão não possui ação utilizável;
 - modos Completa (8 rodadas) e Sala de aula (6 rodadas);
 - modelos Digital 0.6 e Comparação 0.4-C;
-- 12 Desafios Geográficos e seus gabaritos;
-- cartas, Eventos, países e cinco artes piloto;
+- cartas, Eventos, Desafios e cinco artes piloto;
 - Modo Projetor e exportação Markdown, CSV e JSON;
 - banco de dados atual, sem nova migration SQL.
 
@@ -57,7 +52,7 @@ As áreas de descarte e de Desafio ganharam rolagem interna para que os botões 
 
 Substitua a Edge Function atual por `game-api.ts` e faça o deploy primeiro.
 
-### 2. GitHub Pages
+### 2. Site
 
 Depois substitua:
 
@@ -68,28 +63,24 @@ Depois substitua:
 
 Preserve seu `config.js`; ele não está incluído no pacote.
 
-Não há migration SQL. Inicie uma sala nova para testar a 3.0b; partidas antigas preservam o estado e a versão em que foram criadas.
+Não há migration SQL. Crie uma sala nova depois da publicação. Ao abrir a nova versão em cada aparelho, faça uma atualização forçada da página antes de entrar na sala.
 
 ## Teste dirigido recomendado
 
-1. Iniciar uma partida curta com três países e confirmar o Evento da rodada 1.
-2. Em um Evento com escolha de perda, escolher a perda e conferir atributo, boletim e telemetria.
-3. Criar um Acordo, aplicar Tensão ou Suspensão e avançar a rodada: o estado deve permanecer.
-4. Reparar a relação na Cúpula e confirmar que a iniciativa foi consumida.
-5. Aplicar dois abalos antes do reparo e confirmar a dissolução da relação.
-6. Na Cúpula, confirmar que somente o país em foco consegue iniciar uma ação.
-7. Dar a um país apenas Dossiês sem alvo e confirmar a opção de substituição.
-8. Testar descarte e Desafio em tela de notebook baixa.
-9. Abrir o Modo Projetor e verificar Relações e Boletins sem sair da tela.
-10. Exportar o relatório e conferir os novos indicadores e eventos de reparo.
+1. Tentar uma ação com uma aba 3.0b e confirmar que o servidor a recusa sem alterar a partida.
+2. Atualizar a aba, entrar novamente e confirmar a identificação 3.0c no relatório.
+3. Forçar a Grande Crise Financeira Global e validar as três faixas do dado.
+4. Repetir a resolução usando Vantagem para rerrolar.
+5. Usar a Cláusula de Salvaguarda contra Tensão, Suspensão ou Crise.
+6. Exportar o relatório e conferir a seção “Integridade de versão”.
 
 ## Arquivos
 
-- `index.html` — entrada e cache-bust `30b`;
-- `app.js` — interface, relatório e fluxo sequencial da Cúpula;
-- `styles.css` — correções para telas baixas e projeção;
-- `game-api.ts` — motor autoritativo e telemetria;
-- `ANALISE_DOS_TESTES.md` — comparação das duas partidas que orientaram a versão;
+- `index.html` — entrada e cache-bust `30c`;
+- `app.js` — interface, bloqueio visual e relatório de integridade;
+- `styles.css` — interface e enquadramento responsivo preservados;
+- `game-api.ts` — motor autoritativo, bloqueio de versão e telemetria;
+- `ANALISE_DOS_TESTES.md` — comparação GEO-FN3V × GEO-SWNS;
 - `assets/cards/` — cinco artes piloto preservadas;
 - `tests/static-regression.mjs` — verificações estruturais do pacote;
 - `tests/ui-smoke.mjs` — verificação visual automatizada quando o navegador está disponível.

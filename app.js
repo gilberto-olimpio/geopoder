@@ -5,7 +5,7 @@
   const screen = document.getElementById('screen');
   const connection = document.getElementById('connection');
   const COUNTRIES = ['Aurora','Montária','Pacífica','Solária'];
-  const GAME_VERSION = 'Alpha 3.0b';
+  const GAME_VERSION = 'Alpha 3.0c';
   const RULES_VERSION = '0.7-DN';
   const ATTRS = {eco:'💰 Economia',net:'🌐 Redes',dip:'🤝 Diplomacia',cult:'🎭 Cultura'};
 
@@ -131,9 +131,16 @@
     document.getElementById('errorHome')?.addEventListener('click',renderHome);
   }
 
+  function showVersionMismatch(requiredVersion=GAME_VERSION){
+    stopRoomWatch();
+    screen.innerHTML=`<div class="card hero"><div class="eyebrow">Atualização obrigatória</div><h2>Esta tela está desatualizada</h2><p>O servidor exige <b>${esc(requiredVersion)}</b>, mas este aparelho está usando <b>${esc(GAME_VERSION)}</b>.</p><p class="muted">Atualize a página antes de continuar. Nenhuma ação desta versão antiga será aplicada à partida.</p><div class="actions"><button class="btn primary" id="reloadVersion">Atualizar agora</button></div></div>`;
+    document.getElementById('reloadVersion')?.addEventListener('click',()=>window.location.reload());
+  }
+
   async function api(action,payload={}){
     const {data,error}=await sb.functions.invoke('game-api',{body:{action,clientVersion:GAME_VERSION,...payload}});
     if(error){let message=error.message||'Falha ao chamar game-api.';try{const ctx=error.context;if(ctx&&typeof ctx.json==='function'){const b=await ctx.json();message=b?.detail||b?.error||message}}catch{}throw new Error(message)}
+    if(data?.error==='client_version_mismatch'){showVersionMismatch(data.required_version||GAME_VERSION);throw new Error(data.detail||'Atualize a página para continuar.');}
     if(!data?.ok)throw new Error(data?.detail||data?.error||'Resposta inválida do servidor.');return data;
   }
   async function withBusy(fn,{alertOnError=true}={}){if(state.busy)return;state.busy=true;try{return await fn()}catch(e){console.error(e);if(alertOnError)alert(e?.message||String(e));else throw e}finally{state.busy=false}}
@@ -249,16 +256,30 @@
     for(const round of summitRounds){const roundActions=initiatives.filter(e=>Number(e.round)===round);if(!roundActions.some(e=>e.payload?.kind!=='pass'))summitsNoProposal++;}
     const answers=events.filter(e=>e.event_type==='QUESTION_ANSWERED').map(e=>Number(e.payload?.response_time_ms)).filter(Number.isFinite).sort((a,b)=>a-b);
     const medianAnswer=answers.length?Math.round(answers.length%2?answers[Math.floor(answers.length/2)]:(answers[answers.length/2-1]+answers[answers.length/2])/2):null;
-    return{started,recoveries,turnPasses,voluntaryPasses,noOptionPasses,noPlayableTurns,replacements,turns:turns.length,summits:summitRounds.size,summitsNoProposal,medianAnswer};
+    const expectedVersion=String(started.game_version||'—');
+    const directTypes=new Set(['PLAYER_JOINED','ACTION_COMMITTED','QUESTION_ANSWERED','DIPLOMACY_INITIATIVE','EVENT_CHOICE','REACTION_USED']);
+    const versionMap={};
+    for(const e of events){
+      if(!directTypes.has(e.event_type)||!e.actor_country)continue;
+      const version=String(e.payload?.client_version||'unknown');
+      versionMap[e.actor_country]=versionMap[e.actor_country]||new Set();
+      versionMap[e.actor_country].add(version);
+    }
+    const clientVersions=Object.fromEntries(Object.entries(versionMap).map(([country,versions])=>[country,[...versions].sort()]));
+    const versionMismatches=Object.entries(clientVersions).filter(([,versions])=>versions.some(v=>v!==expectedVersion));
+    return{started,recoveries,turnPasses,voluntaryPasses,noOptionPasses,noPlayableTurns,replacements,turns:turns.length,summits:summitRounds.size,summitsNoProposal,medianAnswer,expectedVersion,clientVersions,versionMismatches};
   }
   const topEntry=o=>Object.entries(o||{}).sort((a,b)=>b[1]-a[1])[0]||null;
   function renderHistoryDetail(){
     const d=state.historyDetail;if(!d)return loadTeacherDashboard();
     const teams=(d.players||[]).filter(p=>p.role==='player'),events=d.events||[],counts=countEvents(events),q=questionStats(events),c=cardStats(events),timing=turnTimingStats(events),dip=diplomacyStats(events),lab=labStats(events),notes=events.filter(e=>e.event_type==='TEACHER_NOTE'),start=d.match?.started_at||d.room.started_at,end=d.match?.ended_at||d.room.ended_at,dur=d.match?.duration_seconds??(start&&end?Math.round((new Date(end)-new Date(start))/1000):null);
     const most=topEntry(c.played),discard=topEntry(c.discarded),noTarget=topEntry(c.noTarget);const cardLabel=x=>x?`${CARD[x[0]]?.name||'Carta '+x[0]} (${x[1]})`:'—';
+    const versionRows=teams.map(p=>{const versions=lab.clientVersions[p.country]||['sem ação registrada'];const mismatch=versions.some(v=>v!==lab.expectedVersion&&v!=='sem ação registrada');return `<tr><td>${esc(p.country)}</td><td>${esc(versions.join(', '))}</td><td>${mismatch?'<span class="badge bad">divergente</span>':'<span class="badge good">ok</span>'}</td></tr>`}).join('');
+    const versionAlert=lab.versionMismatches.length?`<div class="banner bad"><b>Versões divergentes detectadas.</b> A sessão recebeu ações de cliente diferente de ${esc(lab.expectedVersion)}. Esses aparelhos precisam atualizar a página.</div>`:`<div class="banner good"><b>Versões consistentes.</b> As ações registradas usam ${esc(lab.expectedVersion)}.</div>`;
     screen.innerHTML=`<section class="card"><div class="dashboard-head"><div><div class="eyebrow">Relatório de partida</div><h2>${esc(d.room.class_name||d.room.code)}</h2><div class="statusline">${statusBadge(d.room.status)}<span class="badge">${esc(d.room.code)}</span><span class="badge">${esc(d.match?.game_version||'—')}</span></div></div><div class="actions"><button class="btn ghost" id="historyBack">Voltar</button><button class="btn ghost" id="historyMd">Relatório (.md)</button><button class="btn ghost" id="historyCsv">Planilha (.csv)</button><button class="btn ghost" id="historyJson">Dados completos (.json)</button></div></div></section>
       <section class="grid four" style="margin-top:16px"><div class="metric"><div class="value">${teams.length}</div><div class="label">equipes</div></div><div class="metric"><div class="value">${d.match?.round??'—'}</div><div class="label">última rodada</div></div><div class="metric"><div class="value">${fmtDuration(dur)}</div><div class="label">duração</div></div><div class="metric"><div class="value">${events.length}</div><div class="label">eventos</div></div></section>
       <section class="card" style="margin-top:16px"><div class="eyebrow">Configuração do experimento</div><h3>${esc(lab.started.match_mode_label||'Configuração não registrada')}</h3><p><b>Rodadas:</b> ${lab.started.max_rounds??'—'} · <b>Modelo inicial:</b> ${esc(lab.started.initial_model_label||'—')} · <b>Regras:</b> ${esc(d.match?.rules_version||'—')}</p><div class="grid four"><div class="metric"><div class="value">${lab.recoveries}</div><div class="label">Recuperações</div></div><div class="metric"><div class="value">${lab.turnPasses}</div><div class="label">turnos passados</div></div><div class="metric"><div class="value">${lab.summitsNoProposal}/${lab.summits}</div><div class="label">Cúpulas sem proposta</div></div><div class="metric"><div class="value">${lab.medianAnswer==null?'—':fmtDuration(lab.medianAnswer/1000)}</div><div class="label">mediana de resposta</div></div></div><p class="muted tiny">Passes voluntários: ${lab.voluntaryPasses}; por falta de Dossiê utilizável: ${lab.noOptionPasses}. Turnos iniciados sem Dossiê utilizável: ${lab.noPlayableTurns}. Substituições usadas: ${lab.replacements}.</p></section>
+      <section class="card" style="margin-top:16px"><div class="eyebrow">Integridade da sessão</div><h3>Versões dos clientes</h3>${versionAlert}<div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>País</th><th>Versão observada</th><th>Status</th></tr></thead><tbody>${versionRows}</tbody></table></div></section>
       <section class="grid two" style="margin-top:16px"><div class="card"><div class="eyebrow">Aprendizagem</div><h3>Desafios</h3>${q.total?`<div class="metric"><div class="value">${q.correct}/${q.total}</div><div class="label">acertos (${Math.round(q.correct/q.total*100)}%)</div></div>`:'<p class="muted">Sem respostas registradas.</p>'}</div><div class="card"><div class="eyebrow">Playtest</div><h3>Cartas</h3><p><b>Mais jogada:</b> ${esc(cardLabel(most))}</p><p><b>Mais descartada:</b> ${esc(cardLabel(discard))}</p><p><b>Mais vezes sem alvo:</b> ${esc(cardLabel(noTarget))}</p></div></section>
       <section class="card" style="margin-top:16px"><div class="eyebrow">Ritmo da partida</div><h3>Tempo de decisão e resolução</h3><div class="grid four"><div class="metric"><div class="value">${timing.medianChoice==null?'—':fmtDuration(timing.medianChoice/1000)}</div><div class="label">mediana para escolher</div></div><div class="metric"><div class="value">${timing.medianResolution==null?'—':fmtDuration(timing.medianResolution/1000)}</div><div class="label">mediana para resolver</div></div><div class="metric"><div class="value">${timing.medianTotal==null?'—':fmtDuration(timing.medianTotal/1000)}</div><div class="label">mediana total do turno</div></div><div class="metric"><div class="value">${timing.timeouts}</div><div class="label">turnos por timeout</div></div></div><p class="muted tiny">A mediana reduz a distorção causada por pausas longas, troca de aparelhos e intervenções do professor. Médias: escolha ${timing.avgChoice==null?'—':fmtDuration(timing.avgChoice/1000)}, resolução ${timing.avgResolution==null?'—':fmtDuration(timing.avgResolution/1000)}, total ${timing.avgTotal==null?'—':fmtDuration(timing.avgTotal/1000)}.</p></section>
       <section class="card" style="margin-top:16px"><div class="eyebrow">Diplomacia</div><h3>Cúpula e relações</h3><div class="grid four"><div class="metric"><div class="value">${dip.initiatives}</div><div class="label">iniciativas</div></div><div class="metric"><div class="value">${dip.agreements}</div><div class="label">Acordos formados</div></div><div class="metric"><div class="value">${dip.blocks}</div><div class="label">Blocos formados</div></div><div class="metric"><div class="value">${dip.trades}</div><div class="label">trocas concluídas</div></div></div><p class="muted tiny">Relações reparadas: ${dip.repairs}. Recusas: ${dip.agreementRefused} Acordo(s), ${dip.blockRefused} Bloco(s). Relações encerradas: ${dip.relationsEnded}. Países que passaram a iniciativa: ${dip.passes}.</p></section>
@@ -776,10 +797,13 @@
     const initialVersion=d.match?.game_version||'—',finalVersion=d.match?.public_state?.game_version||initialVersion;
     let md=`# GeoPoder — Relatório de Playtest\n\n- **Sala:** ${d.room.code}\n- **Turma:** ${d.room.class_name||'—'}\n- **Status:** ${statusLabel(d.room.status)}\n- **Versão inicial:** ${initialVersion}\n- **Versão final observada:** ${finalVersion}\n- **Regras:** ${d.match?.rules_version||'—'}\n- **Modo:** ${lab.started.match_mode_label||'—'} (${lab.started.max_rounds||'—'} rodadas)\n- **Modelo inicial:** ${lab.started.initial_model_label||'—'}\n\n## Equipes\n`;
     for(const p of teams)md+=`- **${p.country}:** ${p.team_name||'—'}\n`;
+    md+=`\n## Integridade de versão\n- Versão esperada: ${lab.expectedVersion}\n`;
+    for(const p of teams){const versions=lab.clientVersions[p.country]||['sem ação registrada'];const mismatch=versions.some(v=>v!==lab.expectedVersion&&v!=='sem ação registrada');md+=`- ${p.country}: ${versions.join(', ')}${mismatch?' — **DIVERGENTE**':''}\n`;}
+    md+=lab.versionMismatches.length?'\n> Alerta: a sessão recebeu ações de pelo menos um cliente desatualizado.\n':'\n- Resultado: versões consistentes nas ações registradas.\n';
     md+=`\n## Aprendizagem\n- Respostas: ${q.total}\n- Acertos: ${q.correct}\n- Erros: ${q.wrong}\n${q.total?`- Percentual: ${Math.round(q.correct/q.total*100)}%\n`:''}`;
     if(Object.keys(q.byQuestion).length){md+='\n### Por questão\n';for(const [id,x] of Object.entries(q.byQuestion))md+=`- Q${id}: ${x.correct}/${x.total} acertos\n`;}
     const entries=o=>Object.entries(o||{}).sort((a,b)=>b[1]-a[1]).map(([id,n])=>`${CARD[id]?.name||'Carta '+id} (${n})`).join('; ')||'nenhum dado';
-    md+=`\n## Cartas\n- Jogadas: ${entries(c.played)}\n- Descartadas: ${entries(c.discarded)}\n- Sem alvo válido: ${entries(c.noTarget)}\n`;
+    md+=`\n## Cartas\n- Jogadas: ${entries(c.played)}\n- Descartadas: ${entries(c.discarded)}\n- Tentativas de jogar carta sem alvo válido: ${entries(c.noTarget)}\n`;
     md+=`\n## Ritmo da partida\n- Turnos registrados: ${timing.turns}\n- Média para escolher a Ação Principal: ${timing.avgChoice==null?'—':(timing.avgChoice/1000).toFixed(1)+' s'}\n- Média de resolução após a escolha: ${timing.avgResolution==null?'—':(timing.avgResolution/1000).toFixed(1)+' s'}\n- Média total do turno: ${timing.avgTotal==null?'—':(timing.avgTotal/1000).toFixed(1)+' s'}\n- Turnos encerrados por timeout: ${timing.timeouts}\n`;
     md+=`- Mediana para escolher a Ação Principal: ${timing.medianChoice==null?'—':(timing.medianChoice/1000).toFixed(1)+' s'}\n- Mediana de resolução após a escolha: ${timing.medianResolution==null?'—':(timing.medianResolution/1000).toFixed(1)+' s'}\n- Mediana total do turno: ${timing.medianTotal==null?'—':(timing.medianTotal/1000).toFixed(1)+' s'}\n`;
     md+=`\n## Indicadores do experimento\n- Recuperações Nacionais: ${lab.recoveries}\n- Turnos passados sem Dossiê: ${lab.turnPasses}/${lab.turns}\n- Passes voluntários: ${lab.voluntaryPasses}\n- Passes por falta de Dossiê utilizável: ${lab.noOptionPasses}\n- Turnos iniciados sem Dossiê utilizável: ${lab.noPlayableTurns}\n- Substituições de Dossiê sem alvo: ${lab.replacements}\n- Cúpulas sem proposta: ${lab.summitsNoProposal}/${lab.summits}\n- Mediana de resposta aos Desafios: ${lab.medianAnswer==null?'—':(lab.medianAnswer/1000).toFixed(1)+' s'}\n`;
